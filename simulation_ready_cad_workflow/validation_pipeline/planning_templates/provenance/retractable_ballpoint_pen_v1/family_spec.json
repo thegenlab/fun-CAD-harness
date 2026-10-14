@@ -1,0 +1,217 @@
+{
+  "mechanism_kind": "click_pen_cam_latch",
+  "mechanism_id": "retractable_ballpoint_pen_click_cycle",
+  "bodies": [
+    {
+      "body_id": "barrel",
+      "group_ids": [
+        "group_pen_barrel"
+      ],
+      "fixed": true,
+      "mass_kg": 0.018,
+      "center_abs_m": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "size_m": [
+        0.036,
+        0.024,
+        0.19
+      ]
+    },
+    {
+      "body_id": "refill",
+      "group_ids": [
+        "group_pen_refill"
+      ],
+      "fixed": false,
+      "mass_kg": 0.006,
+      "center_abs_m": [
+        0.0,
+        0.0,
+        -0.01
+      ],
+      "size_m": [
+        0.012,
+        0.012,
+        0.17
+      ]
+    },
+    {
+      "body_id": "button",
+      "group_ids": [
+        "group_pen_button"
+      ],
+      "fixed": false,
+      "mass_kg": 0.003,
+      "center_abs_m": [
+        0.0,
+        0.0,
+        0.078
+      ],
+      "size_m": [
+        0.015,
+        0.015,
+        0.035
+      ]
+    },
+    {
+      "body_id": "click_cam",
+      "group_ids": [
+        "group_pen_click_cam"
+      ],
+      "fixed": false,
+      "mass_kg": 0.003,
+      "center_abs_m": [
+        0.0,
+        0.0,
+        0.053
+      ],
+      "size_m": [
+        0.018,
+        0.018,
+        0.026
+      ]
+    }
+  ],
+  "button_prismatic_joint": {
+    "joint_id": "button_press",
+    "parent_body_id": "barrel",
+    "child_body_id": "button",
+    "origin_abs_m": [
+      0.0,
+      0.0,
+      0.068
+    ],
+    "axis_abs": [
+      0.0,
+      0.0,
+      -1.0
+    ],
+    "travel_m": 0.012,
+    "spring_stiffness_n_m": 80.0,
+    "damping_n_s_m": 1.0,
+    "spring_preload_n": 0.05
+  },
+  "refill_prismatic_joint": {
+    "joint_id": "refill_slide",
+    "parent_body_id": "barrel",
+    "child_body_id": "refill",
+    "origin_abs_m": [
+      0.0,
+      0.0,
+      -0.01
+    ],
+    "axis_abs": [
+      0.0,
+      0.0,
+      -1.0
+    ],
+    "retracted_position_m": 0.0,
+    "extended_position_m": 0.01,
+    "spring_stiffness_n_m": 160.0,
+    "damping_n_s_m": 0.8,
+    "spring_preload_n": 0.6
+  },
+  "cam_cylindrical_joint": {
+    "joint_id": "click_cam_index",
+    "parent_body_id": "barrel",
+    "child_body_id": "click_cam",
+    "origin_abs_m": [
+      0.0,
+      0.0,
+      0.055
+    ],
+    "axis_abs": [
+      0.0,
+      0.0,
+      1.0
+    ],
+    "axial_travel_m": 0.01,
+    "index_angle_rad": 1.0471975511965976
+  },
+  "compression_spring": {
+    "parent_body_id": "barrel",
+    "child_body_id": "refill",
+    "rest_position_m": 0.0,
+    "stiffness_n_m": 160.0,
+    "damping_n_s_m": 0.8,
+    "preload_n": 0.6
+  },
+  "click_state_machine": {
+    "states": [
+      "retracted",
+      "pressing_to_extend",
+      "extended_latched",
+      "pressing_to_retract"
+    ],
+    "initial_state": "retracted",
+    "first_click_target_m": 0.008,
+    "second_click_target_m": 0.0,
+    "latch_contact_tolerance_m": 0.0008,
+    "release_button_return_m": 0.011,
+    "geometry_contract": {
+      "schema_version": "click_pen_contact_geometry_v1",
+      "button_contact_component_refs": [
+        "button/solid_30",
+        "button/solid_32",
+        "button/solid_34"
+      ],
+      "cam_button_face_component_refs": [
+        "click_cam/solid_37",
+        "click_cam/solid_38",
+        "click_cam/solid_39",
+        "click_cam/solid_40",
+        "click_cam/solid_41",
+        "click_cam/solid_42"
+      ],
+      "cam_follower_component_ref": "click_cam/solid_36",
+      "refill_carrier_component_ref": "refill/solid_26",
+      "barrel_guide_component_refs": [
+        "barrel/solid_13",
+        "barrel/solid_14",
+        "barrel/solid_15",
+        "barrel/solid_16",
+        "barrel/solid_17",
+        "barrel/solid_18",
+        "barrel/solid_19",
+        "barrel/solid_20",
+        "barrel/solid_21",
+        "barrel/solid_22",
+        "barrel/solid_23",
+        "barrel/solid_24"
+      ],
+      "cam_lobe_component_refs": [
+        "click_cam/solid_43",
+        "click_cam/solid_44",
+        "click_cam/solid_45",
+        "click_cam/solid_46",
+        "click_cam/solid_47",
+        "click_cam/solid_48"
+      ],
+      "home_contact_tolerance_m": 0.00015,
+      "full_press_offset_abs_m": [
+        0.0,
+        0.0,
+        -0.012
+      ],
+      "extended_latched_cam_offset_abs_m": [
+        0.0,
+        0.0,
+        -0.008
+      ],
+      "extended_latched_refill_offset_abs_m": [
+        0.0,
+        0.0,
+        -0.008
+      ]
+    }
+  },
+  "input_body_id": "button",
+  "output_body_id": "refill",
+  "nominal_press_force_n": 8.0,
+  "max_support_drift_m": 0.0008,
+  "max_off_axis_rotation_rad": 0.04,
+  "friction": 0.12
+}

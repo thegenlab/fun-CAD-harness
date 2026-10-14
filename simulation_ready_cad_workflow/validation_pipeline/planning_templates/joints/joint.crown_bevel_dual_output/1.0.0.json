@@ -1,0 +1,62 @@
+{
+  "schema_version": "simulation_ready_cad_joint_template_v1",
+  "kind": "joint",
+  "template_id": "joint.crown_bevel_dual_output",
+  "version": "1.0.0",
+  "title": "Crown-bevel dual-output compound joint",
+  "category": "compound_joint",
+  "goal": "Split one hand-crank input through finite crown-bevel meshes into two counter-rotating output shafts.",
+  "family": "compound",
+  "capability_variants": [
+    {
+      "variant_id": "gear.crown_bevel_dual_output",
+      "plugin_id": "multi_output_shaft_coupling_v1",
+      "mechanism_kind": "crown_bevel_dual_output",
+      "runtime_status": "ACTIVE"
+    }
+  ],
+  "input_wrench_kinds": [
+    "torque"
+  ],
+  "observable_quantities": [
+    "pose_6d"
+  ],
+  "components": [
+    "input crank shaft",
+    "crown-bevel meshes",
+    "left output shaft",
+    "right output shaft",
+    "finite shaft supports"
+  ],
+  "required_instance_fields": [
+    "fixed_body_id",
+    "input_body_id",
+    "left_output_body_id",
+    "right_output_body_id",
+    "mesh_geometry",
+    "input_output_ratio",
+    "output_pair_ratio"
+  ],
+  "source_bindings": [
+    {
+      "project_id": "hand_crank_egg_beater_v1",
+      "capsule_id": "egg_beater_crown_drive",
+      "source_status": "PROJECT_CERTIFIED",
+      "capsule_path": "simulation_ready_cad_workflow/validation_pipeline/planning_templates/provenance/hand_crank_egg_beater_v1/capsule.json",
+      "capsule_sha256": "d245840f9f60b879089bb1f175827019b3a2d0d8ae9ede92661437285c1437fc",
+      "family_spec_path": "simulation_ready_cad_workflow/validation_pipeline/planning_templates/provenance/hand_crank_egg_beater_v1/family_spec.json",
+      "family_spec_sha256": "48897ae4e35282aefc70bae16805b3e0f67c248339373075a1e190f7871ee123"
+    }
+  ],
+  "constraints": [
+    "Both outputs must be driven indirectly through the authored gear meshes.",
+    "Counter-rotation and speed-up ratios are computed from all shaft traces.",
+    "Mesh error, support drift, and off-axis rotation remain bounded."
+  ],
+  "approval": {
+    "status": "APPROVED",
+    "approved_by": "user",
+    "approved_on": "2026-08-02",
+    "basis": "Imported from the completed hand_crank_egg_beater_v1 project at the user's request."
+  }
+}

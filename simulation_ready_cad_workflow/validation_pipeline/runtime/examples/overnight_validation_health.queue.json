@@ -1,0 +1,123 @@
+{
+  "schema_version": "0.1",
+  "run_name": "overnight-validation-health",
+  "resource_policy": {
+    "preflight_cpu_percent": 80.0,
+    "preflight_memory_percent": 88.0,
+    "min_available_memory_gib": 4.0,
+    "min_free_disk_gib": 10.0,
+    "critical_memory_percent": 93.0,
+    "critical_available_memory_gib": 1.5,
+    "critical_free_disk_gib": 5.0,
+    "preflight_sample_seconds": 1.0,
+    "resource_poll_seconds": 1.0,
+    "max_resource_wait_seconds": 90.0,
+    "critical_pressure_samples": 3,
+    "cooldown_seconds": 5.0,
+    "pychrono_cpu_threads": 2,
+    "generic_cpu_threads": 2,
+    "terminate_grace_seconds": 5.0,
+    "lower_process_priority": true,
+    "max_log_bytes_per_stream": 16777216
+  },
+  "queue_policy": {
+    "max_wall_time_seconds": 960.0,
+    "stop_on_failure": true,
+    "reuse_successful": false
+  },
+  "jobs": [
+    {
+      "job_id": "runtime-unit-tests",
+      "kind": "generic",
+      "command": [
+        "python",
+        "-m",
+        "unittest",
+        "simulation_ready_cad_workflow.validation_pipeline.tests.test_runtime"
+      ],
+      "working_directory": ".",
+      "timeout_seconds": 90.0,
+      "estimated_peak_memory_gib": 0.5,
+      "max_process_tree_memory_gib": 1.0,
+      "estimated_wall_time_seconds": 20.0,
+      "cpu_threads": 2,
+      "expected_outputs": []
+    },
+    {
+      "job_id": "intake-unit-tests",
+      "kind": "generic",
+      "command": [
+        "python",
+        "-m",
+        "unittest",
+        "simulation_ready_cad_workflow.validation_pipeline.tests.test_intake"
+      ],
+      "working_directory": ".",
+      "timeout_seconds": 180.0,
+      "estimated_peak_memory_gib": 1.0,
+      "max_process_tree_memory_gib": 2.0,
+      "estimated_wall_time_seconds": 90.0,
+      "cpu_threads": 2,
+      "expected_outputs": []
+    },
+    {
+      "job_id": "bullet-contact-runtime",
+      "kind": "pychrono",
+      "command": [
+        "conda.exe",
+        "run",
+        "-n",
+        "chrono_py312_projectchrono",
+        "python",
+        "-m",
+        "simulation_ready_cad_workflow.validation_pipeline.runtime.examples.probe_pychrono_contact_runtime"
+      ],
+      "working_directory": ".",
+      "timeout_seconds": 90.0,
+      "estimated_peak_memory_gib": 0.5,
+      "max_process_tree_memory_gib": 1.0,
+      "estimated_wall_time_seconds": 10.0,
+      "estimated_simulation_steps": 1,
+      "cpu_threads": 2,
+      "expected_outputs": []
+    },
+    {
+      "job_id": "hinge-nonconvex-smoke",
+      "kind": "pychrono",
+      "command": [
+        "conda.exe",
+        "run",
+        "-n",
+        "chrono_py312_projectchrono",
+        "python",
+        "simulation_ready_cad_workflow/joint_template_catalog/unit_tests/continuous_revolute/run_5093A55_nonconvex_force_test.py",
+        "--output-name",
+        "../../../../../.runtime_runs/overnight-validation-health/hinge_physics_result.json",
+        "--duration-s",
+        "0.005",
+        "--step-s",
+        "0.001",
+        "--sample-hz",
+        "200",
+        "--precondition-duration-s",
+        "0",
+        "--lift-duration-s",
+        "0.004",
+        "--reverse-duration-s",
+        "0.001",
+        "--force-magnitude-n",
+        "0.1"
+      ],
+      "working_directory": ".",
+      "timeout_seconds": 120.0,
+      "estimated_peak_memory_gib": 0.8,
+      "max_process_tree_memory_gib": 1.5,
+      "estimated_wall_time_seconds": 15.0,
+      "estimated_simulation_steps": 5,
+      "cpu_threads": 2,
+      "expected_outputs": [
+        ".runtime_runs/overnight-validation-health/hinge_physics_result.json"
+      ]
+    }
+  ]
+}

@@ -1,0 +1,268 @@
+{
+  "schema_version": "simulation_ready_cad_machine_task_suite_v1",
+  "kind": "task_suite",
+  "template_id": "task_suite.hand_crank_egg_beater",
+  "version": "1.0.0",
+  "title": "Hand-crank egg-beater task suite",
+  "machine_family": "hand_crank_egg_beater",
+  "goal": "Verify both beater outputs, their opposed motion, and the approved crank-to-beater speed increase from one shared crank cycle.",
+  "joint_template_refs": [
+    {
+      "template_id": "joint.crown_bevel_dual_output",
+      "version": "1.0.0",
+      "variant_id": "gear.crown_bevel_dual_output",
+      "sha256": "30a12fc9691a326ff6ac30faa758daed48b0a2ca14c97bee157736afea969767"
+    }
+  ],
+  "profiles": [
+    {
+      "profile_id": "profile.hand_crank_egg_beater_v1",
+      "title": "Three-to-one dual-output egg beater",
+      "description": "The approved two-beater profile derived from hand_crank_egg_beater_v1."
+    }
+  ],
+  "scenarios": [
+    {
+      "scenario_id": "scenario.egg_beater_cycle",
+      "title": "Shared hand-crank cycle",
+      "test_program": "task_egg_beater_cycle",
+      "test_load_case_id": "task_egg_beater_cycle",
+      "profile_ids": [
+        "profile.hand_crank_egg_beater_v1"
+      ],
+      "required_branches": [
+        "physical",
+        "ideal_reference"
+      ],
+      "runtime_status": "ACTIVE",
+      "task_ids": [
+        "task.rotate_left_beater",
+        "task.rotate_right_beater",
+        "task.counter_rotate_beaters",
+        "task.speed_up_from_crank"
+      ],
+      "execution_requirements": [
+        "Execute one crank cycle and derive all four task results from the same input and output traces.",
+        "Apply torque only to the authored crank input; neither beater output may be directly actuated.",
+        "Use continuous unwrapped shaft angles for rotation and ratio evaluation.",
+        "Derive expected direction signs from the frozen axis bindings rather than treating a global negative sign as a family-wide constant."
+      ]
+    }
+  ],
+  "fixtures": [],
+  "tasks": [
+    {
+      "task_id": "task.rotate_left_beater",
+      "title": "Rotate the left beater through one revolution",
+      "goal": "Drive the left beater through at least one complete continuous revolution.",
+      "scenario_id": "scenario.egg_beater_cycle",
+      "profile_ids": [
+        "profile.hand_crank_egg_beater_v1"
+      ],
+      "runtime_status": "ACTIVE",
+      "criteria": [
+        {
+          "criterion_id": "criterion.left_continuous_rotation",
+          "description": "The left beater accumulates one full revolution, allowing 0.1 rad numerical shortfall.",
+          "disposition": "PASS",
+          "evaluator_kind": "registered_metric",
+          "evaluator_id": "continuous_rotation_rad",
+          "observable_quantity": "pose_6d",
+          "comparator": "at_least",
+          "expected": 6.283185307179586,
+          "unit": "rad",
+          "tolerance": {
+            "mode": "shortfall",
+            "value": 0.1,
+            "unit": "rad"
+          }
+        }
+      ],
+      "failure_diagnostics": [
+        {
+          "code": "LEFT_BEATER_ROTATION_SHORTFALL",
+          "description": "The left output did not complete the accepted continuous rotation."
+        },
+        {
+          "code": "LEFT_BEATER_ANGLE_WRAP_LOST",
+          "description": "The left output trace was wrapped or otherwise insufficient for continuous-angle evaluation."
+        }
+      ],
+      "evidence_obligations": [
+        "Report the left output's continuous accumulated angle from the shared cycle.",
+        "Preserve physical and ideal-reference left-shaft traces."
+      ]
+    },
+    {
+      "task_id": "task.rotate_right_beater",
+      "title": "Rotate the right beater through one revolution",
+      "goal": "Drive the right beater through at least one complete continuous revolution.",
+      "scenario_id": "scenario.egg_beater_cycle",
+      "profile_ids": [
+        "profile.hand_crank_egg_beater_v1"
+      ],
+      "runtime_status": "ACTIVE",
+      "criteria": [
+        {
+          "criterion_id": "criterion.right_continuous_rotation",
+          "description": "The right beater accumulates one full revolution, allowing 0.1 rad numerical shortfall.",
+          "disposition": "PASS",
+          "evaluator_kind": "registered_metric",
+          "evaluator_id": "continuous_rotation_rad",
+          "observable_quantity": "pose_6d",
+          "comparator": "at_least",
+          "expected": 6.283185307179586,
+          "unit": "rad",
+          "tolerance": {
+            "mode": "shortfall",
+            "value": 0.1,
+            "unit": "rad"
+          }
+        }
+      ],
+      "failure_diagnostics": [
+        {
+          "code": "RIGHT_BEATER_ROTATION_SHORTFALL",
+          "description": "The right output did not complete the accepted continuous rotation."
+        },
+        {
+          "code": "RIGHT_BEATER_ANGLE_WRAP_LOST",
+          "description": "The right output trace was wrapped or otherwise insufficient for continuous-angle evaluation."
+        }
+      ],
+      "evidence_obligations": [
+        "Report the right output's continuous accumulated angle from the shared cycle.",
+        "Preserve physical and ideal-reference right-shaft traces."
+      ]
+    },
+    {
+      "task_id": "task.counter_rotate_beaters",
+      "title": "Counter-rotate the two beaters",
+      "goal": "Verify that the two output beaters rotate in opposite directions at equal speed magnitude.",
+      "scenario_id": "scenario.egg_beater_cycle",
+      "profile_ids": [
+        "profile.hand_crank_egg_beater_v1"
+      ],
+      "runtime_status": "ACTIVE",
+      "criteria": [
+        {
+          "criterion_id": "criterion.opposite_directions",
+          "description": "The frozen-axis output traces have opposite physical rotation directions.",
+          "disposition": "PASS",
+          "evaluator_kind": "suite_predicate",
+          "evaluator_id": "egg_beater_outputs_opposite_directions",
+          "observable_quantity": "pose_6d",
+          "comparator": "equals",
+          "expected": true,
+          "unit": "bool",
+          "tolerance": {
+            "mode": "none",
+            "value": null,
+            "unit": null
+          }
+        },
+        {
+          "criterion_id": "criterion.output_speed_magnitude_ratio",
+          "description": "The two output angular-speed magnitudes have a 1:1 ratio within five percent.",
+          "disposition": "PASS",
+          "evaluator_kind": "suite_predicate",
+          "evaluator_id": "egg_beater_output_speed_magnitude_ratio",
+          "observable_quantity": "pose_6d",
+          "comparator": "within",
+          "expected": 1.0,
+          "unit": "ratio",
+          "tolerance": {
+            "mode": "relative_percent",
+            "value": 5.0,
+            "unit": "percent"
+          }
+        }
+      ],
+      "failure_diagnostics": [
+        {
+          "code": "OUTPUTS_NOT_COUNTER_ROTATING",
+          "description": "The two beater outputs did not rotate in opposite frozen-axis directions."
+        },
+        {
+          "code": "OUTPUT_SPEEDS_MISMATCHED",
+          "description": "The output speed magnitudes differed by more than the approved tolerance."
+        }
+      ],
+      "evidence_obligations": [
+        "Show both signed output traces and the frozen axis-direction bindings.",
+        "Compute the magnitude ratio over the driven interval rather than from a single endpoint."
+      ]
+    },
+    {
+      "task_id": "task.speed_up_from_crank",
+      "title": "Increase beater speed from the crank",
+      "goal": "Verify a three-to-one beater-to-crank angular-speed magnitude ratio with direction interpreted from the frozen axes.",
+      "scenario_id": "scenario.egg_beater_cycle",
+      "profile_ids": [
+        "profile.hand_crank_egg_beater_v1"
+      ],
+      "runtime_status": "ACTIVE",
+      "criteria": [
+        {
+          "criterion_id": "criterion.beater_crank_speed_magnitude_ratio",
+          "description": "The beater-to-crank angular-speed magnitude ratio is 3:1 within five percent.",
+          "disposition": "PASS",
+          "evaluator_kind": "suite_predicate",
+          "evaluator_id": "egg_beater_crank_speed_magnitude_ratio",
+          "observable_quantity": "pose_6d",
+          "comparator": "within",
+          "expected": 3.0,
+          "unit": "ratio",
+          "tolerance": {
+            "mode": "relative_percent",
+            "value": 5.0,
+            "unit": "percent"
+          }
+        },
+        {
+          "criterion_id": "criterion.axis_bound_direction_consistency",
+          "description": "The measured crank-to-beater direction agrees with the sign derived from the frozen axis bindings.",
+          "disposition": "PASS",
+          "evaluator_kind": "suite_predicate",
+          "evaluator_id": "egg_beater_axis_bound_direction_consistency",
+          "observable_quantity": "pose_6d",
+          "comparator": "equals",
+          "expected": true,
+          "unit": "bool",
+          "tolerance": {
+            "mode": "none",
+            "value": null,
+            "unit": null
+          }
+        }
+      ],
+      "failure_diagnostics": [
+        {
+          "code": "CRANK_SPEEDUP_RATIO_MISSED",
+          "description": "The beater-to-crank speed magnitude ratio was outside the approved range."
+        },
+        {
+          "code": "AXIS_BOUND_DIRECTION_MISMATCH",
+          "description": "The measured direction was inconsistent with the frozen input and output axis definitions."
+        }
+      ],
+      "evidence_obligations": [
+        "Report crank and beater signed traces together with their axis bindings.",
+        "Evaluate the speed ratio over the driven interval and preserve both physical and ideal-reference results."
+      ]
+    }
+  ],
+  "source_projects": [
+    {
+      "project_id": "hand_crank_egg_beater_v1",
+      "evidence_status": "TASK_CERTIFIED",
+      "note": "The source project supplied certified dual-output and ratio evidence; the user approved a one-revolution minimum with 0.1 rad shortfall and five-percent ratio tolerances for this task suite."
+    }
+  ],
+  "approval": {
+    "status": "APPROVED",
+    "approved_by": "user",
+    "approved_on": "2026-08-02",
+    "basis": "The user approved grouping all four egg-beater checks into one crank-cycle suite and explicitly requested approximately one full revolution from both beaters."
+  }
+}

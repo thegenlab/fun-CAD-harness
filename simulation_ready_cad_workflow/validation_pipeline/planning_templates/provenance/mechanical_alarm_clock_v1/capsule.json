@@ -1,0 +1,199 @@
+{
+  "schema_version": "0.1",
+  "capsule_id": "clock_gear_train",
+  "name": "Engineering twin-bell mechanical alarm clock train",
+  "member_rigid_group_ids": [
+    "group_barrel",
+    "group_center",
+    "group_third",
+    "group_fourth",
+    "group_second",
+    "group_escape",
+    "group_balance",
+    "group_minute",
+    "group_hour_idler",
+    "group_hour",
+    "group_alarm_barrel",
+    "group_alarm_cam",
+    "group_alarm_target",
+    "group_hammer",
+    "group_setting"
+  ],
+  "boundary_rigid_group_ids": [
+    "group_clock_case"
+  ],
+  "input_ports": [
+    {
+      "port_id": "winding_key_torque",
+      "rigid_group_id": "group_barrel",
+      "frame_id": "frame_barrel_shaft",
+      "wrench_type": "torque",
+      "direction_abs": [
+        0.0,
+        1.0,
+        0.0
+      ],
+      "declared_range": {
+        "min": -0.3,
+        "max": 0.3,
+        "unit": "N*m"
+      }
+    },
+    {
+      "port_id": "manual_setting_torque",
+      "rigid_group_id": "group_setting",
+      "frame_id": "frame_setting_shaft",
+      "wrench_type": "torque",
+      "direction_abs": [
+        0.0,
+        1.0,
+        0.0
+      ],
+      "declared_range": {
+        "min": -0.25,
+        "max": 0.25,
+        "unit": "N*m"
+      }
+    },
+    {
+      "port_id": "alarm_winding_key_torque",
+      "rigid_group_id": "group_alarm_barrel",
+      "frame_id": "frame_alarm_barrel_shaft",
+      "wrench_type": "torque",
+      "direction_abs": [
+        0.0,
+        1.0,
+        0.0
+      ],
+      "declared_range": {
+        "min": -0.3,
+        "max": 0.3,
+        "unit": "N*m"
+      }
+    },
+    {
+      "port_id": "alarm_time_by_hour_hand_torque",
+      "rigid_group_id": "group_hour",
+      "frame_id": "frame_hour_shaft",
+      "wrench_type": "torque",
+      "direction_abs": [
+        0.0,
+        1.0,
+        0.0
+      ],
+      "declared_range": {
+        "min": -0.25,
+        "max": 0.25,
+        "unit": "N*m"
+      }
+    }
+  ],
+  "observables": [
+    {
+      "observable_id": "minute_hand_pose",
+      "rigid_group_id": "group_minute",
+      "frame_id": "frame_minute_shaft",
+      "quantity": "pose_6d"
+    },
+    {
+      "observable_id": "hour_hand_pose",
+      "rigid_group_id": "group_hour",
+      "frame_id": "frame_hour_shaft",
+      "quantity": "pose_6d"
+    },
+    {
+      "observable_id": "second_hand_pose",
+      "rigid_group_id": "group_second",
+      "frame_id": "frame_second_hand",
+      "quantity": "pose_6d"
+    },
+    {
+      "observable_id": "manual_setting_knob_pose",
+      "rigid_group_id": "group_setting",
+      "frame_id": "frame_setting_shaft",
+      "quantity": "pose_6d"
+    },
+    {
+      "observable_id": "alarm_hammer_pose",
+      "rigid_group_id": "group_hammer",
+      "frame_id": "frame_hammer_shaft",
+      "quantity": "pose_6d"
+    },
+    {
+      "observable_id": "alarm_target_cam_pose",
+      "rigid_group_id": "group_alarm_target",
+      "frame_id": "frame_alarm_target_shaft",
+      "quantity": "pose_6d"
+    }
+  ],
+  "expected_behavior": {
+    "description": "The time barrel runs the three-hand display at the declared ratios. A mechanically separate alarm barrel drives only the alarm cam and hammer. Pull-to-set mode engages the rear crown for independent time adjustment. Alarm-setting mode lets the user turn the hour hand through a second finite clutch to latch a separately retained alarm-target cam; the independent alarm releases only when the running hour hand reaches that selected cam position.",
+    "dof": [
+      {
+        "motion": "fifteen_supported_revolute_shafts_with_eight_gear_meshes_one_seconds_transfer_two_cam_followers_one_time_setting_clutch_and_one_hour_hand_alarm_target_clutch"
+      }
+    ],
+    "failure_conditions": [
+      "shaft leaves bearing bridge",
+      "gear phase error exceeds tolerance",
+      "hand train stalls or reverses unexpectedly",
+      "hour/minute ratio leaves 1:12 tolerance",
+      "second/minute ratio leaves 60:1 tolerance",
+      "manual setting fails to back-drive all three hands",
+      "balance fails to oscillate",
+      "hammer fails to swing",
+      "hour hand fails to latch the alarm target cam",
+      "alarm rings before the hour hand reaches the selected target",
+      "non-joint solids penetrate"
+    ]
+  },
+  "reduced_model_claim": {
+    "verification_status": "UNVERIFIED",
+    "family": "compound",
+    "fixed_group_ids": [
+      "group_clock_case"
+    ],
+    "moving_group_ids": [
+      "group_barrel",
+      "group_center",
+      "group_third",
+      "group_fourth",
+      "group_second",
+      "group_escape",
+      "group_balance",
+      "group_minute",
+      "group_hour_idler",
+      "group_hour",
+      "group_alarm_barrel",
+      "group_alarm_cam",
+      "group_alarm_target",
+      "group_hammer",
+      "group_setting"
+    ],
+    "joint_frame_id": "frame_barrel_shaft",
+    "axis_abs": [
+      0.0,
+      1.0,
+      0.0
+    ],
+    "family_spec_file": "mechanism_capsules/clock_gear_train.family.json"
+  },
+  "declared_nominal_tests": [
+    {
+      "input_port_id": "winding_key_torque",
+      "schedule": "Apply winding-direction torque, observe hand advance and hammer swing, settle, then apply controlled reverse torque and return."
+    },
+    {
+      "input_port_id": "manual_setting_torque",
+      "schedule": "Engage the finite setting clutch, torque only the rear crown, verify all three hands keep their ratios, reverse, and settle."
+    },
+    {
+      "input_port_id": "alarm_winding_key_torque",
+      "schedule": "Hold the time barrel, torque only the independent alarm barrel, verify the hammer swings while all three hands remain still, reverse, and settle."
+    },
+    {
+      "input_port_id": "alarm_time_by_hour_hand_torque",
+      "schedule": "Turn only the hour hand in alarm-setting mode, verify the finite clutch moves and latches the separate alarm-target cam, restore the current display, then run the time barrel until the hour hand reaches the selected target and releases the independent alarm barrel."
+    }
+  ]
+}

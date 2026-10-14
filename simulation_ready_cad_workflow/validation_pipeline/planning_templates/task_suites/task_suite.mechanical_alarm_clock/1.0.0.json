@@ -1,0 +1,582 @@
+{
+  "schema_version": "simulation_ready_cad_machine_task_suite_v1",
+  "kind": "task_suite",
+  "template_id": "task_suite.mechanical_alarm_clock",
+  "version": "1.0.0",
+  "title": "Complete multifunction mechanical alarm clock task suite",
+  "machine_family": "mechanical_alarm_clock",
+  "goal": "Verify the complete twin-bell mechanical alarm clock through authored three-hand timekeeping, manual time setting, independently powered alarm motion, hour-hand alarm-target setting, and selected-position alarm triggering.",
+  "joint_template_refs": [
+    {
+      "template_id": "joint.spur_gear_clock_train",
+      "version": "1.0.0",
+      "variant_id": "clock.multifunction",
+      "sha256": "d09401f55d475c568435d7f33bdfde78720eca908eb89746607383c57a935083"
+    }
+  ],
+  "profiles": [
+    {
+      "profile_id": "clock.multifunction",
+      "title": "Complete multifunction twin-bell clock",
+      "description": "The timekeeping barrel owns all three hands, the rear setting input acts through the setting clutch, the hour hand sets the dedicated alarm target through its clutch, and a mechanically separate alarm barrel owns the alarm cam and hammer."
+    }
+  ],
+  "scenarios": [
+    {
+      "scenario_id": "clock.three_hand_timekeeping",
+      "title": "Run and compare the three-hand clock train",
+      "test_program": "task_clock_cycle",
+      "test_load_case_id": "task_three_hand_timekeeping",
+      "profile_ids": [
+        "clock.multifunction"
+      ],
+      "required_branches": [
+        "physical",
+        "ideal_reference"
+      ],
+      "runtime_status": "ACTIVE",
+      "task_ids": [
+        "run_three_hand_clock_logic"
+      ],
+      "execution_requirements": [
+        "Drive only the authored timekeeping input and preserve separate traces for the hour, minute, and second hand shafts.",
+        "Bind each angular-ratio criterion to its declared numerator and denominator before execution.",
+        "Preserve physical and ideal-reference evidence for the same frozen input schedule."
+      ]
+    },
+    {
+      "scenario_id": "clock.manual_setting",
+      "title": "Set the clock through the rear setting input",
+      "test_program": "manual_time_setting_clock",
+      "test_load_case_id": "task_manual_time_setting",
+      "profile_ids": [
+        "clock.multifunction"
+      ],
+      "required_branches": [
+        "physical",
+        "ideal_reference"
+      ],
+      "runtime_status": "ACTIVE",
+      "task_ids": [
+        "set_time_manually"
+      ],
+      "execution_requirements": [
+        "Drive only the authored rear setting input through the finite setting clutch.",
+        "Evaluate minute-hand setting travel against the corrected 0.2 rad target with 0.02 rad shortfall tolerance.",
+        "Audit the wrench path to prove that no hand shaft is directly actuated."
+      ]
+    },
+    {
+      "scenario_id": "clock.independent_twin_bell_alarm",
+      "title": "Ring the twin-bell alarm independently",
+      "test_program": "alarm_clock_cycle",
+      "test_load_case_id": "task_alarm_cycle",
+      "profile_ids": [
+        "clock.multifunction"
+      ],
+      "required_branches": [
+        "physical"
+      ],
+      "runtime_status": "ACTIVE",
+      "task_ids": [
+        "ring_alarm_independently"
+      ],
+      "execution_requirements": [
+        "Drive only the independent alarm barrel and record the hammer plus all three hand shafts over the same alarm window.",
+        "Audit that the hammer is reached through the alarm cam and follower rather than direct hammer actuation.",
+        "Measure hand drift from the settled state immediately before alarm actuation."
+      ]
+    },
+    {
+      "scenario_id": "clock.alarm_target_setting",
+      "title": "Set the alarm target by turning the hour hand",
+      "test_program": "hour_hand_alarm_setting_clock",
+      "test_load_case_id": "task_alarm_time_setting",
+      "profile_ids": [
+        "clock.multifunction"
+      ],
+      "required_branches": [
+        "physical",
+        "ideal_reference"
+      ],
+      "runtime_status": "ACTIVE",
+      "task_ids": [
+        "set_alarm_time_by_turning_hour_hand"
+      ],
+      "execution_requirements": [
+        "Drive only the authored hour-hand alarm-setting input through the finite alarm-target clutch.",
+        "Record the hour hand and dedicated alarm-target cam over the setting and latch windows.",
+        "Audit the wrench path to prove that the alarm-target cam is not directly actuated."
+      ]
+    },
+    {
+      "scenario_id": "clock.selected_position_alarm_trigger",
+      "title": "Trigger the alarm at the selected hand position",
+      "test_program": "scheduled_alarm_clock",
+      "test_load_case_id": "task_scheduled_alarm_trigger",
+      "profile_ids": [
+        "clock.multifunction"
+      ],
+      "required_branches": [
+        "physical",
+        "ideal_reference"
+      ],
+      "runtime_status": "ACTIVE",
+      "task_ids": [
+        "trigger_alarm_at_selected_hand_position"
+      ],
+      "execution_requirements": [
+        "Set the dedicated alarm target through the hour hand, restore the current display, then drive only the timekeeping barrel.",
+        "Record target retention, pre-trigger quiet, selected-position arrival, post-trigger hammer motion, and continued timekeeping in separate windows.",
+        "Keep the independent alarm barrel, alarm cam, follower, hammer, and three-hand timekeeping train in the same complete multifunction execution."
+      ]
+    }
+  ],
+  "fixtures": [],
+  "tasks": [
+    {
+      "task_id": "run_three_hand_clock_logic",
+      "title": "Verify three-hand timekeeping",
+      "goal": "Move the minute hand far enough to observe the clock train while preserving the authored hour-to-minute and second-to-minute ratios and a consistent display direction.",
+      "scenario_id": "clock.three_hand_timekeeping",
+      "profile_ids": [
+        "clock.multifunction"
+      ],
+      "runtime_status": "ACTIVE",
+      "criteria": [
+        {
+          "criterion_id": "clock.minute_hand_minimum_travel",
+          "description": "The minute hand travels at least 0.27 rad, with an approved absolute shortfall tolerance of 0.02 rad.",
+          "disposition": "PASS",
+          "evaluator_kind": "registered_metric",
+          "evaluator_id": "continuous_rotation_rad",
+          "observable_quantity": "pose_6d",
+          "comparator": "at_least",
+          "expected": 0.27,
+          "unit": "rad",
+          "tolerance": {
+            "mode": "shortfall",
+            "value": 0.02,
+            "unit": "rad"
+          }
+        },
+        {
+          "criterion_id": "clock.hour_to_minute_ratio",
+          "description": "The hour-hand travel divided by the minute-hand travel remains 1/12 within two percent.",
+          "disposition": "PASS",
+          "evaluator_kind": "registered_metric",
+          "evaluator_id": "angular_ratio",
+          "observable_quantity": "pose_6d",
+          "comparator": "within",
+          "expected": 0.08333333333333333,
+          "unit": "ratio",
+          "tolerance": {
+            "mode": "relative_percent",
+            "value": 2,
+            "unit": "percent"
+          }
+        },
+        {
+          "criterion_id": "clock.second_to_minute_ratio",
+          "description": "The second-hand travel divided by the minute-hand travel remains 60 within two percent.",
+          "disposition": "PASS",
+          "evaluator_kind": "registered_metric",
+          "evaluator_id": "angular_ratio",
+          "observable_quantity": "pose_6d",
+          "comparator": "within",
+          "expected": 60,
+          "unit": "ratio",
+          "tolerance": {
+            "mode": "relative_percent",
+            "value": 2,
+            "unit": "percent"
+          }
+        },
+        {
+          "criterion_id": "clock.display_direction_consistency",
+          "description": "All three hands use the display direction declared by the frozen shaft bindings.",
+          "disposition": "PASS",
+          "evaluator_kind": "suite_predicate",
+          "evaluator_id": "clock.display_direction_consistent",
+          "observable_quantity": "pose_6d",
+          "comparator": "equals",
+          "expected": true,
+          "unit": "bool",
+          "tolerance": {
+            "mode": "none",
+            "value": null,
+            "unit": null
+          }
+        }
+      ],
+      "failure_diagnostics": [
+        {
+          "code": "TIMEKEEPING_TRAVEL_SHORT",
+          "description": "The minute hand did not produce enough observable travel for the approved test window."
+        },
+        {
+          "code": "HAND_RATIO_MISMATCH",
+          "description": "At least one measured hand ratio exceeded its approved tolerance."
+        },
+        {
+          "code": "HAND_DIRECTION_MISMATCH",
+          "description": "A hand moved against its frozen display-direction convention."
+        }
+      ],
+      "evidence_obligations": [
+        "Preserve the bound hour, minute, and second shaft identities with each measured trace.",
+        "Evaluate ratios across the shared powered window rather than from unrelated endpoints.",
+        "Retain both physical and ideal-reference results and their comparison."
+      ]
+    },
+    {
+      "task_id": "set_time_manually",
+      "title": "Verify manual time setting",
+      "goal": "Move the minute hand through the authored setting clutch without directly actuating any clock hand.",
+      "scenario_id": "clock.manual_setting",
+      "profile_ids": [
+        "clock.multifunction"
+      ],
+      "runtime_status": "ACTIVE",
+      "criteria": [
+        {
+          "criterion_id": "clock.manual_setting_minute_travel",
+          "description": "Manual setting moves the minute hand at least 0.2 rad, with an approved absolute shortfall tolerance of 0.02 rad.",
+          "disposition": "PASS",
+          "evaluator_kind": "registered_metric",
+          "evaluator_id": "continuous_rotation_rad",
+          "observable_quantity": "pose_6d",
+          "comparator": "at_least",
+          "expected": 0.2,
+          "unit": "rad",
+          "tolerance": {
+            "mode": "shortfall",
+            "value": 0.02,
+            "unit": "rad"
+          }
+        },
+        {
+          "criterion_id": "clock.manual_setting_indirect_actuation",
+          "description": "The setting input reaches the hands only through the authored setting clutch and gear train.",
+          "disposition": "PASS",
+          "evaluator_kind": "registered_metric",
+          "evaluator_id": "actuation_provenance",
+          "observable_quantity": "actuation_log",
+          "comparator": "equals",
+          "expected": "indirect_only",
+          "unit": "enum",
+          "tolerance": {
+            "mode": "none",
+            "value": null,
+            "unit": null
+          }
+        }
+      ],
+      "failure_diagnostics": [
+        {
+          "code": "MANUAL_SETTING_TRAVEL_SHORT",
+          "description": "The corrected 0.2 rad manual-setting target was not reached within its approved shortfall tolerance."
+        },
+        {
+          "code": "DIRECT_HAND_ACTUATION",
+          "description": "A hand shaft was directly driven instead of moving through the setting clutch and clock train."
+        }
+      ],
+      "evidence_obligations": [
+        "Preserve the setting-input wrench audit and the minute-hand trace.",
+        "Evaluate the corrected 0.2 rad target rather than the historical incorrect 0.02 rad binding.",
+        "Retain both physical and ideal-reference results and their comparison."
+      ]
+    },
+    {
+      "task_id": "ring_alarm_independently",
+      "title": "Verify independent twin-bell alarm motion",
+      "goal": "Swing the alarm hammer through the independently powered alarm train while all three clock hands remain effectively stationary.",
+      "scenario_id": "clock.independent_twin_bell_alarm",
+      "profile_ids": [
+        "clock.multifunction"
+      ],
+      "runtime_status": "ACTIVE",
+      "criteria": [
+        {
+          "criterion_id": "clock.alarm_hammer_minimum_swing",
+          "description": "The alarm hammer swings at least 0.08 rad, with an approved absolute shortfall tolerance of 0.01 rad.",
+          "disposition": "PASS",
+          "evaluator_kind": "registered_metric",
+          "evaluator_id": "continuous_rotation_rad",
+          "observable_quantity": "pose_6d",
+          "comparator": "at_least",
+          "expected": 0.08,
+          "unit": "rad",
+          "tolerance": {
+            "mode": "shortfall",
+            "value": 0.01,
+            "unit": "rad"
+          }
+        },
+        {
+          "criterion_id": "clock.maximum_hand_drift_during_alarm",
+          "description": "The maximum drift of any clock hand during independent alarm actuation is no more than 0.02 rad.",
+          "disposition": "PASS",
+          "evaluator_kind": "suite_predicate",
+          "evaluator_id": "clock.maximum_hand_drift_rad",
+          "observable_quantity": "pose_6d",
+          "comparator": "at_most",
+          "expected": 0.02,
+          "unit": "rad",
+          "tolerance": {
+            "mode": "none",
+            "value": null,
+            "unit": null
+          }
+        },
+        {
+          "criterion_id": "clock.indirect_hammer_actuation",
+          "description": "The alarm input reaches the hammer only through the authored alarm cam and follower.",
+          "disposition": "PASS",
+          "evaluator_kind": "registered_metric",
+          "evaluator_id": "actuation_provenance",
+          "observable_quantity": "actuation_log",
+          "comparator": "equals",
+          "expected": "indirect_only",
+          "unit": "enum",
+          "tolerance": {
+            "mode": "none",
+            "value": null,
+            "unit": null
+          }
+        }
+      ],
+      "failure_diagnostics": [
+        {
+          "code": "ALARM_HAMMER_SWING_SHORT",
+          "description": "The hammer did not reach the approved minimum swing."
+        },
+        {
+          "code": "ALARM_HAND_ISOLATION_FAILED",
+          "description": "At least one hand drifted more than the approved isolation tolerance during alarm actuation."
+        },
+        {
+          "code": "DIRECT_HAMMER_ACTUATION",
+          "description": "The hammer was directly driven instead of moving through the isolated alarm mechanism."
+        }
+      ],
+      "evidence_obligations": [
+        "Record hammer and all three hand traces over an identical alarm window.",
+        "Retain the verified independent-alarm-input wrench audit.",
+        "Do not substitute evidence from any shared-power or simplified clock topology."
+      ]
+    },
+    {
+      "task_id": "set_alarm_time_by_turning_hour_hand",
+      "title": "Set alarm time by turning the hour hand",
+      "goal": "Turn the hour hand through its finite clutch, make the dedicated alarm-target cam follow the selected position, hold that target after release, and never actuate the target cam directly.",
+      "scenario_id": "clock.alarm_target_setting",
+      "profile_ids": [
+        "clock.multifunction"
+      ],
+      "runtime_status": "ACTIVE",
+      "criteria": [
+        {
+          "criterion_id": "clock.alarm_target_latch_error",
+          "description": "At the latched setting position, the dedicated alarm target differs from the hour-hand selection by no more than 0.0025 rad.",
+          "disposition": "PASS",
+          "evaluator_kind": "suite_predicate",
+          "evaluator_id": "clock.alarm_target_latch_error_rad",
+          "observable_quantity": "pose_6d",
+          "comparator": "at_most",
+          "expected": 0.0025,
+          "unit": "rad",
+          "tolerance": {
+            "mode": "none",
+            "value": null,
+            "unit": null
+          }
+        },
+        {
+          "criterion_id": "clock.alarm_target_latch_span",
+          "description": "After the hour-hand setting input is released, the dedicated alarm target drifts by no more than 0.0025 rad.",
+          "disposition": "PASS",
+          "evaluator_kind": "suite_predicate",
+          "evaluator_id": "clock.alarm_target_latch_span_rad",
+          "observable_quantity": "pose_6d",
+          "comparator": "at_most",
+          "expected": 0.0025,
+          "unit": "rad",
+          "tolerance": {
+            "mode": "none",
+            "value": null,
+            "unit": null
+          }
+        },
+        {
+          "criterion_id": "clock.indirect_alarm_target_actuation",
+          "description": "The hour-hand setting input reaches the dedicated alarm-target cam only through the authored finite clutch.",
+          "disposition": "PASS",
+          "evaluator_kind": "registered_metric",
+          "evaluator_id": "actuation_provenance",
+          "observable_quantity": "actuation_log",
+          "comparator": "equals",
+          "expected": "indirect_only",
+          "unit": "enum",
+          "tolerance": {
+            "mode": "none",
+            "value": null,
+            "unit": null
+          }
+        }
+      ],
+      "failure_diagnostics": [
+        {
+          "code": "ALARM_TARGET_SELECTION_ERROR",
+          "description": "The latched alarm target did not match the selected hour-hand position within tolerance."
+        },
+        {
+          "code": "ALARM_TARGET_DID_NOT_HOLD",
+          "description": "The alarm target drifted after the setting input was released."
+        },
+        {
+          "code": "DIRECT_ALARM_TARGET_ACTUATION",
+          "description": "The alarm-target cam was driven directly instead of through the hour-hand clutch."
+        }
+      ],
+      "evidence_obligations": [
+        "Preserve the hour-hand and alarm-target traces over the setting and latch windows.",
+        "Retain the hour-hand input wrench audit and finite-clutch topology evidence.",
+        "Bind both latch criteria to the dedicated alarm-target cam from the complete multifunction clock."
+      ]
+    },
+    {
+      "task_id": "trigger_alarm_at_selected_hand_position",
+      "title": "Trigger alarm at the selected hand position",
+      "goal": "Retain the selected alarm target while the three-hand train advances, remain quiet before the hour hand reaches that target, ring the independent alarm, and continue timekeeping afterward.",
+      "scenario_id": "clock.selected_position_alarm_trigger",
+      "profile_ids": [
+        "clock.multifunction"
+      ],
+      "runtime_status": "ACTIVE",
+      "criteria": [
+        {
+          "criterion_id": "clock.selected_alarm_position_error",
+          "description": "At trigger, the running hour hand differs from the retained alarm target by no more than 0.0025 rad.",
+          "disposition": "PASS",
+          "evaluator_kind": "suite_predicate",
+          "evaluator_id": "clock.selected_alarm_position_error_rad",
+          "observable_quantity": "pose_6d",
+          "comparator": "at_most",
+          "expected": 0.0025,
+          "unit": "rad",
+          "tolerance": {
+            "mode": "none",
+            "value": null,
+            "unit": null
+          }
+        },
+        {
+          "criterion_id": "clock.alarm_target_drift_before_trigger",
+          "description": "The selected alarm target drifts by no more than 0.0025 rad while the timekeeping train advances to it.",
+          "disposition": "PASS",
+          "evaluator_kind": "suite_predicate",
+          "evaluator_id": "clock.alarm_target_drift_rad",
+          "observable_quantity": "pose_6d",
+          "comparator": "at_most",
+          "expected": 0.0025,
+          "unit": "rad",
+          "tolerance": {
+            "mode": "none",
+            "value": null,
+            "unit": null
+          }
+        },
+        {
+          "criterion_id": "clock.pretrigger_hammer_quiet",
+          "description": "Before the selected-position trigger, hammer motion is no more than 0.02 rad.",
+          "disposition": "PASS",
+          "evaluator_kind": "registered_metric",
+          "evaluator_id": "continuous_rotation_rad",
+          "observable_quantity": "pose_6d",
+          "comparator": "at_most",
+          "expected": 0.02,
+          "unit": "rad",
+          "tolerance": {
+            "mode": "none",
+            "value": null,
+            "unit": null
+          }
+        },
+        {
+          "criterion_id": "clock.posttrigger_hammer_swing",
+          "description": "After the selected-position trigger, the hammer swings at least 0.08 rad with an approved 0.01 rad shortfall tolerance.",
+          "disposition": "PASS",
+          "evaluator_kind": "registered_metric",
+          "evaluator_id": "continuous_rotation_rad",
+          "observable_quantity": "pose_6d",
+          "comparator": "at_least",
+          "expected": 0.08,
+          "unit": "rad",
+          "tolerance": {
+            "mode": "shortfall",
+            "value": 0.01,
+            "unit": "rad"
+          }
+        },
+        {
+          "criterion_id": "clock.posttrigger_minute_hand_travel",
+          "description": "After the alarm triggers, the minute hand continues timekeeping by at least 0.03 rad.",
+          "disposition": "PASS",
+          "evaluator_kind": "registered_metric",
+          "evaluator_id": "continuous_rotation_rad",
+          "observable_quantity": "pose_6d",
+          "comparator": "at_least",
+          "expected": 0.03,
+          "unit": "rad",
+          "tolerance": {
+            "mode": "none",
+            "value": null,
+            "unit": null
+          }
+        }
+      ],
+      "failure_diagnostics": [
+        {
+          "code": "ALARM_TRIGGER_POSITION_MISMATCH",
+          "description": "The hour hand did not reach the retained selected target within tolerance."
+        },
+        {
+          "code": "ALARM_TARGET_DRIFTED",
+          "description": "The selected alarm target moved before trigger."
+        },
+        {
+          "code": "ALARM_TRIGGERED_EARLY",
+          "description": "The hammer moved before the selected-position trigger."
+        },
+        {
+          "code": "ALARM_DID_NOT_RING",
+          "description": "The post-trigger hammer motion did not reach the approved minimum."
+        },
+        {
+          "code": "TIMEKEEPING_STOPPED_AFTER_ALARM",
+          "description": "The minute hand did not continue by the approved post-trigger amount."
+        }
+      ],
+      "evidence_obligations": [
+        "Preserve alarm-target, hour-hand, pre-trigger, trigger, and post-trigger windows with unambiguous boundaries.",
+        "Record continued timekeeping after trigger; a hammer-only trace is insufficient.",
+        "Retain physical and ideal-reference results for the same frozen setting and timekeeping schedule."
+      ]
+    }
+  ],
+  "source_projects": [
+    {
+      "project_id": "mechanical_alarm_clock_v1",
+      "evidence_status": "TASK_CERTIFIED",
+      "note": "The complete twin-bell mechanical alarm clock is the authoritative source for the five restored tasks: three-hand timekeeping, manual time setting, independently powered alarm motion, hour-hand alarm-target setting, and selected-position alarm triggering."
+    }
+  ],
+  "approval": {
+    "status": "APPROVED",
+    "approved_by": "user",
+    "approved_on": "2026-08-08",
+    "basis": "The user explicitly approved restoring the complete multifunction mechanical alarm clock's original five-task library."
+  }
+}

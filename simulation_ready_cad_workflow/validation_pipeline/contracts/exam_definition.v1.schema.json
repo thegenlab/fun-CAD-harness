@@ -1,0 +1,48 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "simulation_ready_cad_exam_definition_v1",
+  "title": "Simulation-ready CAD exam definition",
+  "type": "object",
+  "required": [
+    "schema_version",
+    "exam_id",
+    "machine",
+    "source_path",
+    "functional_goal",
+    "operation_interface",
+    "public_indicators",
+    "working_conditions",
+    "stripped_design_decisions",
+    "extra_gaps"
+  ],
+  "properties": {
+    "schema_version": {
+      "const": "simulation_ready_cad_exam_definition_v1"
+    },
+    "catalog_order": {"type": "integer", "minimum": 0},
+    "exam_id": {"type": "string", "minLength": 1},
+    "machine": {"type": "string", "minLength": 1},
+    "source_path": {"type": ["string", "null"]},
+    "provenance_source_path": {"type": "string"},
+    "instruction_version": {"type": "boolean"},
+    "engineering_version": {"type": "boolean"},
+    "functional_goal": {"type": "string"},
+    "operation_interface": {"type": ["object", "null"]},
+    "public_indicators": {"type": "array", "items": {"type": "object"}},
+    "public_requirement_ids": {
+      "type": "array",
+      "items": {"type": "string"},
+      "uniqueItems": true
+    },
+    "working_conditions": {"type": "array", "items": {"type": "object"}},
+    "stripped_design_decisions": {
+      "type": "array",
+      "items": {"type": "string"}
+    },
+    "extra_gaps": {"type": "array", "items": {"type": "object"}},
+    "replay_bundle_id": {"type": "string"},
+    "instruction_scoring": {"type": "object"},
+    "engineering_scoring": {"type": "object"}
+  },
+  "additionalProperties": false
+}

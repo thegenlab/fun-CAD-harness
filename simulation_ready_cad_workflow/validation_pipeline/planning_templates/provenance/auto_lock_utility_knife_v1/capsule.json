@@ -1,0 +1,83 @@
+{
+  "schema_version": "0.1",
+  "capsule_id": "utility_knife_detent_slider",
+  "name": "Auto-lock knife blade slider and spring detent",
+  "member_rigid_group_ids": [
+    "group_blade_carriage",
+    "group_thumb_latch"
+  ],
+  "boundary_rigid_group_ids": [
+    "group_knife_handle"
+  ],
+  "input_ports": [
+    {
+      "port_id": "thumb_press_and_slide",
+      "rigid_group_id": "group_thumb_latch",
+      "frame_id": "frame_thumb_slider",
+      "wrench_type": "force",
+      "direction_abs": [
+        0.8823529411764706,
+        0.0,
+        -0.47058823529411764
+      ],
+      "declared_range": {
+        "min": -25.0,
+        "max": 25.0,
+        "unit": "N"
+      }
+    }
+  ],
+  "observables": [
+    {
+      "observable_id": "blade_carriage_pose",
+      "rigid_group_id": "group_blade_carriage",
+      "frame_id": "frame_blade_carriage",
+      "quantity": "pose_6d"
+    },
+    {
+      "observable_id": "thumb_latch_pose",
+      "rigid_group_id": "group_thumb_latch",
+      "frame_id": "frame_thumb_slider",
+      "quantity": "pose_6d"
+    }
+  ],
+  "expected_behavior": {
+    "description": "Pressing the thumb button releases the spring tab so the blade can slide; releasing it captures the nearest fixed detent.",
+    "dof": [
+      {
+        "motion": "axial blade slide plus short spring-return latch press"
+      }
+    ],
+    "failure_conditions": [
+      "blade moves without latch release",
+      "latch misses a selected detent",
+      "locked blade slips under axial load",
+      "blade cannot retract",
+      "blade is actuated directly"
+    ]
+  },
+  "reduced_model_claim": {
+    "verification_status": "UNVERIFIED",
+    "family": "compound",
+    "fixed_group_ids": [
+      "group_knife_handle"
+    ],
+    "moving_group_ids": [
+      "group_blade_carriage",
+      "group_thumb_latch"
+    ],
+    "joint_frame_id": "frame_blade_carriage",
+    "axis_abs": [
+      1.0,
+      0.0,
+      0.0
+    ],
+    "family_spec_file": "family_specs/utility_knife_detent_slider.json"
+  },
+  "declared_nominal_tests": [
+    {
+      "input_port_id": "thumb_press_and_slide",
+      "schedule": "Press and extend, release into two selected detents, apply axial holding load, press again and retract."
+    }
+  ]
+}

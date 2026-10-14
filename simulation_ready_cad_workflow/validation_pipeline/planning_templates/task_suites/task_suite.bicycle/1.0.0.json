@@ -1,0 +1,316 @@
+{
+  "schema_version": "simulation_ready_cad_machine_task_suite_v1",
+  "kind": "task_suite",
+  "template_id": "task_suite.bicycle",
+  "version": "1.0.0",
+  "title": "Bicycle task suite",
+  "machine_family": "machine.bicycle",
+  "goal": "Verify steering sweep, continuous wheel rotation, and the approved powered chain-drive roundtrip for a conventional two-wheel bicycle. Superseded by task_suite.bicycle@1.1.0 (all-ACTIVE scenarios with guided ground roll); this version is retained for provenance and must not be selected for new plans.",
+  "joint_template_refs": [
+    {
+      "template_id": "joint.generic_revolute",
+      "version": "1.0.0",
+      "variant_id": "mode.bounded",
+      "sha256": "77228543f1e07c17641ded175967763718398ca217608bce5983465c5d3445fa"
+    },
+    {
+      "template_id": "joint.generic_revolute",
+      "version": "1.0.0",
+      "variant_id": "mode.continuous_unwrapped",
+      "sha256": "77228543f1e07c17641ded175967763718398ca217608bce5983465c5d3445fa"
+    },
+    {
+      "template_id": "joint.chain_sprocket_transmission",
+      "version": "1.0.0",
+      "variant_id": "ratio.fixed_2_0",
+      "sha256": "4f995d0ade73ad4b7cefbc5add82ca276f3a6205abe3948d10202cdeed88985e"
+    }
+  ],
+  "profiles": [
+    {
+      "profile_id": "profile.standard_two_wheel_bicycle",
+      "title": "Standard two-wheel bicycle",
+      "description": "A steerable front assembly, continuously rotating front and rear wheels, and a two-to-one chain-driven rear output."
+    }
+  ],
+  "scenarios": [
+    {
+      "scenario_id": "scenario.steering_sweep",
+      "title": "Steering sweep",
+      "test_program": "task_angle_roundtrip",
+      "test_load_case_id": "task_angle_roundtrip",
+      "profile_ids": [
+        "profile.standard_two_wheel_bicycle"
+      ],
+      "required_branches": [
+        "physical",
+        "ideal_reference"
+      ],
+      "runtime_status": "ACTIVE",
+      "task_ids": [
+        "task.steering_sweep"
+      ],
+      "execution_requirements": [
+        "Apply bounded torque to the steering rigid group and measure its continuous steering angle.",
+        "Direct actuation of the steering output is allowed by the approved task definition.",
+        "Derive the public bounded steering target directly from the selected schema-0.2 continuous_rotation_rad requirement.",
+        "Audit unintended penetration at every physical simulation time step."
+      ]
+    },
+    {
+      "scenario_id": "scenario.continuous_wheel_rotation",
+      "title": "Continuous wheel rotation",
+      "test_program": "task_continuous_revolute_rotation",
+      "test_load_case_id": "task_continuous_revolute_rotation",
+      "profile_ids": [
+        "profile.standard_two_wheel_bicycle"
+      ],
+      "required_branches": [
+        "physical",
+        "ideal_reference"
+      ],
+      "runtime_status": "IMPLEMENTATION_REQUIRED",
+      "task_ids": [
+        "task.continuous_wheel_rotation"
+      ],
+      "execution_requirements": [
+        "Measure continuous unwrapped accumulated wheel angle; a wrapped final pose is insufficient.",
+        "Either rotation direction is accepted by the approved task definition.",
+        "Do not mark this scenario runnable until a registered continuous-rotation program exists.",
+        "Audit unintended penetration at every physical simulation time step over the complete rotation."
+      ]
+    },
+    {
+      "scenario_id": "scenario.powered_chain_roundtrip",
+      "title": "Powered chain-drive roundtrip",
+      "test_program": "task_bicycle_powered_roundtrip",
+      "test_load_case_id": "task_bicycle_powered_roundtrip",
+      "profile_ids": [
+        "profile.standard_two_wheel_bicycle"
+      ],
+      "required_branches": [
+        "physical",
+        "ideal_reference"
+      ],
+      "runtime_status": "ACTIVE",
+      "task_ids": [
+        "task.powered_chain_roundtrip"
+      ],
+      "execution_requirements": [
+        "Exclude initial engagement from powered rotation and ratio measurement.",
+        "Check the ratio across the powered-window samples and adjacent increments rather than endpoints alone.",
+        "Keep input actuation at zero throughout passive return.",
+        "Never actuate the rear output shaft directly.",
+        "Audit unintended penetration at every physical simulation time step.",
+        "Reject matching-sprocket overlap deeper than the chain-width-bound cap even inside fixed flexible zones."
+      ]
+    }
+  ],
+  "fixtures": [],
+  "tasks": [
+    {
+      "task_id": "task.steering_sweep",
+      "title": "Steering sweep",
+      "goal": "Reach the approved steering angle and compare physical steering motion with the ideal reference.",
+      "scenario_id": "scenario.steering_sweep",
+      "profile_ids": [
+        "profile.standard_two_wheel_bicycle"
+      ],
+      "runtime_status": "ACTIVE",
+      "criteria": [
+        {
+          "criterion_id": "criterion.minimum_steering_angle",
+          "description": "The steering rigid group reaches at least 0.35 rad in either approved direction.",
+          "disposition": "PASS",
+          "evaluator_kind": "registered_metric",
+          "evaluator_id": "continuous_rotation_rad",
+          "observable_quantity": "pose_6d",
+          "comparator": "at_least",
+          "expected": 0.35,
+          "unit": "rad",
+          "tolerance": {
+            "mode": "none",
+            "value": null,
+            "unit": null
+          }
+        }
+      ],
+      "failure_diagnostics": [
+        {
+          "code": "STEERING_ANGLE_SHORTFALL",
+          "description": "The steering group did not reach the approved minimum angle."
+        },
+        {
+          "code": "STEERING_JOINT_JAMMED",
+          "description": "The steering joint stopped before the approved sweep was reached."
+        },
+        {
+          "code": "STEERING_GROUP_DETACHED",
+          "description": "The steering group detached or drifted off its authored axis."
+        }
+      ],
+      "evidence_obligations": [
+        "Measure steering angle from pose_6d in both physical and ideal-reference branches.",
+        "Do not invent a return-to-home acceptance tolerance when the frozen requirement does not provide one."
+      ]
+    },
+    {
+      "task_id": "task.continuous_wheel_rotation",
+      "title": "Continuous accumulated wheel rotation",
+      "goal": "Rotate a bicycle wheel through the approved unwrapped accumulated angle in either direction.",
+      "scenario_id": "scenario.continuous_wheel_rotation",
+      "profile_ids": [
+        "profile.standard_two_wheel_bicycle"
+      ],
+      "runtime_status": "IMPLEMENTATION_REQUIRED",
+      "criteria": [
+        {
+          "criterion_id": "criterion.minimum_accumulated_wheel_rotation",
+          "description": "The wheel accumulates at least one complete unwrapped revolution in either direction.",
+          "disposition": "PASS",
+          "evaluator_kind": "suite_predicate",
+          "evaluator_id": "wheel_rotation_magnitude_rad",
+          "observable_quantity": "pose_6d",
+          "comparator": "at_least",
+          "expected": 6.283185307179586,
+          "unit": "rad",
+          "tolerance": {
+            "mode": "none",
+            "value": null,
+            "unit": null
+          }
+        }
+      ],
+      "failure_diagnostics": [
+        {
+          "code": "WHEEL_ROTATION_SHORTFALL",
+          "description": "The wheel did not accumulate one complete revolution."
+        },
+        {
+          "code": "WHEEL_ANGLE_WRAP_LOST",
+          "description": "The trace could not establish continuous unwrapped wheel rotation."
+        },
+        {
+          "code": "WHEEL_SUPPORT_FAILED",
+          "description": "The wheel jammed, detached, or drifted off its authored axle."
+        }
+      ],
+      "evidence_obligations": [
+        "Report the continuous unwrapped accumulated wheel angle.",
+        "Execute the same commanded motion in physical and ideal-reference branches."
+      ]
+    },
+    {
+      "task_id": "task.powered_chain_roundtrip",
+      "title": "Powered chain-drive roundtrip",
+      "goal": "Drive only the input shaft, verify rear output rotation and the fixed ratio, then verify passive return.",
+      "scenario_id": "scenario.powered_chain_roundtrip",
+      "profile_ids": [
+        "profile.standard_two_wheel_bicycle"
+      ],
+      "runtime_status": "ACTIVE",
+      "criteria": [
+        {
+          "criterion_id": "criterion.minimum_powered_output_rotation",
+          "description": "The powered rear output accumulates at least 2.8 rad after initial engagement is excluded.",
+          "disposition": "PASS",
+          "evaluator_kind": "registered_metric",
+          "evaluator_id": "continuous_rotation_rad",
+          "observable_quantity": "pose_6d",
+          "comparator": "at_least",
+          "expected": 2.8,
+          "unit": "rad",
+          "tolerance": {
+            "mode": "none",
+            "value": null,
+            "unit": null
+          }
+        },
+        {
+          "criterion_id": "criterion.signed_output_input_ratio",
+          "description": "The signed rear-output-per-input angular ratio is 2.0 within 0.02.",
+          "disposition": "PASS",
+          "evaluator_kind": "registered_metric",
+          "evaluator_id": "angular_ratio",
+          "observable_quantity": "pose_6d",
+          "comparator": "within",
+          "expected": 2.0,
+          "unit": "ratio",
+          "tolerance": {
+            "mode": "absolute",
+            "value": 0.02,
+            "unit": "ratio"
+          }
+        },
+        {
+          "criterion_id": "criterion.maximum_return_error",
+          "description": "After input removal, the rear output returns within 0.25 rad of its start position.",
+          "disposition": "PASS",
+          "evaluator_kind": "registered_metric",
+          "evaluator_id": "return_to_start_rad",
+          "observable_quantity": "pose_6d",
+          "comparator": "at_most",
+          "expected": 0.25,
+          "unit": "rad",
+          "tolerance": {
+            "mode": "none",
+            "value": null,
+            "unit": null
+          }
+        },
+        {
+          "criterion_id": "criterion.indirect_output_actuation",
+          "description": "The rear output is driven indirectly through the chain transmission and is never directly actuated.",
+          "disposition": "PASS",
+          "evaluator_kind": "registered_metric",
+          "evaluator_id": "actuation_provenance",
+          "observable_quantity": "actuation_log",
+          "comparator": "equals",
+          "expected": "indirect_only",
+          "unit": "enum",
+          "tolerance": {
+            "mode": "none",
+            "value": null,
+            "unit": null
+          }
+        }
+      ],
+      "failure_diagnostics": [
+        {
+          "code": "POWERED_OUTPUT_ROTATION_SHORTFALL",
+          "description": "The rear output did not reach 2.8 rad during the powered measurement window."
+        },
+        {
+          "code": "CHAIN_RATIO_MISMATCH",
+          "description": "The powered chain ratio was outside 2.0 plus or minus 0.02."
+        },
+        {
+          "code": "PASSIVE_RETURN_ERROR",
+          "description": "The rear output did not return within 0.25 rad after the input was removed."
+        },
+        {
+          "code": "DIRECT_OUTPUT_ACTUATION",
+          "description": "The rear output received forbidden direct actuation."
+        }
+      ],
+      "evidence_obligations": [
+        "Preserve powered-window sample and adjacent-increment ratio evidence.",
+        "Preserve the zero-input passive-return interval and complete wrench audit.",
+        "Retain physical and ideal-reference traces with per-time-step collision evidence."
+      ]
+    }
+  ],
+  "source_projects": [
+    {
+      "project_id": "cleanroom_bicycle_drivetrain_b29514db21",
+      "evidence_status": "CAPABILITY_CERTIFIED",
+      "note": "The fixed two-to-one chain capability is certified. Steering and generic continuous-wheel scenarios retain their approved IMPLEMENTATION_REQUIRED runtime status."
+    }
+  ],
+  "approval": {
+    "status": "APPROVED",
+    "approved_by": "user",
+    "approved_on": "2026-08-02",
+    "basis": "This suite groups the three previously approved bicycle tasks without changing their thresholds, runtime statuses, or joint-template bindings."
+  }
+}

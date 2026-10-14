@@ -1,0 +1,99 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "simulation_ready_cad_requirements_input.v1",
+  "title": "Immutable external requirements input document",
+  "description": "Formal structural contract for the requirements file bound by intake. Structural rules (required fields, types, enumerations) live here; deep semantics (prompt-clause binding, metric registry compatibility, hash verification, uniqueness) stay in the intake and acceptance compilers, which remain the authority. Documents may carry additional descriptive fields; unknown fields are tolerated exactly as the code-level checks tolerate them.",
+  "type": "object",
+  "required": ["schema_version", "requirements_id", "tasks"],
+  "properties": {
+    "schema_version": {"enum": ["0.1", "0.2"]},
+    "requirements_id": {"type": "string"},
+    "prompt": {"type": "string"},
+    "non_numeric_engineering_constraints": {"type": "array"},
+    "visual_evidence_checklist": {"type": "array"},
+    "tasks": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["task_id", "description"],
+        "properties": {
+          "task_id": {"type": "string"},
+          "description": {"type": "string"},
+          "success_criteria": {"type": "array"},
+          "acceptance_requirements": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "required": [
+                "requirement_id",
+                "prompt_clause",
+                "metric_id",
+                "target",
+                "target_role",
+                "test_program",
+                "test_load_case_id",
+                "allow_direct_output_actuation",
+                "required_branches"
+              ],
+              "properties": {
+                "requirement_id": {"type": "string"},
+                "prompt_clause": {"type": "string"},
+                "metric_id": {"type": "string"},
+                "observable_quantity": {"type": "string"},
+                "direction": {"enum": ["positive", "negative", "either"]},
+                "target": {
+                  "type": "object",
+                  "required": ["comparator", "value", "unit"],
+                  "properties": {
+                    "comparator": {
+                      "enum": [
+                        "at_least",
+                        "at_most",
+                        "equals",
+                        "within",
+                        "sequence_equals"
+                      ]
+                    },
+                    "unit": {"type": "string"}
+                  }
+                },
+                "target_role": {"type": "string"},
+                "reference_role": {"type": ["string", "null"]},
+                "input_role": {"type": ["string", "null"]},
+                "coordinate_frame_role": {"type": ["string", "null"]},
+                "working_mode": {"type": "string"},
+                "test_program": {"type": "string"},
+                "test_load_case_id": {"type": "string"},
+                "allow_direct_output_actuation": {"type": "boolean"},
+                "required_branches": {
+                  "type": "array",
+                  "items": {
+                    "enum": ["physical", "ideal_reference", "ideal_dynamics"]
+                  }
+                },
+                "expected_contact_ids": {
+                  "type": "array",
+                  "items": {"type": "string"}
+                },
+                "forbidden_contact_ids": {
+                  "type": "array",
+                  "items": {"type": "string"}
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "allOf": [
+    {
+      "if": {
+        "type": "object",
+        "required": ["schema_version"],
+        "properties": {"schema_version": {"const": "0.2"}}
+      },
+      "then": {"type": "object", "required": ["prompt"]}
+    }
+  ]
+}

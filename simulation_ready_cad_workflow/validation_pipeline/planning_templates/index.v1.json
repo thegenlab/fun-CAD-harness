@@ -1,0 +1,176 @@
+{
+  "schema_version": "simulation_ready_cad_planning_template_catalog_v1",
+  "catalog_id": "planning_templates.builtin",
+  "catalog_version": "1.4.1",
+  "entries": [
+    {
+      "kind": "joint",
+      "template_id": "joint.axis_spring_revolute",
+      "version": "1.0.0",
+      "path": "joints/joint.axis_spring_revolute/1.0.0.json",
+      "sha256": "dd6a8a650aeb679b777ebdd6df7e67f9028f2defea89d8c1d5f0a28c6fc05482"
+    },
+    {
+      "kind": "joint",
+      "template_id": "joint.bicycle_ground_contact",
+      "version": "1.0.0",
+      "path": "joints/joint.bicycle_ground_contact/1.0.0.json",
+      "sha256": "5e7921dfe99f8fb42925b1fc8849e74c53cae35ed5077ce49de152cdbb5f40fa"
+    },
+    {
+      "kind": "joint",
+      "template_id": "joint.chain_sprocket_transmission",
+      "version": "1.0.0",
+      "path": "joints/joint.chain_sprocket_transmission/1.0.0.json",
+      "sha256": "4f995d0ade73ad4b7cefbc5add82ca276f3a6205abe3948d10202cdeed88985e"
+    },
+    {
+      "kind": "joint",
+      "template_id": "joint.click_pen_cam_latch",
+      "version": "1.0.0",
+      "path": "joints/joint.click_pen_cam_latch/1.0.0.json",
+      "sha256": "8604883c00acf3b5bcfde8ec8a4e752dd55a9dcf5050bf50b558805d8cd8d41c"
+    },
+    {
+      "kind": "joint",
+      "template_id": "joint.closed_revolute_linkage",
+      "version": "1.0.0",
+      "path": "joints/joint.closed_revolute_linkage/1.0.0.json",
+      "sha256": "dbdbe7677ce4fc0e8f79d83ba66a460fc79852316f4d544c5b6d15a74df5c279"
+    },
+    {
+      "kind": "joint",
+      "template_id": "joint.crown_bevel_dual_output",
+      "version": "1.0.0",
+      "path": "joints/joint.crown_bevel_dual_output/1.0.0.json",
+      "sha256": "30a12fc9691a326ff6ac30faa758daed48b0a2ca14c97bee157736afea969767"
+    },
+    {
+      "kind": "joint",
+      "template_id": "joint.generic_revolute",
+      "version": "1.0.0",
+      "path": "joints/joint.generic_revolute/1.0.0.json",
+      "sha256": "77228543f1e07c17641ded175967763718398ca217608bce5983465c5d3445fa"
+    },
+    {
+      "kind": "joint",
+      "template_id": "joint.prismatic_detent_latch",
+      "version": "1.0.0",
+      "path": "joints/joint.prismatic_detent_latch/1.0.0.json",
+      "sha256": "209cc6d490fa0008e61d443293f1108ddb265437e0bcd2e35fa5b6cf416a9a82"
+    },
+    {
+      "kind": "joint",
+      "template_id": "joint.rack_pinion_drive",
+      "version": "1.0.0",
+      "path": "joints/joint.rack_pinion_drive/1.0.0.json",
+      "sha256": "f748f7d79230b2b798d75275ee5973eac15dc9d33e27a9960c3f90971f5a01dd"
+    },
+    {
+      "kind": "joint",
+      "template_id": "joint.scissor_lift",
+      "version": "1.0.0",
+      "path": "joints/joint.scissor_lift/1.0.0.json",
+      "sha256": "c6f75eeee27b8ddd09645b7bf8c948bccd7355539336bbad3205702e3ced9411"
+    },
+    {
+      "kind": "joint",
+      "template_id": "joint.spur_gear_clock_train",
+      "version": "1.0.0",
+      "path": "joints/joint.spur_gear_clock_train/1.0.0.json",
+      "sha256": "d09401f55d475c568435d7f33bdfde78720eca908eb89746607383c57a935083"
+    },
+    {
+      "kind": "task_suite",
+      "template_id": "task_suite.auto_lock_utility_knife",
+      "version": "1.0.0",
+      "path": "task_suites/task_suite.auto_lock_utility_knife/1.0.0.json",
+      "sha256": "d7b29e1ffba038820421774863e3f0bd595cad21ffae3c89d6da9b39f8bec3b0"
+    },
+    {
+      "kind": "task_suite",
+      "template_id": "task_suite.bicycle",
+      "version": "1.0.0",
+      "path": "task_suites/task_suite.bicycle/1.0.0.json",
+      "sha256": "cc1d6bce3d246619304996013545979f733987c3222c1ec037e985ca8e089249"
+    },
+    {
+      "kind": "task_suite",
+      "template_id": "task_suite.bicycle",
+      "version": "1.1.0",
+      "path": "task_suites/task_suite.bicycle/1.1.0.json",
+      "sha256": "01ff7a211f4f4e679e9d0c8784c3ded65ce5a37aa902fcfe89b8d47efaac10c2"
+    },
+    {
+      "kind": "task_suite",
+      "template_id": "task_suite.folding_drying_rack",
+      "version": "1.0.0",
+      "path": "task_suites/task_suite.folding_drying_rack/1.0.0.json",
+      "sha256": "822038ea8ae33211d02471ffc3d15ff86aba0e2e5481352330929594ef9db883"
+    },
+    {
+      "kind": "task_suite",
+      "template_id": "task_suite.four_bar_wiper",
+      "version": "1.0.0",
+      "path": "task_suites/task_suite.four_bar_wiper/1.0.0.json",
+      "sha256": "6245378c1cf05590c82bd0419b70b0b650be2d94ce50d7a179ab84623091bcbd"
+    },
+    {
+      "kind": "task_suite",
+      "template_id": "task_suite.hand_crank_egg_beater",
+      "version": "1.0.0",
+      "path": "task_suites/task_suite.hand_crank_egg_beater/1.0.0.json",
+      "sha256": "c4fcca4f75c70bcea9b4c01e7e324ada00a03aaa165b0b884c8bfae6d3fe8eca"
+    },
+    {
+      "kind": "task_suite",
+      "template_id": "task_suite.hinged_toolbox",
+      "version": "1.0.0",
+      "path": "task_suites/task_suite.hinged_toolbox/1.0.0.json",
+      "sha256": "4da3be8408de24c1fde1c1df15685e48ec912928762eac04b080d014f1e608f3"
+    },
+    {
+      "kind": "task_suite",
+      "template_id": "task_suite.mechanical_alarm_clock",
+      "version": "1.0.0",
+      "path": "task_suites/task_suite.mechanical_alarm_clock/1.0.0.json",
+      "sha256": "defd211367257ac5595eea988b94bf34efd84a55d08eb9b04c01a407a3276228"
+    },
+    {
+      "kind": "task_suite",
+      "template_id": "task_suite.pedal_trash_can",
+      "version": "1.0.0",
+      "path": "task_suites/task_suite.pedal_trash_can/1.0.0.json",
+      "sha256": "b00440b9a142fae6f95a9210963204d9bb8c64e921199a1a08f2547d76285398"
+    },
+    {
+      "kind": "task_suite",
+      "template_id": "task_suite.rack_pinion_gate",
+      "version": "1.0.0",
+      "path": "task_suites/task_suite.rack_pinion_gate/1.0.0.json",
+      "sha256": "30b8761bf875ef42d96fe39f41dcae534dc306156b29e5cfed2fa430c4530c2d"
+    },
+    {
+      "kind": "task_suite",
+      "template_id": "task_suite.rack_pinion_gate",
+      "version": "1.1.0",
+      "path": "task_suites/task_suite.rack_pinion_gate/1.1.0.json",
+      "sha256": "5eea0e8ec9f4c0f421a2275fa63e1cc00f8b0bf014b3967dc7ffc71c3243f78e"
+    },
+    {
+      "kind": "task_suite",
+      "template_id": "task_suite.retractable_ballpoint_pen",
+      "version": "1.0.0",
+      "path": "task_suites/task_suite.retractable_ballpoint_pen/1.0.0.json",
+      "sha256": "69d17b7f76d250eef5d4295d3a25070476bfcce05c172297d337b7e7992ffae4"
+    },
+    {
+      "kind": "task_suite",
+      "template_id": "task_suite.spring_kitchen_tongs",
+      "version": "1.0.0",
+      "path": "task_suites/task_suite.spring_kitchen_tongs/1.0.0.json",
+      "sha256": "07d98533258e0dff05e29720df53bfd01333714ceb3f8817815b18b4ec3d845b"
+    }
+  ],
+  "catalog_sha256": "9538f08a97780246df1230369a1019bf59054d3e4e6d9167014eac7f790561c4"
+}

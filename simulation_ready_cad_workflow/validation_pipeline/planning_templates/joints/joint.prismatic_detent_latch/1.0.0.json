@@ -1,0 +1,60 @@
+{
+  "schema_version": "simulation_ready_cad_joint_template_v1",
+  "kind": "joint",
+  "template_id": "joint.prismatic_detent_latch",
+  "version": "1.0.0",
+  "title": "Prismatic detent-latch compound joint",
+  "category": "compound_joint",
+  "goal": "Guide linear carriage travel through discrete physical detents and resist an approved axial load while latched.",
+  "family": "compound",
+  "capability_variants": [
+    {
+      "variant_id": "latch.prismatic_detent",
+      "plugin_id": "prismatic_detent_latch_v1",
+      "mechanism_kind": "prismatic_detent_latch",
+      "runtime_status": "ACTIVE"
+    }
+  ],
+  "input_wrench_kinds": [
+    "force"
+  ],
+  "observable_quantities": [
+    "pose_6d"
+  ],
+  "components": [
+    "guided prismatic carriage",
+    "thumb latch press joint",
+    "multiple detent interfaces",
+    "finite holding contacts"
+  ],
+  "required_instance_fields": [
+    "fixed_body_id",
+    "carriage_body_id",
+    "input_body_id",
+    "prismatic_axis_abs",
+    "detent_positions_m",
+    "detent_contact_geometry"
+  ],
+  "source_bindings": [
+    {
+      "project_id": "auto_lock_utility_knife_v1",
+      "capsule_id": "utility_knife_detent_slider",
+      "source_status": "PROJECT_CERTIFIED",
+      "capsule_path": "simulation_ready_cad_workflow/validation_pipeline/planning_templates/provenance/auto_lock_utility_knife_v1/capsule.json",
+      "capsule_sha256": "3ba4f6c3d023ceea61cd32ebbe6a15478751238e0aec4e56484ce87cc6199cb1",
+      "family_spec_path": "simulation_ready_cad_workflow/validation_pipeline/planning_templates/provenance/auto_lock_utility_knife_v1/family_spec.json",
+      "family_spec_sha256": "d09a1e786bbe540a45fd750ae38f13b473bcccb5a539b03dbf8e92f494e4a5a0"
+    }
+  ],
+  "constraints": [
+    "Detent positions are measured from carriage motion and physical contact evidence.",
+    "The output carriage may not be teleported or kinematically scripted between detents.",
+    "Holding performance must be checked under the approved opposing axial load."
+  ],
+  "approval": {
+    "status": "APPROVED",
+    "approved_by": "user",
+    "approved_on": "2026-08-02",
+    "basis": "Imported from the completed auto_lock_utility_knife_v1 project at the user's request."
+  }
+}

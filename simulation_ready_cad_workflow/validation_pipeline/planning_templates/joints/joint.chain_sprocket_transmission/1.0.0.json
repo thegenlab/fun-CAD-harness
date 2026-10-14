@@ -1,0 +1,82 @@
+{
+  "schema_version": "simulation_ready_cad_joint_template_v1",
+  "kind": "joint",
+  "template_id": "joint.chain_sprocket_transmission",
+  "version": "1.0.0",
+  "title": "Chain and sprocket compound joint",
+  "category": "compound_joint",
+  "goal": "Couple continuous input-shaft and output-shaft rotation through a finite compliant transmission with phase-locked, saved-state-audited moving chain-path evidence.",
+  "family": "compound",
+  "capability_variants": [
+    {
+      "variant_id": "ratio.fixed_2_0",
+      "plugin_id": "bicycle_chain_sprocket_drive_v2",
+      "mechanism_kind": "bicycle_chain_sprocket_drive",
+      "runtime_status": "ACTIVE",
+      "capability_ids": [
+        "actuation.indirect_output_only",
+        "chain.finite_compliant_force_path",
+        "chain.fixed_spatial_flex_zones",
+        "chain.matching_sprocket_depth_limited",
+        "chain.moving_path_evidence",
+        "chain.saved_state_clearance_audit",
+        "dashboard.chain_phase_animation"
+      ],
+      "model_boundary_ids": [
+        "chain.no_full_flexible_body_physics",
+        "chain.no_individual_link_dynamics",
+        "chain.no_tooth_contact_dynamics"
+      ]
+    }
+  ],
+  "input_wrench_kinds": [
+    "torque"
+  ],
+  "observable_quantities": [
+    "pose_6d",
+    "actuation_log"
+  ],
+  "components": [
+    "input continuous revolute support",
+    "output continuous revolute support",
+    "input sprocket",
+    "validator-owned moving chain-path evidence",
+    "output sprocket"
+  ],
+  "required_instance_fields": [
+    "fixed_support_group_id",
+    "input_shaft_group_id",
+    "output_shaft_group_id",
+    "input_axis_frame_id",
+    "output_axis_frame_id",
+    "sprocket_geometry",
+    "chain_path_geometry",
+    "signed_output_per_input"
+  ],
+  "source_bindings": [
+    {
+      "project_id": "cleanroom_bicycle_drivetrain_b29514db21",
+      "capsule_id": "bicycle_drivetrain",
+      "source_status": "CAPABILITY_CERTIFIED",
+      "capsule_path": null,
+      "capsule_sha256": null,
+      "family_spec_path": "simulation_ready_cad_workflow/validation_pipeline/planning_templates/provenance/cleanroom_bicycle_drivetrain_b29514db21/family_spec.json",
+      "family_spec_sha256": "0eeb270da2bbe952627e8cf863caacea4d49945559f5b43d7aa8888dd12dbfea"
+    }
+  ],
+  "constraints": [
+    "The compound joint owns both shaft supports; duplicate standalone support capsules are forbidden.",
+    "Only the input shaft may expose a powered input port.",
+    "The active runtime variant is fixed at signed output/input ratio 2.0 and cannot be changed by editing JSON.",
+    "Sprocket solids, shaft axes, moving chain path, and physical collision bindings must remain consistent at every audited state.",
+    "Flexible interaction zones remain fixed in the authored-world frame at the frozen sprocket centers and axes; they do not follow rotating sprocket material or chain samples.",
+    "Matching sprocket overlap inside its fixed flexible zone is limited to the validator-derived public chain-and-sprocket geometry penetration cap; all deeper overlap fails.",
+    "The reduced model does not claim individual-link dynamics, individual tooth contact, or full flexible-body chain physics."
+  ],
+  "approval": {
+    "status": "APPROVED",
+    "approved_by": "user",
+    "approved_on": "2026-08-02",
+    "basis": "User approved compound transmissions as compound-joint supplements to primitive joint templates."
+  }
+}

@@ -1,0 +1,108 @@
+{
+  "boundary_rigid_group_ids": [
+    "ground_group",
+    "guide_group"
+  ],
+  "capsule_id": "bicycle_ground_roll",
+  "declared_nominal_tests": [
+    {
+      "input_port_id": "rear_wheel_torque",
+      "schedule": "Harness-owned frozen program"
+    }
+  ],
+  "dependencies": [],
+  "expected_behavior": {
+    "description": "rear-wheel-only native Coulomb ground rolling with passive front wheel and visible finite guide",
+    "dof": [
+      {
+        "motion": "rear-wheel-only native Coulomb ground rolling with passive front wheel and visible finite guide"
+      }
+    ],
+    "failure_conditions": [
+      "detachment",
+      "unintended penetration",
+      "threshold shortfall"
+    ]
+  },
+  "input_ports": [
+    {
+      "declared_range": {
+        "max": 15,
+        "min": 0,
+        "unit": "N*m"
+      },
+      "direction_abs": [
+        0,
+        1,
+        0
+      ],
+      "frame_id": "rear_wheel_input",
+      "port_id": "rear_wheel_torque",
+      "rigid_group_id": "rear_wheel_group",
+      "wrench_type": "torque"
+    }
+  ],
+  "member_rigid_group_ids": [
+    "chassis_group",
+    "input_crank_group",
+    "steering_group",
+    "rear_wheel_group",
+    "front_wheel_group"
+  ],
+  "name": "Guided rear-driven bicycle ground roll",
+  "observables": [
+    {
+      "frame_id": "chassis_pose",
+      "observable_id": "chassis_ground_motion",
+      "quantity": "position_3d",
+      "rigid_group_id": "chassis_group"
+    },
+    {
+      "frame_id": "front_wheel_output",
+      "observable_id": "front_wheel_angle",
+      "quantity": "pose_6d",
+      "rigid_group_id": "front_wheel_group"
+    },
+    {
+      "frame_id": "front_wheel_output",
+      "observable_id": "front_wheel_contact",
+      "quantity": "contact_event",
+      "rigid_group_id": "front_wheel_group"
+    },
+    {
+      "frame_id": "front_wheel_output",
+      "observable_id": "paired_wheel_ground_contacts",
+      "quantity": "contact_event",
+      "rigid_group_id": "front_wheel_group"
+    },
+    {
+      "frame_id": "front_wheel_output",
+      "observable_id": "front_wheel_wrench_provenance",
+      "quantity": "actuation_log",
+      "rigid_group_id": "front_wheel_group"
+    }
+  ],
+  "reduced_model_claim": {
+    "axis_abs": [
+      1,
+      0,
+      0
+    ],
+    "family": "compound",
+    "family_spec_file": "family_specs/bicycle_ground_roll.json",
+    "fixed_group_ids": [
+      "ground_group",
+      "guide_group"
+    ],
+    "joint_frame_id": "ground_guide_axis",
+    "moving_group_ids": [
+      "chassis_group",
+      "input_crank_group",
+      "steering_group",
+      "rear_wheel_group",
+      "front_wheel_group"
+    ],
+    "verification_status": "UNVERIFIED"
+  },
+  "schema_version": "0.1"
+}

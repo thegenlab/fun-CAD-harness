@@ -1,0 +1,363 @@
+{
+  "schema_version": "simulation_ready_cad_machine_task_suite_v1",
+  "kind": "task_suite",
+  "template_id": "task_suite.bicycle",
+  "version": "1.1.0",
+  "title": "Bicycle task suite",
+  "machine_family": "machine.bicycle",
+  "goal": "Verify bounded steering, powered chain transmission, and rear-wheel-driven straight ground rolling with a passively rolling front wheel.",
+  "joint_template_refs": [
+    {
+      "template_id": "joint.generic_revolute",
+      "version": "1.0.0",
+      "variant_id": "mode.bounded",
+      "sha256": "77228543f1e07c17641ded175967763718398ca217608bce5983465c5d3445fa"
+    },
+    {
+      "template_id": "joint.chain_sprocket_transmission",
+      "version": "1.0.0",
+      "variant_id": "ratio.fixed_2_0",
+      "sha256": "4f995d0ade73ad4b7cefbc5add82ca276f3a6205abe3948d10202cdeed88985e"
+    },
+    {
+      "template_id": "joint.bicycle_ground_contact",
+      "version": "1.0.0",
+      "variant_id": "mode.guided_straight_roll",
+      "sha256": "5e7921dfe99f8fb42925b1fc8849e74c53cae35ed5077ce49de152cdbb5f40fa"
+    }
+  ],
+  "profiles": [
+    {
+      "profile_id": "profile.standard_two_wheel_bicycle",
+      "title": "Standard two-wheel bicycle",
+      "description": "A steerable front assembly, a two-to-one chain-driven rear wheel, and finite front/rear wheel contact with a visible guided upright rolling fixture."
+    }
+  ],
+  "scenarios": [
+    {
+      "scenario_id": "scenario.steering_sweep",
+      "title": "Steering sweep",
+      "test_program": "task_angle_roundtrip",
+      "test_load_case_id": "task_angle_roundtrip",
+      "profile_ids": [
+        "profile.standard_two_wheel_bicycle"
+      ],
+      "required_branches": [
+        "physical",
+        "ideal_reference"
+      ],
+      "runtime_status": "ACTIVE",
+      "task_ids": [
+        "task.steering_sweep"
+      ],
+      "execution_requirements": [
+        "Apply bounded torque only to the steering rigid group and measure its continuous steering angle.",
+        "Derive the public bounded steering target directly from the frozen continuous_rotation_rad requirement.",
+        "Compare physical and ideal-reference steering traces and audit unintended penetration at every physical step."
+      ]
+    },
+    {
+      "scenario_id": "scenario.powered_chain_roundtrip",
+      "title": "Powered chain-drive roundtrip",
+      "test_program": "task_bicycle_powered_roundtrip",
+      "test_load_case_id": "task_bicycle_powered_roundtrip",
+      "profile_ids": [
+        "profile.standard_two_wheel_bicycle"
+      ],
+      "required_branches": [
+        "physical",
+        "ideal_reference"
+      ],
+      "runtime_status": "ACTIVE",
+      "task_ids": [
+        "task.powered_chain_roundtrip"
+      ],
+      "execution_requirements": [
+        "Actuate only the crank/input shaft; never actuate the rear output shaft directly.",
+        "Exclude initial engagement from powered rotation and ratio measurement.",
+        "Check powered-window samples and adjacent increments, retain zero-input passive return, and audit moving chain-path contact and penetration at every step."
+      ]
+    },
+    {
+      "scenario_id": "scenario.rear_driven_ground_roll",
+      "title": "Rear-wheel-driven ground roll",
+      "test_program": "task_bicycle_ground_roll",
+      "test_load_case_id": "task_bicycle_ground_roll",
+      "profile_ids": [
+        "profile.standard_two_wheel_bicycle"
+      ],
+      "required_branches": [
+        "physical",
+        "ideal_reference"
+      ],
+      "runtime_status": "ACTIVE",
+      "task_ids": [
+        "task.rear_driven_ground_roll"
+      ],
+      "execution_requirements": [
+        "Use the supplied bicycle ground-contact template; the design AI must not author a replacement task or joint definition.",
+        "Apply task torque only to the rear wheel while leaving the chassis free along the ground travel axis and the front wheel unactuated.",
+        "Use native finite Coulomb contact for both wheels. Require two declared axle Revolute bearings, one visible-fixture Prismatic guide, and one straight-ahead steering task lock; hidden rolling, no-slip, gear, or motion-prescription links are forbidden.",
+        "Bind both wheel radii, both axle contact heights, and the finite ground plane to the submitted STEP geometry before physics starts.",
+        "Record all five body poses, front and rear wheel angles, chassis travel, contact counts, contact coverage, finite-surface separation, slip, drift, off-axis error, penetration, and complete wrench provenance at every saved step.",
+        "Show the same full-machine motion in both the interactive physical replay and the certificate replay."
+      ]
+    }
+  ],
+  "fixtures": [
+    {
+      "fixture_id": "fixture.visible_upright_guide",
+      "title": "Visible guided upright rolling stand",
+      "parameters": [
+        {
+          "parameter_id": "parameter.travel_axis_free",
+          "value": true,
+          "unit": "bool",
+          "description": "The visible guide leaves straight-line chassis travel unconstrained."
+        },
+        {
+          "parameter_id": "parameter.hidden_support_allowed",
+          "value": false,
+          "unit": "bool",
+          "description": "No hidden fixture or support may be used."
+        },
+        {
+          "parameter_id": "parameter.unassisted_balance_claimed",
+          "value": false,
+          "unit": "bool",
+          "description": "The guided test does not claim unassisted bicycle balance."
+        }
+      ]
+    }
+  ],
+  "tasks": [
+    {
+      "task_id": "task.steering_sweep",
+      "title": "Steering sweep",
+      "goal": "Reach the approved steering angle and compare physical steering motion with the ideal reference.",
+      "scenario_id": "scenario.steering_sweep",
+      "profile_ids": [
+        "profile.standard_two_wheel_bicycle"
+      ],
+      "runtime_status": "ACTIVE",
+      "criteria": [
+        {
+          "criterion_id": "criterion.minimum_steering_angle",
+          "description": "The steering rigid group reaches at least 0.35 rad in either approved direction.",
+          "disposition": "PASS",
+          "evaluator_kind": "registered_metric",
+          "evaluator_id": "continuous_rotation_rad",
+          "observable_quantity": "pose_6d",
+          "comparator": "at_least",
+          "expected": 0.35,
+          "unit": "rad",
+          "tolerance": {"mode": "none", "value": null, "unit": null}
+        }
+      ],
+      "failure_diagnostics": [
+        {"code": "STEERING_ANGLE_SHORTFALL", "description": "The steering group did not reach the approved minimum angle."},
+        {"code": "STEERING_JOINT_JAMMED", "description": "The steering joint stopped before the approved sweep was reached."},
+        {"code": "STEERING_GROUP_DETACHED", "description": "The steering group detached or drifted off its authored axis."}
+      ],
+      "evidence_obligations": [
+        "Measure steering angle from pose_6d in both required branches.",
+        "Do not invent a return-to-home tolerance that the frozen task does not specify."
+      ]
+    },
+    {
+      "task_id": "task.powered_chain_roundtrip",
+      "title": "Powered chain-drive roundtrip",
+      "goal": "Drive only the input shaft, verify rear output rotation and fixed ratio, then verify passive return.",
+      "scenario_id": "scenario.powered_chain_roundtrip",
+      "profile_ids": [
+        "profile.standard_two_wheel_bicycle"
+      ],
+      "runtime_status": "ACTIVE",
+      "criteria": [
+        {
+          "criterion_id": "criterion.minimum_powered_output_rotation",
+          "description": "The powered rear output accumulates at least 2.8 rad after initial engagement is excluded.",
+          "disposition": "PASS",
+          "evaluator_kind": "registered_metric",
+          "evaluator_id": "continuous_rotation_rad",
+          "observable_quantity": "pose_6d",
+          "comparator": "at_least",
+          "expected": 2.8,
+          "unit": "rad",
+          "tolerance": {"mode": "none", "value": null, "unit": null}
+        },
+        {
+          "criterion_id": "criterion.signed_output_input_ratio",
+          "description": "The signed rear-output-per-input angular ratio is 2.0 within 0.02.",
+          "disposition": "PASS",
+          "evaluator_kind": "registered_metric",
+          "evaluator_id": "angular_ratio",
+          "observable_quantity": "pose_6d",
+          "comparator": "within",
+          "expected": 2.0,
+          "unit": "ratio",
+          "tolerance": {"mode": "absolute", "value": 0.02, "unit": "ratio"}
+        },
+        {
+          "criterion_id": "criterion.maximum_return_error",
+          "description": "After input removal, the rear output returns within 0.25 rad of its start position.",
+          "disposition": "PASS",
+          "evaluator_kind": "registered_metric",
+          "evaluator_id": "return_to_start_rad",
+          "observable_quantity": "pose_6d",
+          "comparator": "at_most",
+          "expected": 0.25,
+          "unit": "rad",
+          "tolerance": {"mode": "none", "value": null, "unit": null}
+        },
+        {
+          "criterion_id": "criterion.indirect_rear_output_actuation",
+          "description": "The rear output is driven indirectly through the chain and is never directly actuated.",
+          "disposition": "PASS",
+          "evaluator_kind": "registered_metric",
+          "evaluator_id": "actuation_provenance",
+          "observable_quantity": "actuation_log",
+          "comparator": "equals",
+          "expected": "indirect_only",
+          "unit": "enum",
+          "tolerance": {"mode": "none", "value": null, "unit": null}
+        }
+      ],
+      "failure_diagnostics": [
+        {"code": "POWERED_OUTPUT_ROTATION_SHORTFALL", "description": "The rear output did not reach 2.8 rad in the powered window."},
+        {"code": "CHAIN_RATIO_MISMATCH", "description": "The powered chain ratio was outside 2.0 plus or minus 0.02."},
+        {"code": "PASSIVE_RETURN_ERROR", "description": "The rear output did not return within 0.25 rad after input removal."},
+        {"code": "DIRECT_OUTPUT_ACTUATION", "description": "The rear output received forbidden direct actuation."}
+      ],
+      "evidence_obligations": [
+        "Preserve powered-window and adjacent-increment ratio evidence.",
+        "Preserve zero-input passive return, wrench provenance, moving chain-path state, and per-step collision evidence."
+      ]
+    },
+    {
+      "task_id": "task.rear_driven_ground_roll",
+      "title": "Rear-wheel-driven ground roll",
+      "goal": "Apply torque only to the rear wheel, translate the chassis over finite ground, and rotate the front wheel passively through contact.",
+      "scenario_id": "scenario.rear_driven_ground_roll",
+      "profile_ids": [
+        "profile.standard_two_wheel_bicycle"
+      ],
+      "runtime_status": "ACTIVE",
+      "criteria": [
+        {
+          "criterion_id": "criterion.minimum_passive_front_rotation",
+          "description": "The unactuated front wheel accumulates at least 5.0 rad during the powered window.",
+          "disposition": "PASS",
+          "evaluator_kind": "registered_metric",
+          "evaluator_id": "continuous_rotation_rad",
+          "observable_quantity": "pose_6d",
+          "comparator": "at_least",
+          "expected": 5.0,
+          "unit": "rad",
+          "tolerance": {"mode": "none", "value": null, "unit": null}
+        },
+        {
+          "criterion_id": "criterion.minimum_chassis_travel",
+          "description": "The bicycle chassis travels at least 1.50 m along the approved ground axis.",
+          "disposition": "PASS",
+          "evaluator_kind": "registered_metric",
+          "evaluator_id": "signed_displacement_m",
+          "observable_quantity": "position_3d",
+          "comparator": "at_least",
+          "expected": 1.5,
+          "unit": "m",
+          "tolerance": {"mode": "none", "value": null, "unit": null}
+        },
+        {
+          "criterion_id": "criterion.powered_wheel_ground_contact_coverage",
+          "description": "Both wheel-ground contact callbacks are present in at least 90% of saved powered samples.",
+          "disposition": "PASS",
+          "evaluator_kind": "registered_metric",
+          "evaluator_id": "powered_contact_coverage_ratio",
+          "observable_quantity": "contact_event",
+          "comparator": "at_least",
+          "expected": 0.9,
+          "unit": "ratio",
+          "tolerance": {"mode": "none", "value": null, "unit": null}
+        },
+        {
+          "criterion_id": "criterion.maximum_ground_separation",
+          "description": "Maximum powered wheel-ground separation, including distance beyond finite-surface bounds, is at most 0.0002 m.",
+          "disposition": "PASS",
+          "evaluator_kind": "registered_metric",
+          "evaluator_id": "ground_separation_m",
+          "observable_quantity": "contact_event",
+          "comparator": "at_most",
+          "expected": 0.0002,
+          "unit": "m",
+          "tolerance": {"mode": "none", "value": null, "unit": null}
+        },
+        {
+          "criterion_id": "criterion.maximum_rolling_slip_ratio",
+          "description": "The powered front-wheel rolling slip ratio is at most 0.12 after the first 0.10 m of travel.",
+          "disposition": "PASS",
+          "evaluator_kind": "registered_metric",
+          "evaluator_id": "rolling_slip_ratio",
+          "observable_quantity": "pose_6d",
+          "comparator": "at_most",
+          "expected": 0.12,
+          "unit": "ratio",
+          "tolerance": {"mode": "none", "value": null, "unit": null}
+        },
+        {
+          "criterion_id": "criterion.maximum_ground_penetration",
+          "description": "Wheel-ground penetration is at most 0.004 m.",
+          "disposition": "PASS",
+          "evaluator_kind": "registered_metric",
+          "evaluator_id": "forbidden_penetration_m",
+          "observable_quantity": "contact_event",
+          "comparator": "at_most",
+          "expected": 0.004,
+          "unit": "m",
+          "tolerance": {"mode": "none", "value": null, "unit": null}
+        },
+        {
+          "criterion_id": "criterion.indirect_front_wheel_actuation",
+          "description": "The front wheel is passive and receives no direct task actuation.",
+          "disposition": "PASS",
+          "evaluator_kind": "registered_metric",
+          "evaluator_id": "actuation_provenance",
+          "observable_quantity": "actuation_log",
+          "comparator": "equals",
+          "expected": "indirect_only",
+          "unit": "enum",
+          "tolerance": {"mode": "none", "value": null, "unit": null}
+        }
+      ],
+      "failure_diagnostics": [
+        {"code": "FRONT_WHEEL_ROTATION_SHORTFALL", "description": "The passive front wheel did not reach 5.0 rad."},
+        {"code": "CHASSIS_TRAVEL_SHORTFALL", "description": "The chassis did not travel 1.50 m."},
+        {"code": "WHEEL_GROUND_CONTACT_INCOMPLETE", "description": "Paired wheel-ground contact callbacks covered less than 90% of the powered window."},
+        {"code": "WHEEL_GROUND_SEPARATION_EXCEEDED", "description": "A wheel separated more than 0.0002 m vertically or moved beyond the finite ground bounds."},
+        {"code": "ROLLING_SLIP_EXCEEDED", "description": "Front-wheel rolling slip exceeded 0.12."},
+        {"code": "GROUND_PENETRATION_EXCEEDED", "description": "Wheel-ground penetration exceeded 0.004 m."},
+        {"code": "DIRECT_FRONT_WHEEL_ACTUATION", "description": "The front wheel received forbidden direct actuation."},
+        {"code": "GUIDE_OR_AXLE_DRIFT_EXCEEDED", "description": "The visible guide or a wheel axle exceeded its public drift bound."}
+      ],
+      "evidence_obligations": [
+        "Preserve physical and ideal-reference traces with synchronized five-body poses.",
+        "Preserve per-step rear/front contact counts, contact coverage, finite-surface separation, slip, axle drift, guide drift, off-axis angle, penetration, and complete wrench audit.",
+        "Do not hide any target or threshold from the design AI.",
+        "Do not claim unassisted balance, tire deformation, or steering dynamics from this guided test."
+      ]
+    }
+  ],
+  "source_projects": [
+    {
+      "project_id": "cleanroom_bicycle_drivetrain_b29514db21",
+      "evidence_status": "CAPABILITY_CERTIFIED",
+      "note": "The chain-drive capability remains certified; bounded steering is active, and the new guided ground-roll capability must earn its certificate in the current bicycle run."
+    }
+  ],
+  "approval": {
+    "status": "APPROVED",
+    "approved_by": "human:user",
+    "approved_on": "2026-08-04",
+    "basis": "Human approval for global reuse was granted in the Codex task for candidate SHA-256 76f8d689bf2d00d2e04cdb9bbc90f7c8ddbae1dd0c038db6d274fb9e5e9cc756. The approved candidate already contained the ground-roll support semantics and public contact gates requiring declared support joints, powered contact coverage, and finite-surface separation evidence. After approval, only approval metadata was added and the embedded ground-contact reference was administratively rebound from the approved candidate joint hash to that joint's catalog-file hash; task and joint semantics and public thresholds are identical to the approved candidates. 2026-08-26: embedded ground-contact reference re-pinned after that joint's provenance attachment; suite tasks, scenarios, and thresholds unchanged."
+  }
+}

@@ -1,0 +1,38 @@
+cff-version: 1.2.0
+message: "If you use FunCAD-Harness, please cite the paper."
+title: "FunCAD-Harness"
+type: software
+license: MIT
+repository-code: "https://github.com/thegenlab/fun-CAD-harness"
+url: "https://thegenlab.ai/funcad/"
+authors:
+  - given-names: Wenqian
+    family-names: Zhang
+    affiliation: "The Chinese University of Hong Kong, Shenzhen"
+  - given-names: Yangyi
+    family-names: Huang
+    affiliation: "The Chinese University of Hong Kong"
+  - given-names: Zigeng
+    family-names: Xu
+    affiliation: "The Chinese University of Hong Kong, Shenzhen"
+  - given-names: Weiyang
+    family-names: Liu
+    affiliation: "The Chinese University of Hong Kong"
+  - given-names: Zhen
+    family-names: Liu
+    affiliation: "The Chinese University of Hong Kong, Shenzhen"
+preferred-citation:
+  type: article
+  title: "Can It Actually Work? Synthesizing Functional CAD Mechanisms"
+  year: 2026
+  authors:
+    - given-names: Wenqian
+      family-names: Zhang
+    - given-names: Yangyi
+      family-names: Huang
+    - given-names: Zigeng
+      family-names: Xu
+    - given-names: Weiyang
+      family-names: Liu
+    - given-names: Zhen
+      family-names: Liu

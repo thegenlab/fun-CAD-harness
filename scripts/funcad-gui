@@ -1,0 +1,18 @@
+#!/usr/bin/env bash
+# Start the FunCAD-Harness web GUI (new-task page and live dashboard) on this machine.
+#   scripts/funcad-gui [--port 8765]
+# Open the http://127.0.0.1:<port>/launch#human=... link it prints.
+set -euo pipefail
+ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+if [ ! -f "$ROOT/.env" ]; then
+  echo "Run scripts/setup_conda.sh first (or use Docker, see README)." >&2
+  exit 1
+fi
+set -a
+. "$ROOT/.env"
+set +a
+# Agents and renderers find the CAD environment's python and ffmpeg first.
+export PATH="$(dirname "$SIMREADY_CAD_PYTHON"):$PATH"
+cd "$ROOT"
+exec "$SIMREADY_CAD_PYTHON" -X utf8 -m simulation_ready_cad_workflow.validation_pipeline.dashboard \
+  serve --enable-launch --host 127.0.0.1 "$@"

@@ -1,0 +1,129 @@
+{
+  "mechanism_kind": "rack_pinion",
+  "mechanism_id": "hand_crank_vertical_gate_drive_engineering",
+  "bodies": [
+    {
+      "body_id": "ground",
+      "group_ids": [
+        "group_gate_frame"
+      ],
+      "fixed": true,
+      "mass_kg": 36.0,
+      "center_abs_m": [
+        0.0,
+        0.0,
+        0.62
+      ],
+      "size_m": [
+        1.04,
+        0.43,
+        1.26
+      ],
+      "rotation_abs_quat_wxyz": [
+        1.0,
+        0.0,
+        0.0,
+        0.0
+      ]
+    },
+    {
+      "body_id": "pinion",
+      "group_ids": [
+        "group_pinion_crank"
+      ],
+      "fixed": false,
+      "mass_kg": 1.8,
+      "center_abs_m": [
+        0.39,
+        -0.105,
+        0.53
+      ],
+      "size_m": [
+        0.25,
+        0.26,
+        0.22
+      ],
+      "rotation_abs_quat_wxyz": [
+        1.0,
+        0.0,
+        0.0,
+        0.0
+      ]
+    },
+    {
+      "body_id": "rack",
+      "group_ids": [
+        "group_rack_gate"
+      ],
+      "fixed": false,
+      "mass_kg": 18.0,
+      "center_abs_m": [
+        0.0,
+        0.0,
+        0.45
+      ],
+      "size_m": [
+        0.7,
+        0.15,
+        0.82
+      ],
+      "rotation_abs_quat_wxyz": [
+        1.0,
+        0.0,
+        0.0,
+        0.0
+      ]
+    }
+  ],
+  "fixed_body_id": "ground",
+  "pinion_body_id": "pinion",
+  "rack_body_id": "rack",
+  "pinion_origin_abs_m": [
+    0.39,
+    -0.105,
+    0.53
+  ],
+  "pinion_axis_abs": [
+    0.0,
+    1.0,
+    0.0
+  ],
+  "rack_axis_abs": [
+    0.0,
+    0.0,
+    1.0
+  ],
+  "pinion_pitch_radius_m": 0.04,
+  "pressure_angle_rad": 0.3490658503988659,
+  "home_progress_m": 0.0,
+  "outbound_progress_m": 0.18,
+  "nominal_input_torque_nm": 18.0,
+  "return_input_torque_nm": 2.0,
+  "max_torque_phase_s": 0.8,
+  "max_return_phase_s": 0.8,
+  "settle_phase_s": 0.08,
+  "output_progress_tolerance_m": 0.004,
+  "max_support_drift_m": 0.0015,
+  "max_off_axis_rotation_rad": 0.04363323129985824,
+  "max_coupling_error_m": 0.002,
+  "friction": 0.08,
+  "geometry_reference": {
+    "module_mm": 5.0,
+    "pinion_teeth": 16,
+    "backlash_mm": 0.6,
+    "face_width_mm": 28.0,
+    "guide_clearance_mm": 2.0,
+    "frame_bounds_m": {
+      "min": [
+        -0.565,
+        -0.215,
+        0.0
+      ],
+      "max": [
+        0.565,
+        0.215,
+        1.26
+      ]
+    }
+  }
+}

@@ -1,0 +1,210 @@
+{
+  "bodies": [
+    {
+      "body_id": "laboratory_chassis_group",
+      "center_abs_m": [
+        0.03924157655522159,
+        0.009980168388429278,
+        0.1471028068336617
+      ],
+      "fixed": true,
+      "group_ids": [
+        "laboratory_chassis_group"
+      ],
+      "mass_kg": 154.028825879851,
+      "rotation_abs_quat_wxyz": [
+        1.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "size_m": [
+        2.2060000002,
+        0.435,
+        0.9000000001
+      ]
+    },
+    {
+      "body_id": "input_crank_group",
+      "center_abs_m": [
+        -0.2500000220707962,
+        -0.022760979945505855,
+        0.34000002293130277
+      ],
+      "fixed": false,
+      "group_ids": [
+        "input_crank_group"
+      ],
+      "mass_kg": 1.160843191203093,
+      "rotation_abs_quat_wxyz": [
+        1.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "size_m": [
+        0.426,
+        0.242,
+        0.1600000002
+      ]
+    },
+    {
+      "body_id": "rear_drive_wheel_group",
+      "center_abs_m": [
+        -0.8494161570982722,
+        -0.002352686733197013,
+        0.3801840509618811
+      ],
+      "fixed": false,
+      "group_ids": [
+        "rear_drive_wheel_group"
+      ],
+      "mass_kg": 4.867008872277751,
+      "rotation_abs_quat_wxyz": [
+        1.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "size_m": [
+        0.6670622773879867,
+        0.1290000001,
+        0.6620000002
+      ]
+    }
+  ],
+  "chain_path_binding": {
+    "context_group_id": "visible_chain_path_group",
+    "frame_id": "visible_chain_path_reference",
+    "reference_abs_m": [
+      -0.55,
+      -0.102,
+      0.38
+    ],
+    "spans_input_wrap_zone": true,
+    "spans_output_wrap_zone": true
+  },
+  "fixed_body_id": "laboratory_chassis_group",
+  "fixed_occurrence_id": "laboratory_chassis_occurrence",
+  "fixed_part_id": "laboratory_chassis",
+  "friction": 0.06,
+  "input_bearing": {
+    "axial_stiffness_n_m": 150000.0,
+    "fixed_body_id": "laboratory_chassis_group",
+    "frame_id": "input_crank_axis",
+    "maximum_force_n": 1500.0,
+    "maximum_return_torque_nm": 5.0,
+    "maximum_torque_nm": 8.0,
+    "moving_body_id": "input_crank_group",
+    "radial_clearance_m": 0.0015,
+    "radial_stiffness_n_m": 250000.0,
+    "return_damping_n_m_s_rad": 0.18,
+    "return_stiffness_n_m_rad": 1.2,
+    "support_id": "input_crank_finite_bearing_support",
+    "tilt_damping_n_m_s_rad": 2.5,
+    "tilt_stiffness_n_m_rad": 120.0,
+    "translation_damping_n_s_m": 350.0
+  },
+  "input_body_id": "input_crank_group",
+  "input_frame": {
+    "axis_abs": [
+      0.0,
+      1.0,
+      0.0
+    ],
+    "body_id": "input_crank_group",
+    "frame_id": "input_crank_axis",
+    "origin_abs_m": [
+      -0.25,
+      0.0,
+      0.34
+    ]
+  },
+  "input_occurrence_id": "input_crank_occurrence",
+  "input_part_id": "input_crank",
+  "input_port": {
+    "axis_abs": [
+      0.0,
+      1.0,
+      0.0
+    ],
+    "frame_id": "input_crank_axis",
+    "maximum_magnitude_nm": 5.0,
+    "port_id": "input_crank_torque",
+    "target_body_id": "input_crank_group",
+    "wrench_kind": "torque"
+  },
+  "max_off_axis_rotation_rad": 0.01,
+  "max_support_drift_m": 0.003,
+  "maximum_resistive_test_load_nm": 1.0,
+  "mechanism_id": "bicycle_drivetrain",
+  "mechanism_kind": "bicycle_chain_sprocket_drive",
+  "observables": {
+    "input_angle": {
+      "body_id": "input_crank_group",
+      "frame_id": "input_crank_axis",
+      "observable_id": "input_crank_pose_6d",
+      "quantity": "pose_6d"
+    },
+    "output_actuation_log": {
+      "body_id": "rear_drive_wheel_group",
+      "frame_id": "rear_drive_wheel_axis",
+      "observable_id": "rear_drive_wheel_actuation_log",
+      "quantity": "actuation_log"
+    },
+    "output_angle": {
+      "body_id": "rear_drive_wheel_group",
+      "frame_id": "rear_drive_wheel_axis",
+      "observable_id": "rear_drive_wheel_pose_6d",
+      "quantity": "pose_6d"
+    }
+  },
+  "output_bearing": {
+    "axial_stiffness_n_m": 180000.0,
+    "fixed_body_id": "laboratory_chassis_group",
+    "frame_id": "rear_drive_wheel_axis",
+    "maximum_force_n": 1800.0,
+    "maximum_torque_nm": 8.0,
+    "moving_body_id": "rear_drive_wheel_group",
+    "radial_clearance_m": 0.0015,
+    "radial_stiffness_n_m": 300000.0,
+    "spin_damping_n_m_s_rad": 0.03,
+    "support_id": "rear_wheel_finite_bearing_support",
+    "tilt_damping_n_m_s_rad": 3.0,
+    "tilt_stiffness_n_m_rad": 150.0,
+    "translation_damping_n_s_m": 420.0
+  },
+  "output_body_id": "rear_drive_wheel_group",
+  "output_frame": {
+    "axis_abs": [
+      0.0,
+      1.0,
+      0.0
+    ],
+    "body_id": "rear_drive_wheel_group",
+    "frame_id": "rear_drive_wheel_axis",
+    "origin_abs_m": [
+      -0.85,
+      0.0,
+      0.38
+    ]
+  },
+  "output_occurrence_id": "rear_drive_wheel_occurrence",
+  "output_part_id": "rear_drive_wheel",
+  "schema_version": "1.0",
+  "transmission": {
+    "chain_damping_n_s_m": 80.0,
+    "chain_path_group_id": "visible_chain_path_group",
+    "chain_stiffness_n_m": 25000.0,
+    "input_body_id": "input_crank_group",
+    "input_frame_id": "input_crank_axis",
+    "input_pitch_radius_m": 0.08,
+    "maximum_alignment_error_m": 0.003,
+    "maximum_axis_angle_error_rad": 0.01,
+    "maximum_differential_tension_n": 300.0,
+    "output_body_id": "rear_drive_wheel_group",
+    "output_frame_id": "rear_drive_wheel_axis",
+    "output_pitch_radius_m": 0.04,
+    "support_id": "compliant_chain_transmission_support"
+  }
+}

@@ -1,0 +1,37 @@
+{
+  "schema_version": "simulation_ready_cad_collision_components_v1",
+  "sources": [
+    {
+      "body_id": "input_crank",
+      "source_solid_id": "solid_2",
+      "components": [
+        {
+          "component_id": "input_crank_component_001",
+          "step_file": "collision_components/solid_2/input_crank_component_001.step",
+          "sha256": "REPLACE_WITH_64_HEX_SHA256"
+        },
+        {
+          "component_id": "input_crank_component_002",
+          "step_file": "collision_components/solid_2/input_crank_component_002.step",
+          "sha256": "REPLACE_WITH_64_HEX_SHA256"
+        }
+      ]
+    },
+    {
+      "body_id": "rear_drive_wheel",
+      "source_solid_id": "solid_3",
+      "components": [
+        {
+          "component_id": "rear_drive_wheel_component_001",
+          "step_file": "collision_components/solid_3/rear_drive_wheel_component_001.step",
+          "sha256": "REPLACE_WITH_64_HEX_SHA256"
+        },
+        {
+          "component_id": "rear_drive_wheel_component_002",
+          "step_file": "collision_components/solid_3/rear_drive_wheel_component_002.step",
+          "sha256": "REPLACE_WITH_64_HEX_SHA256"
+        }
+      ]
+    }
+  ]
+}

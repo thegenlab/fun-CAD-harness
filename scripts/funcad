@@ -1,0 +1,18 @@
+#!/usr/bin/env bash
+# Run the FunCAD-Harness command line with the environments from .env.
+#   scripts/funcad create --mode free --project folding_stool --task examples/tasks/folding_stool.md
+#   scripts/funcad resume folding_stool
+#   scripts/funcad --help
+set -euo pipefail
+ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+if [ ! -f "$ROOT/.env" ]; then
+  echo "Run scripts/setup_conda.sh first (or use: scripts/funcad-docker cli ...)." >&2
+  exit 1
+fi
+set -a
+. "$ROOT/.env"
+set +a
+# Agents and renderers find the CAD environment's python and ffmpeg first.
+export PATH="$(dirname "$SIMREADY_CAD_PYTHON"):$PATH"
+cd "$ROOT"
+exec "$SIMREADY_CAD_PYTHON" -X utf8 -m simulation_ready_cad_workflow.validation_pipeline.slim_harness "$@"

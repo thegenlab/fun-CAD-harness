@@ -1,0 +1,64 @@
+{
+  "schema_version": "simulation_ready_cad_joint_template_v1",
+  "kind": "joint",
+  "template_id": "joint.click_pen_cam_latch",
+  "version": "1.0.0",
+  "title": "Click-pen cam and latch compound joint",
+  "category": "compound_joint",
+  "goal": "Convert repeated button presses through a cylindrical cam, spring, and latch state machine into alternating tip extension and retraction.",
+  "family": "compound",
+  "capability_variants": [
+    {
+      "variant_id": "latch.click_pen_cam",
+      "plugin_id": "click_pen_cam_latch_v1",
+      "mechanism_kind": "click_pen_cam_latch",
+      "runtime_status": "ACTIVE"
+    }
+  ],
+  "input_wrench_kinds": [
+    "force"
+  ],
+  "observable_quantities": [
+    "pose_6d",
+    "contact_event"
+  ],
+  "components": [
+    "button prismatic joint",
+    "cylindrical cam joint",
+    "compression spring",
+    "latch contact state machine",
+    "refill output carriage"
+  ],
+  "required_instance_fields": [
+    "fixed_body_id",
+    "button_body_id",
+    "cam_body_id",
+    "refill_body_id",
+    "button_axis_abs",
+    "cam_geometry",
+    "spring_parameters",
+    "latch_contact_geometry"
+  ],
+  "source_bindings": [
+    {
+      "project_id": "retractable_ballpoint_pen_v1",
+      "capsule_id": "ballpoint_click_cam",
+      "source_status": "UNRESOLVED_EXEMPLAR",
+      "capsule_path": "simulation_ready_cad_workflow/validation_pipeline/planning_templates/provenance/retractable_ballpoint_pen_v1/capsule.json",
+      "capsule_sha256": "9ebd99f048366368d00299cd4113cbd04c4ecc6f38a68fbd2020db0e35da1cbe",
+      "family_spec_path": "simulation_ready_cad_workflow/validation_pipeline/planning_templates/provenance/retractable_ballpoint_pen_v1/family_spec.json",
+      "family_spec_sha256": "20f46b3efc1ffef1901a3ede1da07c10cf02be7e535a67785f8e78d8507784cc"
+    }
+  ],
+  "constraints": [
+    "Button, cam, latch, spring, and refill motion must remain physically coupled.",
+    "Latch state is established from contact and motion evidence rather than a scripted state variable alone.",
+    "The registered plugin is active, but the retractable_ballpoint_pen_v1 exemplar was never KINEMATIC_CERTIFIED through r150; r150 stopped at PHYSICAL_PREFLIGHT_FAILED with approximately 0.001717 m button-cam penetration, so its tasks are not admitted automatically."
+  ],
+  "approval": {
+    "status": "APPROVED",
+    "approved_by": "user",
+    "approved_on": "2026-08-02",
+    "basis": "Imported from retractable_ballpoint_pen_v1 at the user's request; task certification status is kept separate."
+  }
+}

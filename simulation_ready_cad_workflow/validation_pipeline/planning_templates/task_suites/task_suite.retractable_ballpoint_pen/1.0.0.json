@@ -1,0 +1,447 @@
+{
+  "schema_version": "simulation_ready_cad_machine_task_suite_v1",
+  "kind": "task_suite",
+  "template_id": "task_suite.retractable_ballpoint_pen",
+  "version": "1.0.0",
+  "title": "Retractable ballpoint-pen task suite",
+  "machine_family": "retractable_ballpoint_pen",
+  "goal": "Verify alternating click-pen extension and retraction states, including refill position, latch state, button return, and cylindrical-cam indexing.",
+  "joint_template_refs": [
+    {
+      "template_id": "joint.click_pen_cam_latch",
+      "version": "1.0.0",
+      "variant_id": "latch.click_pen_cam",
+      "sha256": "8604883c00acf3b5bcfde8ec8a4e752dd55a9dcf5050bf50b558805d8cd8d41c"
+    }
+  ],
+  "profiles": [
+    {
+      "profile_id": "profile.retractable_ballpoint_pen_v1",
+      "title": "Seven-millimetre click-pen profile",
+      "description": "The formally approved task definition derived from retractable_ballpoint_pen_v1; source-machine failure is evidence about that machine, not a defect in these task requirements."
+    }
+  ],
+  "scenarios": [
+    {
+      "scenario_id": "scenario.first_click",
+      "title": "First click extension",
+      "test_program": "task_pen_first_click",
+      "test_load_case_id": "task_pen_first_click",
+      "profile_ids": [
+        "profile.retractable_ballpoint_pen_v1"
+      ],
+      "required_branches": [
+        "physical",
+        "ideal_reference"
+      ],
+      "runtime_status": "ACTIVE",
+      "task_ids": [
+        "task.first_click_extend_and_latch"
+      ],
+      "execution_requirements": [
+        "Press and release only the authored button input.",
+        "Derive latch and cam-index states from contact and motion evidence rather than accepting a scripted state variable alone.",
+        "Audit unintended penetration at every physical simulation time step."
+      ]
+    },
+    {
+      "scenario_id": "scenario.second_click",
+      "title": "Second click retraction",
+      "test_program": "task_pen_second_click",
+      "test_load_case_id": "task_pen_second_click",
+      "profile_ids": [
+        "profile.retractable_ballpoint_pen_v1"
+      ],
+      "required_branches": [
+        "physical",
+        "ideal_reference"
+      ],
+      "runtime_status": "ACTIVE",
+      "task_ids": [
+        "task.second_click_retract_and_latch"
+      ],
+      "execution_requirements": [
+        "Begin from a physically established extended-and-latched state, then press and release the authored button.",
+        "Evaluate final home position independently from cumulative refill travel.",
+        "Audit unintended penetration at every physical simulation time step."
+      ]
+    },
+    {
+      "scenario_id": "scenario.repeat_click_cycles",
+      "title": "Two complete click cycles",
+      "test_program": "task_pen_repeat_cycles",
+      "test_load_case_id": "task_pen_repeat_cycles",
+      "profile_ids": [
+        "profile.retractable_ballpoint_pen_v1"
+      ],
+      "required_branches": [
+        "physical",
+        "ideal_reference"
+      ],
+      "runtime_status": "ACTIVE",
+      "task_ids": [
+        "task.repeat_two_click_cycles"
+      ],
+      "execution_requirements": [
+        "Execute four complete button press-and-release actions without resetting the mechanism between clicks.",
+        "Record each released latch state, button return, and cam index in temporal order.",
+        "Audit unintended penetration at every physical simulation time step."
+      ]
+    }
+  ],
+  "fixtures": [],
+  "tasks": [
+    {
+      "task_id": "task.first_click_extend_and_latch",
+      "title": "Extend and latch on the first click",
+      "goal": "Extend the refill by at least 7 mm and establish a stable extended latch after button release.",
+      "scenario_id": "scenario.first_click",
+      "profile_ids": [
+        "profile.retractable_ballpoint_pen_v1"
+      ],
+      "runtime_status": "ACTIVE",
+      "criteria": [
+        {
+          "criterion_id": "criterion.first_click_extension",
+          "description": "The refill reaches at least 0.007 m of signed extension from its retracted home position.",
+          "disposition": "PASS",
+          "evaluator_kind": "registered_metric",
+          "evaluator_id": "signed_displacement_m",
+          "observable_quantity": "pose_6d",
+          "comparator": "at_least",
+          "expected": 0.007,
+          "unit": "m",
+          "tolerance": {
+            "mode": "none",
+            "value": null,
+            "unit": null
+          }
+        },
+        {
+          "criterion_id": "criterion.extended_latch_state",
+          "description": "After release, the mechanism occupies the physically evidenced EXTENDED_LATCHED state.",
+          "disposition": "PASS",
+          "evaluator_kind": "suite_predicate",
+          "evaluator_id": "pen_released_latch_state",
+          "observable_quantity": "contact_event",
+          "comparator": "equals",
+          "expected": "EXTENDED_LATCHED",
+          "unit": "enum",
+          "tolerance": {
+            "mode": "none",
+            "value": null,
+            "unit": null
+          }
+        },
+        {
+          "criterion_id": "criterion.first_button_return",
+          "description": "The button returns after the first press is released.",
+          "disposition": "PASS",
+          "evaluator_kind": "suite_predicate",
+          "evaluator_id": "pen_button_returned_after_release",
+          "observable_quantity": "pose_6d",
+          "comparator": "equals",
+          "expected": true,
+          "unit": "bool",
+          "tolerance": {
+            "mode": "none",
+            "value": null,
+            "unit": null
+          }
+        },
+        {
+          "criterion_id": "criterion.first_cam_index",
+          "description": "The cylindrical cam completes the correct first index transition.",
+          "disposition": "PASS",
+          "evaluator_kind": "suite_predicate",
+          "evaluator_id": "pen_cam_index_transition_valid",
+          "observable_quantity": "pose_6d",
+          "comparator": "equals",
+          "expected": true,
+          "unit": "bool",
+          "tolerance": {
+            "mode": "none",
+            "value": null,
+            "unit": null
+          }
+        }
+      ],
+      "failure_diagnostics": [
+        {
+          "code": "FIRST_CLICK_EXTENSION_SHORTFALL",
+          "description": "The refill did not extend by 7 mm."
+        },
+        {
+          "code": "EXTENDED_LATCH_NOT_ESTABLISHED",
+          "description": "The mechanism did not establish the required extended latch after release."
+        },
+        {
+          "code": "BUTTON_DID_NOT_RETURN",
+          "description": "The button did not return after the press was released."
+        },
+        {
+          "code": "CAM_INDEX_INCORRECT",
+          "description": "The cam did not complete the required index transition."
+        }
+      ],
+      "evidence_obligations": [
+        "Report refill extension, released latch state, button return, and cam-index transition separately.",
+        "Do not infer success from cumulative travel alone."
+      ]
+    },
+    {
+      "task_id": "task.second_click_retract_and_latch",
+      "title": "Retract and latch on the second click",
+      "goal": "Return the refill to home and establish a stable retracted latch after the second button release.",
+      "scenario_id": "scenario.second_click",
+      "profile_ids": [
+        "profile.retractable_ballpoint_pen_v1"
+      ],
+      "runtime_status": "ACTIVE",
+      "criteria": [
+        {
+          "criterion_id": "criterion.second_click_home_position",
+          "description": "The refill finishes at its retracted home position within 0.0008 m.",
+          "disposition": "PASS",
+          "evaluator_kind": "registered_metric",
+          "evaluator_id": "signed_displacement_m",
+          "observable_quantity": "pose_6d",
+          "comparator": "within",
+          "expected": 0.0,
+          "unit": "m",
+          "tolerance": {
+            "mode": "absolute",
+            "value": 0.0008,
+            "unit": "m"
+          }
+        },
+        {
+          "criterion_id": "criterion.retracted_latch_state",
+          "description": "After release, the mechanism occupies the physically evidenced RETRACTED_LATCHED state.",
+          "disposition": "PASS",
+          "evaluator_kind": "suite_predicate",
+          "evaluator_id": "pen_released_latch_state",
+          "observable_quantity": "contact_event",
+          "comparator": "equals",
+          "expected": "RETRACTED_LATCHED",
+          "unit": "enum",
+          "tolerance": {
+            "mode": "none",
+            "value": null,
+            "unit": null
+          }
+        },
+        {
+          "criterion_id": "criterion.second_button_return",
+          "description": "The button returns after the second press is released.",
+          "disposition": "PASS",
+          "evaluator_kind": "suite_predicate",
+          "evaluator_id": "pen_button_returned_after_release",
+          "observable_quantity": "pose_6d",
+          "comparator": "equals",
+          "expected": true,
+          "unit": "bool",
+          "tolerance": {
+            "mode": "none",
+            "value": null,
+            "unit": null
+          }
+        },
+        {
+          "criterion_id": "criterion.second_cam_index",
+          "description": "The cylindrical cam completes the correct second index transition.",
+          "disposition": "PASS",
+          "evaluator_kind": "suite_predicate",
+          "evaluator_id": "pen_cam_index_transition_valid",
+          "observable_quantity": "pose_6d",
+          "comparator": "equals",
+          "expected": true,
+          "unit": "bool",
+          "tolerance": {
+            "mode": "none",
+            "value": null,
+            "unit": null
+          }
+        },
+        {
+          "criterion_id": "criterion.first_cycle_travel",
+          "description": "The first extension-retraction cycle accumulates at least 0.014 m of refill travel; this is supporting evidence only.",
+          "disposition": "WARNING",
+          "evaluator_kind": "registered_metric",
+          "evaluator_id": "cumulative_travel_m",
+          "observable_quantity": "pose_6d",
+          "comparator": "at_least",
+          "expected": 0.014,
+          "unit": "m",
+          "tolerance": {
+            "mode": "none",
+            "value": null,
+            "unit": null
+          }
+        }
+      ],
+      "failure_diagnostics": [
+        {
+          "code": "SECOND_CLICK_HOME_MISSED",
+          "description": "The refill did not return within the approved retracted-home tolerance."
+        },
+        {
+          "code": "RETRACTED_LATCH_NOT_ESTABLISHED",
+          "description": "The mechanism did not establish the required retracted latch after release."
+        },
+        {
+          "code": "BUTTON_DID_NOT_RETURN",
+          "description": "The button did not return after the press was released."
+        },
+        {
+          "code": "CAM_INDEX_INCORRECT",
+          "description": "The cam did not complete the required index transition."
+        },
+        {
+          "code": "CYCLE_TRAVEL_LOW",
+          "description": "The supporting cumulative-travel result was below 0.014 m."
+        }
+      ],
+      "evidence_obligations": [
+        "Report final refill position, released latch state, button return, and cam-index transition separately.",
+        "Treat cumulative travel as diagnostic evidence rather than proof of the final state."
+      ]
+    },
+    {
+      "task_id": "task.repeat_two_click_cycles",
+      "title": "Complete two click cycles",
+      "goal": "Produce the correct alternating latch sequence across four presses and finish retracted.",
+      "scenario_id": "scenario.repeat_click_cycles",
+      "profile_ids": [
+        "profile.retractable_ballpoint_pen_v1"
+      ],
+      "runtime_status": "ACTIVE",
+      "criteria": [
+        {
+          "criterion_id": "criterion.released_state_sequence",
+          "description": "The four released states alternate extended, retracted, extended, and retracted in order.",
+          "disposition": "PASS",
+          "evaluator_kind": "suite_predicate",
+          "evaluator_id": "pen_released_latch_state_sequence",
+          "observable_quantity": "contact_event",
+          "comparator": "sequence_equals",
+          "expected": [
+            "EXTENDED_LATCHED",
+            "RETRACTED_LATCHED",
+            "EXTENDED_LATCHED",
+            "RETRACTED_LATCHED"
+          ],
+          "unit": "state_sequence",
+          "tolerance": {
+            "mode": "none",
+            "value": null,
+            "unit": null
+          }
+        },
+        {
+          "criterion_id": "criterion.all_button_returns",
+          "description": "The button returns after every one of the four releases.",
+          "disposition": "PASS",
+          "evaluator_kind": "suite_predicate",
+          "evaluator_id": "pen_button_returned_after_every_release",
+          "observable_quantity": "pose_6d",
+          "comparator": "equals",
+          "expected": true,
+          "unit": "bool",
+          "tolerance": {
+            "mode": "none",
+            "value": null,
+            "unit": null
+          }
+        },
+        {
+          "criterion_id": "criterion.all_cam_indexes",
+          "description": "Every press produces the correct cylindrical-cam index transition.",
+          "disposition": "PASS",
+          "evaluator_kind": "suite_predicate",
+          "evaluator_id": "pen_all_cam_index_transitions_valid",
+          "observable_quantity": "pose_6d",
+          "comparator": "equals",
+          "expected": true,
+          "unit": "bool",
+          "tolerance": {
+            "mode": "none",
+            "value": null,
+            "unit": null
+          }
+        },
+        {
+          "criterion_id": "criterion.repeat_final_home_position",
+          "description": "After the fourth release, the refill finishes at retracted home within 0.0008 m.",
+          "disposition": "PASS",
+          "evaluator_kind": "registered_metric",
+          "evaluator_id": "signed_displacement_m",
+          "observable_quantity": "pose_6d",
+          "comparator": "within",
+          "expected": 0.0,
+          "unit": "m",
+          "tolerance": {
+            "mode": "absolute",
+            "value": 0.0008,
+            "unit": "m"
+          }
+        },
+        {
+          "criterion_id": "criterion.two_cycle_travel",
+          "description": "Two extension-retraction cycles accumulate at least 0.028 m of refill travel; this is supporting evidence only.",
+          "disposition": "WARNING",
+          "evaluator_kind": "registered_metric",
+          "evaluator_id": "cumulative_travel_m",
+          "observable_quantity": "pose_6d",
+          "comparator": "at_least",
+          "expected": 0.028,
+          "unit": "m",
+          "tolerance": {
+            "mode": "none",
+            "value": null,
+            "unit": null
+          }
+        }
+      ],
+      "failure_diagnostics": [
+        {
+          "code": "CLICK_STATE_SEQUENCE_INVALID",
+          "description": "The released latch states did not alternate in the required order."
+        },
+        {
+          "code": "BUTTON_DID_NOT_RETURN",
+          "description": "At least one button release did not return correctly."
+        },
+        {
+          "code": "CAM_INDEX_INCORRECT",
+          "description": "At least one cam index transition was incorrect."
+        },
+        {
+          "code": "REPEAT_FINAL_HOME_MISSED",
+          "description": "The refill did not finish within the approved retracted-home tolerance."
+        },
+        {
+          "code": "CYCLE_TRAVEL_LOW",
+          "description": "The supporting cumulative-travel result was below 0.028 m."
+        }
+      ],
+      "evidence_obligations": [
+        "Preserve the time-ordered latch, button, cam, and refill traces for all four presses.",
+        "A cumulative-travel result cannot substitute for the required released-state sequence."
+      ]
+    }
+  ],
+  "source_projects": [
+    {
+      "project_id": "retractable_ballpoint_pen_v1",
+      "evidence_status": "PHYSICAL_PREFLIGHT_FAILED",
+      "note": "The source machine remained blocked by button-cam penetration through r150. This evidence status describes that machine instance only; the user explicitly approved these task definitions for the formal library."
+    }
+  ],
+  "approval": {
+    "status": "APPROVED",
+    "approved_by": "user",
+    "approved_on": "2026-08-02",
+    "basis": "The user approved the click-pen tasks as formal requirements and clarified that a machine may fail a valid task without invalidating the task template."
+  }
+}

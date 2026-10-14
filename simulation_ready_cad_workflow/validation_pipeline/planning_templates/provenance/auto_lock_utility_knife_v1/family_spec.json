@@ -1,0 +1,228 @@
+{
+  "mechanism_kind": "prismatic_detent_latch",
+  "mechanism_id": "auto_lock_utility_knife_slider",
+  "bodies": [
+    {
+      "body_id": "handle",
+      "group_ids": [
+        "group_knife_handle"
+      ],
+      "fixed": true,
+      "mass_kg": 0.16,
+      "center_abs_m": [
+        -0.018,
+        0.0,
+        0.0
+      ],
+      "size_m": [
+        0.192,
+        0.034,
+        0.044
+      ]
+    },
+    {
+      "body_id": "blade_carriage",
+      "group_ids": [
+        "group_blade_carriage"
+      ],
+      "fixed": false,
+      "mass_kg": 0.045,
+      "center_abs_m": [
+        0.028,
+        0.0,
+        0.0
+      ],
+      "size_m": [
+        0.156,
+        0.02,
+        0.026
+      ]
+    },
+    {
+      "body_id": "thumb_latch",
+      "group_ids": [
+        "group_thumb_latch"
+      ],
+      "fixed": false,
+      "mass_kg": 0.012,
+      "center_abs_m": [
+        -0.027,
+        0.0,
+        0.019
+      ],
+      "size_m": [
+        0.052,
+        0.024,
+        0.034
+      ]
+    }
+  ],
+  "blade_prismatic_joint": {
+    "joint_id": "blade_slide",
+    "parent_body_id": "handle",
+    "child_body_id": "blade_carriage",
+    "origin_abs_m": [
+      -0.03,
+      0.0,
+      0.0
+    ],
+    "axis_abs": [
+      1.0,
+      0.0,
+      0.0
+    ],
+    "min_position_m": 0.0,
+    "max_position_m": 0.065
+  },
+  "latch_press_joint": {
+    "joint_id": "thumb_press",
+    "parent_body_id": "blade_carriage",
+    "child_body_id": "thumb_latch",
+    "origin_abs_m": [
+      -0.034,
+      0.0,
+      0.017
+    ],
+    "axis_abs": [
+      0.0,
+      0.0,
+      -1.0
+    ],
+    "min_position_m": -0.00015,
+    "travel_m": 0.004,
+    "spring_stiffness_n_m": 900.0,
+    "damping_n_s_m": 8.0,
+    "spring_preload_n": 1.0
+  },
+  "detent_interface": {
+    "rack_body_id": "handle",
+    "tab_body_id": "thumb_latch",
+    "positions_m": [
+      0.0,
+      0.025,
+      0.045,
+      0.065
+    ],
+    "capture_tolerance_m": 0.0015,
+    "release_press_m": 0.003,
+    "holding_force_n": 45.0,
+    "geometry_contract": {
+      "schema_version": "utility_knife_detent_geometry_v1",
+      "rack_component_refs": [
+        "handle/solid_11",
+        "handle/solid_12",
+        "handle/solid_13",
+        "handle/solid_14",
+        "handle/solid_15",
+        "handle/solid_16",
+        "handle/solid_17",
+        "handle/solid_18"
+      ],
+      "seat_component_refs": [
+        "handle/solid_19",
+        "handle/solid_20",
+        "handle/solid_21",
+        "handle/solid_22"
+      ],
+      "tab_component_ref": "thumb_latch/solid_35",
+      "rack_tooth_centers_abs_m": [
+        [
+          -0.016,
+          0.0081,
+          0.0155
+        ],
+        [
+          -0.002,
+          0.0081,
+          0.0155
+        ],
+        [
+          0.009,
+          0.0081,
+          0.0155
+        ],
+        [
+          0.023,
+          0.0081,
+          0.0155
+        ],
+        [
+          0.029,
+          0.0081,
+          0.0155
+        ],
+        [
+          0.043,
+          0.0081,
+          0.0155
+        ],
+        [
+          0.049,
+          0.0081,
+          0.0155
+        ],
+        [
+          0.063,
+          0.0081,
+          0.0155
+        ]
+      ],
+      "rack_tooth_size_m": [
+        0.007,
+        0.0022,
+        0.007
+      ],
+      "seat_centers_abs_m": [
+        [
+          -0.009,
+          0.00815,
+          0.0156
+        ],
+        [
+          0.016,
+          0.00815,
+          0.0156
+        ],
+        [
+          0.036,
+          0.00815,
+          0.0156
+        ],
+        [
+          0.056,
+          0.00815,
+          0.0156
+        ]
+      ],
+      "seat_size_m": [
+        0.0066,
+        0.0023,
+        0.001
+      ],
+      "tab_home_center_abs_m": [
+        -0.009,
+        0.008,
+        0.0125
+      ],
+      "tab_size_m": [
+        0.006,
+        0.002,
+        0.005
+      ],
+      "pressed_offset_abs_m": [
+        0.0,
+        0.0,
+        -0.004
+      ],
+      "contact_tolerance_m": 0.00055,
+      "minimum_pressed_clearance_m": 0.001
+    }
+  },
+  "input_body_id": "thumb_latch",
+  "output_body_id": "blade_carriage",
+  "nominal_press_force_n": 8.0,
+  "nominal_slide_force_n": 15.0,
+  "adversarial_axial_force_n": 30.0,
+  "max_support_drift_m": 0.001,
+  "max_off_axis_rotation_rad": 0.04
+}

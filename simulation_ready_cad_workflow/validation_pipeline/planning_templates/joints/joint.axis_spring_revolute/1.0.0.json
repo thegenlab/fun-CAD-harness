@@ -1,0 +1,64 @@
+{
+  "schema_version": "simulation_ready_cad_joint_template_v1",
+  "kind": "joint",
+  "template_id": "joint.axis_spring_revolute",
+  "version": "1.0.0",
+  "title": "Spring-loaded revolute joint",
+  "category": "primitive_joint",
+  "goal": "Add an authored rotational spring, damping, finite bearing support, hard stops, and optional contact fixture to a revolute joint.",
+  "family": "revolute",
+  "capability_variants": [
+    {
+      "variant_id": "revolute.axis_spring",
+      "plugin_id": "plain_revolute_v1",
+      "mechanism_kind": "axis_spring",
+      "runtime_status": "ACTIVE"
+    }
+  ],
+  "input_wrench_kinds": [
+    "torque"
+  ],
+  "observable_quantities": [
+    "pose_6d",
+    "contact_event"
+  ],
+  "components": [
+    "generic revolute joint",
+    "rotational spring",
+    "rotational damping",
+    "finite bearing support",
+    "hard stops",
+    "optional contact fixture"
+  ],
+  "required_instance_fields": [
+    "fixed_rigid_group_id",
+    "moving_rigid_group_id",
+    "axis_abs",
+    "rest_position_rad",
+    "stiffness_nm_per_rad",
+    "damping_nm_s_per_rad",
+    "maximum_deflection_rad"
+  ],
+  "source_bindings": [
+    {
+      "project_id": "spring_kitchen_tongs_v1",
+      "capsule_id": "spring_tong_hinge",
+      "source_status": "PROJECT_CERTIFIED",
+      "capsule_path": "simulation_ready_cad_workflow/validation_pipeline/planning_templates/provenance/spring_kitchen_tongs_v1/capsule.json",
+      "capsule_sha256": "f416522b39e8aa9d261695276aedbddb1af2f16ed1ddab2708ea8d7cdf47cb36",
+      "family_spec_path": "simulation_ready_cad_workflow/validation_pipeline/planning_templates/provenance/spring_kitchen_tongs_v1/family_spec.json",
+      "family_spec_sha256": "489f0cf129923aa531decac3780c80f8323da1cf558a22518a9d04a60aee8530"
+    }
+  ],
+  "constraints": [
+    "Spring and damping values must be finite and bound to the joint axis.",
+    "Hard stops and contact fixtures must correspond to physical CAD surfaces.",
+    "Contact tasks must preserve two-sided contact identity rather than infer grip from angle alone."
+  ],
+  "approval": {
+    "status": "APPROVED",
+    "approved_by": "user",
+    "approved_on": "2026-08-02",
+    "basis": "Imported from the completed spring_kitchen_tongs_v1 project at the user's request."
+  }
+}

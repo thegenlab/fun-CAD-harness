@@ -1,0 +1,64 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "simulation_ready_cad_design_package_input.v1",
+  "title": "Design package manifest input document (package.json)",
+  "description": "Formal structural contract for the AI-submitted design package manifest. Structural rules (required fields, types, constants) live here; deep semantics (path safety, artifact hash verification, package stability, geometry validation) stay in the intake rules, which remain the authority. Unknown fields are tolerated exactly as the code-level checks tolerate them (intake reports them as warnings).",
+  "type": "object",
+  "required": [
+    "schema_version",
+    "package_id",
+    "design_version",
+    "created_by_ai",
+    "assembly_file",
+    "assembly_contract_file",
+    "mechanism_coverage_file",
+    "machine_task_mapping_file",
+    "mechanism_capsule_files",
+    "requirements_ref",
+    "artifacts"
+  ],
+  "properties": {
+    "schema_version": {"const": "0.1"},
+    "package_id": {"type": "string"},
+    "design_version": {"type": "string"},
+    "created_by_ai": {"const": true},
+    "assembly_file": {"type": "string"},
+    "assembly_contract_file": {"type": "string"},
+    "mechanism_coverage_file": {"type": "string"},
+    "machine_task_mapping_file": {"type": "string"},
+    "mechanism_capsule_files": {
+      "type": "array",
+      "items": {"type": "string"}
+    },
+    "requirements_ref": {
+      "type": "object",
+      "required": ["requirements_id", "sha256"],
+      "properties": {
+        "requirements_id": {"type": "string"},
+        "sha256": {"type": "string"}
+      }
+    },
+    "artifacts": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["path", "sha256"],
+        "properties": {
+          "path": {"type": "string"},
+          "sha256": {"type": "string"}
+        }
+      }
+    },
+    "source_native_assembly_file": {"type": "string"},
+    "source_cad_generator_file": {"type": "string"},
+    "single_source_cad": {
+      "type": "object",
+      "required": ["policy", "authoritative_artifact", "derived_assets"],
+      "properties": {
+        "policy": {"const": "required_v1"},
+        "authoritative_artifact": {"type": "string"},
+        "derived_assets": {"const": "hash_bound_and_regenerated"}
+      }
+    }
+  }
+}

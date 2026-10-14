@@ -1,0 +1,52 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "simulation_ready_cad_benchmark_test_result_v1",
+  "title": "Benchmark test result",
+  "description": "One evaluation of a candidate package against one TestSpec. Visualization and generator-process metrics are recorded here only when they do not change the mechanical verdict.",
+  "type": "object",
+  "required": [
+    "schema_version",
+    "test_spec_sha256",
+    "candidate_package_sha256",
+    "validator_build_sha256",
+    "attempt_id",
+    "status",
+    "failure_owner",
+    "scores_mechanical"
+  ],
+  "additionalProperties": false,
+  "properties": {
+    "schema_version": {"const": "simulation_ready_cad_benchmark_test_result_v1"},
+    "test_spec_sha256": {"type": "string"},
+    "candidate_package_sha256": {"type": "string"},
+    "validator_build_sha256": {"type": "string"},
+    "attempt_id": {"type": "string"},
+    "environment_fingerprint": {"type": "object"},
+    "status": {
+      "enum": ["PASS", "FAIL", "INCONCLUSIVE", "INFRA_ERROR"]
+    },
+    "failure_owner": {
+      "enum": ["ASSET", "HARNESS", "ENVIRONMENT", "PROVIDER", "CAPABILITY", null]
+    },
+    "scores_mechanical": {"type": "boolean"},
+    "metrics": {"type": "object"},
+    "threshold_comparison": {"type": "object"},
+    "evidence": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["role", "path", "sha256"],
+        "additionalProperties": false,
+        "properties": {
+          "role": {"type": "string"},
+          "path": {"type": "string"},
+          "sha256": {"type": "string"}
+        }
+      }
+    },
+    "resource_usage": {"type": "object"},
+    "retry_count": {"type": "integer"},
+    "reused": {"type": "boolean"},
+    "reuse_receipt": {"type": ["object", "null"]}
+  }
+}

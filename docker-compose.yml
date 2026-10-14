@@ -1,0 +1,21 @@
+# FunCAD-Harness GUI in Docker. Start it with scripts/funcad-docker (Linux/macOS),
+# which creates the mounted directories and runs the container as your user.
+# Runs, logs and CAD outputs are written to ./runs.
+services:
+  funcad:
+    build: .
+    image: ghcr.io/thegenlab/fun-cad-harness:latest
+    # OCP and PyChrono ship x86-64 Linux builds; Apple Silicon runs them under emulation.
+    platform: linux/amd64
+    user: "${FUNCAD_UID:-1000}:${FUNCAD_GID:-1000}"
+    ports:
+      - "127.0.0.1:8765:8765"
+    volumes:
+      - ./runs:/opt/funcad-harness/.runtime_runs
+      # Agent logins, shared with the host CLIs (or created by `scripts/funcad-docker codex-login`).
+      - ${HOME}/.codex:/home/funcad/.codex
+      - ${HOME}/.claude:/home/funcad/.claude
+    environment:
+      # Alternatively authenticate with API keys instead of logins.
+      - OPENAI_API_KEY
+      - ANTHROPIC_API_KEY

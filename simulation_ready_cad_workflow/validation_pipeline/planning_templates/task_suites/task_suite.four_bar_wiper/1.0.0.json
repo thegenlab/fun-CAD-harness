@@ -1,0 +1,138 @@
+{
+  "schema_version": "simulation_ready_cad_machine_task_suite_v1",
+  "kind": "task_suite",
+  "template_id": "task_suite.four_bar_wiper",
+  "version": "1.0.0",
+  "title": "Four-bar windshield-wiper task suite",
+  "machine_family": "four_bar_wiper",
+  "goal": "Verify the approved windshield sweep and return-to-home behavior from one four-bar linkage roundtrip.",
+  "joint_template_refs": [
+    {
+      "template_id": "joint.closed_revolute_linkage",
+      "version": "1.0.0",
+      "variant_id": "profile.wiper_four_bar",
+      "sha256": "dbdbe7677ce4fc0e8f79d83ba66a460fc79852316f4d544c5b6d15a74df5c279"
+    }
+  ],
+  "profiles": [
+    {
+      "profile_id": "profile.four_bar_wiper_v1",
+      "title": "Four-bar wiper v1",
+      "description": "The task-certified historical windshield-wiper profile."
+    }
+  ],
+  "scenarios": [
+    {
+      "scenario_id": "scenario.wiper_sweep_roundtrip",
+      "title": "Sweep and return the wiper",
+      "test_program": "task_output_angle_roundtrip",
+      "test_load_case_id": "task_output_angle_roundtrip",
+      "profile_ids": [
+        "profile.four_bar_wiper_v1"
+      ],
+      "required_branches": [
+        "physical",
+        "ideal_reference"
+      ],
+      "runtime_status": "ACTIVE",
+      "task_ids": [
+        "sweep_windshield",
+        "return_wiper_home"
+      ],
+      "execution_requirements": [
+        "Execute the sweep and return checks from one continuous output-angle roundtrip.",
+        "Measure output-rocker angle from the authored wiper output frame in both required branches."
+      ]
+    }
+  ],
+  "fixtures": [],
+  "tasks": [
+    {
+      "task_id": "sweep_windshield",
+      "title": "Sweep the windshield",
+      "goal": "Produce at least the approved wiper sweep angle.",
+      "scenario_id": "scenario.wiper_sweep_roundtrip",
+      "profile_ids": [
+        "profile.four_bar_wiper_v1"
+      ],
+      "runtime_status": "ACTIVE",
+      "criteria": [
+        {
+          "criterion_id": "minimum_sweep_angle",
+          "description": "The output wiper sweep reaches at least 26 degrees.",
+          "disposition": "PASS",
+          "evaluator_kind": "registered_metric",
+          "evaluator_id": "continuous_rotation_rad",
+          "observable_quantity": "pose_6d",
+          "comparator": "at_least",
+          "expected": 0.4537856055185257,
+          "unit": "rad",
+          "tolerance": {
+            "mode": "none",
+            "value": null,
+            "unit": null
+          }
+        }
+      ],
+      "failure_diagnostics": [
+        {
+          "code": "INSUFFICIENT_WIPER_SWEEP",
+          "description": "The measured output sweep is less than 26 degrees."
+        }
+      ],
+      "evidence_obligations": [
+        "Preserve the physical and ideal-reference output-angle traces and the evaluated sweep amplitude."
+      ]
+    },
+    {
+      "task_id": "return_wiper_home",
+      "title": "Return the wiper home",
+      "goal": "Return the wiper to its initial position within the approved error.",
+      "scenario_id": "scenario.wiper_sweep_roundtrip",
+      "profile_ids": [
+        "profile.four_bar_wiper_v1"
+      ],
+      "runtime_status": "ACTIVE",
+      "criteria": [
+        {
+          "criterion_id": "maximum_home_error",
+          "description": "The final wiper home error is at most 3.5 degrees.",
+          "disposition": "PASS",
+          "evaluator_kind": "registered_metric",
+          "evaluator_id": "return_to_start_rad",
+          "observable_quantity": "pose_6d",
+          "comparator": "at_most",
+          "expected": 0.061086523819801536,
+          "unit": "rad",
+          "tolerance": {
+            "mode": "none",
+            "value": null,
+            "unit": null
+          }
+        }
+      ],
+      "failure_diagnostics": [
+        {
+          "code": "WIPER_HOME_ERROR_EXCEEDED",
+          "description": "The final output-rocker angle is more than 3.5 degrees from its initial position."
+        }
+      ],
+      "evidence_obligations": [
+        "Preserve the final physical and ideal-reference output angles and the return-to-start evaluation."
+      ]
+    }
+  ],
+  "source_projects": [
+    {
+      "project_id": "four_bar_wiper_v1",
+      "evidence_status": "TASK_CERTIFIED",
+      "note": "Both typed task criteria were historically executed and passed with physical and ideal-reference evidence."
+    }
+  ],
+  "approval": {
+    "status": "APPROVED",
+    "approved_by": "user",
+    "approved_on": "2026-08-02",
+    "basis": "The user approved retaining the existing 26 degree sweep and 3.5 degree return criteria as one grouped machine task suite."
+  }
+}

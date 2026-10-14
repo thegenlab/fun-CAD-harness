@@ -1,0 +1,79 @@
+{
+  "schema_version": "0.1",
+  "capsule_id": "wiper_four_bar_linkage",
+  "name": "Motor crank to engineering windshield-wiper four-bar linkage",
+  "member_rigid_group_ids": [
+    "group_crank",
+    "group_coupler",
+    "group_wiper_arm"
+  ],
+  "boundary_rigid_group_ids": [
+    "group_cowl"
+  ],
+  "input_ports": [
+    {
+      "port_id": "motor_crank_force",
+      "rigid_group_id": "group_crank",
+      "frame_id": "frame_crank_force",
+      "wrench_type": "force",
+      "direction_abs": [
+        -0.5000000000000049,
+        0.8660254037844358,
+        0.0
+      ],
+      "declared_range": {
+        "min": -100.0,
+        "max": 100.0,
+        "unit": "N"
+      }
+    }
+  ],
+  "observables": [
+    {
+      "observable_id": "wiper_tip_pose",
+      "rigid_group_id": "group_wiper_arm",
+      "frame_id": "frame_wiper_tip",
+      "quantity": "pose_6d"
+    }
+  ],
+  "expected_behavior": {
+    "description": "A motor crank stroke drives the exact coupler closure and sweeps the spring-backed blade by 28 degrees, then reverses to the parked hard stop.",
+    "dof": [
+      {
+        "motion": "planar_crank_rocker_four_bar"
+      }
+    ],
+    "failure_conditions": [
+      "pivot detachment",
+      "excess joint drift",
+      "off-plane collapse",
+      "blade misses windshield",
+      "blade fails to park"
+    ]
+  },
+  "reduced_model_claim": {
+    "verification_status": "UNVERIFIED",
+    "family": "compound",
+    "fixed_group_ids": [
+      "group_cowl"
+    ],
+    "moving_group_ids": [
+      "group_crank",
+      "group_coupler",
+      "group_wiper_arm"
+    ],
+    "joint_frame_id": "frame_crank_ground",
+    "axis_abs": [
+      0.0,
+      0.0,
+      1.0
+    ],
+    "family_spec_file": "mechanism_capsules/wiper_four_bar_linkage.family.json"
+  },
+  "declared_nominal_tests": [
+    {
+      "input_port_id": "motor_crank_force",
+      "schedule": "Apply a tangential 80 N motor-equivalent crank force for the outbound sweep, then reverse at 60 N to park."
+    }
+  ]
+}

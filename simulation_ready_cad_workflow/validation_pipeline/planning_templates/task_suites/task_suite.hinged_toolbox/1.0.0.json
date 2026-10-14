@@ -1,0 +1,138 @@
+{
+  "schema_version": "simulation_ready_cad_machine_task_suite_v1",
+  "kind": "task_suite",
+  "template_id": "task_suite.hinged_toolbox",
+  "version": "1.0.0",
+  "title": "Hinged toolbox task suite",
+  "machine_family": "hinged_toolbox",
+  "goal": "Verify that a toolbox lid opens to the approved angle and returns to its approved closed position in one roundtrip execution.",
+  "joint_template_refs": [
+    {
+      "template_id": "joint.generic_revolute",
+      "version": "1.0.0",
+      "variant_id": "mode.bounded",
+      "sha256": "77228543f1e07c17641ded175967763718398ca217608bce5983465c5d3445fa"
+    }
+  ],
+  "profiles": [
+    {
+      "profile_id": "profile.hinged_toolbox_v1",
+      "title": "Hinged toolbox v1",
+      "description": "The approved historical toolbox profile with an 85 degree open target and the original radian-valued closed position."
+    }
+  ],
+  "scenarios": [
+    {
+      "scenario_id": "scenario.toolbox_lid_roundtrip",
+      "title": "Open and close the toolbox lid",
+      "test_program": "task_angle_roundtrip",
+      "test_load_case_id": "task_angle_roundtrip",
+      "profile_ids": [
+        "profile.hinged_toolbox_v1"
+      ],
+      "required_branches": [
+        "physical",
+        "ideal_reference"
+      ],
+      "runtime_status": "ACTIVE",
+      "task_ids": [
+        "open_toolbox_lid",
+        "close_toolbox_lid"
+      ],
+      "execution_requirements": [
+        "Execute the opening and closing checks from one continuous roundtrip trace.",
+        "Measure lid angle from the authored revolute axis in both required branches."
+      ]
+    }
+  ],
+  "fixtures": [],
+  "tasks": [
+    {
+      "task_id": "open_toolbox_lid",
+      "title": "Open the toolbox lid",
+      "goal": "Move the lid to the approved open angle.",
+      "scenario_id": "scenario.toolbox_lid_roundtrip",
+      "profile_ids": [
+        "profile.hinged_toolbox_v1"
+      ],
+      "runtime_status": "ACTIVE",
+      "criteria": [
+        {
+          "criterion_id": "open_angle_target",
+          "description": "The lid reaches 85 degrees within an absolute tolerance of 3 degrees.",
+          "disposition": "PASS",
+          "evaluator_kind": "registered_metric",
+          "evaluator_id": "continuous_rotation_rad",
+          "observable_quantity": "pose_6d",
+          "comparator": "equals",
+          "expected": 1.4835298641951802,
+          "unit": "rad",
+          "tolerance": {
+            "mode": "absolute",
+            "value": 0.05235987755982989,
+            "unit": "rad"
+          }
+        }
+      ],
+      "failure_diagnostics": [
+        {
+          "code": "OPEN_ANGLE_OUT_OF_TOLERANCE",
+          "description": "The measured open angle is outside the approved 82 to 88 degree interval."
+        }
+      ],
+      "evidence_obligations": [
+        "Preserve the physical and ideal-reference lid-angle traces and the evaluated peak opening angle."
+      ]
+    },
+    {
+      "task_id": "close_toolbox_lid",
+      "title": "Close the toolbox lid",
+      "goal": "Return the lid to the approved closed position.",
+      "scenario_id": "scenario.toolbox_lid_roundtrip",
+      "profile_ids": [
+        "profile.hinged_toolbox_v1"
+      ],
+      "runtime_status": "ACTIVE",
+      "criteria": [
+        {
+          "criterion_id": "closed_position_target",
+          "description": "The lid returns to 0 rad within the user-approved tolerance of plus or minus 0.1 rad.",
+          "disposition": "PASS",
+          "evaluator_kind": "registered_metric",
+          "evaluator_id": "return_to_start_rad",
+          "observable_quantity": "pose_6d",
+          "comparator": "equals",
+          "expected": 0.0,
+          "unit": "rad",
+          "tolerance": {
+            "mode": "absolute",
+            "value": 0.1,
+            "unit": "rad"
+          }
+        }
+      ],
+      "failure_diagnostics": [
+        {
+          "code": "CLOSED_POSITION_OUT_OF_TOLERANCE",
+          "description": "The final lid position differs from the closed position by more than 0.1 rad."
+        }
+      ],
+      "evidence_obligations": [
+        "Preserve the final physical and ideal-reference lid angles and the return-to-start evaluation."
+      ]
+    }
+  ],
+  "source_projects": [
+    {
+      "project_id": "hinged_toolbox_v1",
+      "evidence_status": "LEGACY_UNTYPED",
+      "note": "The historical program and whole-machine result exist, while the typed targets and tolerances are established by this user-approved suite."
+    }
+  ],
+  "approval": {
+    "status": "APPROVED",
+    "approved_by": "user",
+    "approved_on": "2026-08-02",
+    "basis": "The user approved an 85 degree opening target with a 3 degree absolute tolerance and a 0 rad closing target with the original radian unit and a 0.1 rad absolute tolerance."
+  }
+}

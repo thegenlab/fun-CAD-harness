@@ -1,0 +1,82 @@
+{
+  "schema_version": "0.1",
+  "capsule_id": "drying_rack_scissor_drive",
+  "name": "Whole folding drying rack scissor and telescoping brace",
+  "member_rigid_group_ids": [
+    "group_outer_scissor_frame",
+    "group_inner_scissor_frame",
+    "group_lift_platform",
+    "group_cylinder_barrel",
+    "group_cylinder_rod"
+  ],
+  "boundary_rigid_group_ids": [
+    "group_base_frame"
+  ],
+  "input_ports": [
+    {
+      "port_id": "brace_force",
+      "rigid_group_id": "group_cylinder_barrel",
+      "frame_id": "frame_brace_input",
+      "wrench_type": "force",
+      "direction_abs": [
+        -0.099156084,
+        0.0,
+        0.995071892
+      ],
+      "declared_range": {
+        "min": -1000.0,
+        "max": 1000.0,
+        "unit": "N"
+      }
+    }
+  ],
+  "observables": [
+    {
+      "observable_id": "platform_height",
+      "rigid_group_id": "group_lift_platform",
+      "frame_id": "frame_top_grid",
+      "quantity": "pose_6d"
+    }
+  ],
+  "expected_behavior": {
+    "description": "The telescoping brace opens and closes the complete two-sided X-frame while the full drying grid remains level.",
+    "dof": [
+      {
+        "motion": "coupled_scissor_revolute_and_slider_motion"
+      }
+    ],
+    "failure_conditions": [
+      "leg pivot detachment",
+      "slider leaves its rail",
+      "top grid tips out of plane",
+      "rack fails to deploy or fold"
+    ]
+  },
+  "reduced_model_claim": {
+    "verification_status": "UNVERIFIED",
+    "family": "compound",
+    "fixed_group_ids": [
+      "group_base_frame"
+    ],
+    "moving_group_ids": [
+      "group_outer_scissor_frame",
+      "group_inner_scissor_frame",
+      "group_lift_platform",
+      "group_cylinder_barrel",
+      "group_cylinder_rod"
+    ],
+    "joint_frame_id": "frame_base",
+    "axis_abs": [
+      0.0,
+      0.0,
+      1.0
+    ],
+    "family_spec_file": "family_specs/drying_rack_scissor.json"
+  },
+  "declared_nominal_tests": [
+    {
+      "input_port_id": "brace_force",
+      "schedule": "Extend the brace to deploy the whole rack, settle, retract it to fold, then settle at home."
+    }
+  ]
+}

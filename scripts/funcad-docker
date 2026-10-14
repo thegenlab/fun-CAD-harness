@@ -1,0 +1,22 @@
+#!/usr/bin/env bash
+# Run FunCAD-Harness in Docker as the current user.
+#   scripts/funcad-docker               build the image and start the GUI
+#   scripts/funcad-docker codex-login   log Codex CLI in (device code), stored in ~/.codex
+#   scripts/funcad-docker claude-login  log Claude Code in, stored in ~/.claude
+#   scripts/funcad-docker cli ARGS...   run the harness command line, e.g.
+#       scripts/funcad-docker cli create --mode free --project stool --task examples/tasks/folding_stool.md
+set -euo pipefail
+ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+cd "$ROOT"
+# Create the mounted directories as this user; Docker would create them as root.
+mkdir -p runs "$HOME/.codex" "$HOME/.claude"
+export FUNCAD_UID="$(id -u)" FUNCAD_GID="$(id -g)"
+case "${1:-up}" in
+  up) exec docker compose up --build ;;
+  codex-login) exec docker compose run --rm --build funcad codex login --device-auth ;;
+  claude-login) exec docker compose run --rm --build funcad claude auth login ;;
+  # Task files you write go in ./tasks (examples/ is already in the image).
+  cli) shift; mkdir -p tasks; exec docker compose run --rm --build -v "$ROOT/tasks:/opt/funcad-harness/tasks:ro" funcad \
+         /opt/conda/envs/funcad-cad/bin/python -X utf8 -m simulation_ready_cad_workflow.validation_pipeline.slim_harness "$@" ;;
+  *) echo "usage: scripts/funcad-docker [up|codex-login|claude-login|cli ARGS...]" >&2; exit 2 ;;
+esac

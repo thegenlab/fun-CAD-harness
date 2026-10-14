@@ -1,0 +1,62 @@
+{
+  "schema_version": "simulation_ready_cad_joint_template_v1",
+  "kind": "joint",
+  "template_id": "joint.scissor_lift",
+  "version": "1.0.0",
+  "title": "Scissor-lift compound joint",
+  "category": "compound_joint",
+  "goal": "Convert bounded actuator force into guided platform displacement through crossed links and finite pivots.",
+  "family": "compound",
+  "capability_variants": [
+    {
+      "variant_id": "linkage.scissor_lift",
+      "plugin_id": "hydraulic_scissor_lift_v1",
+      "mechanism_kind": "hydraulic_scissor_lift",
+      "runtime_status": "ACTIVE"
+    }
+  ],
+  "input_wrench_kinds": [
+    "force"
+  ],
+  "observable_quantities": [
+    "pose_6d"
+  ],
+  "components": [
+    "crossed link pairs",
+    "finite pivot supports",
+    "linear actuator",
+    "guided platform",
+    "capture interfaces"
+  ],
+  "required_instance_fields": [
+    "fixed_body_id",
+    "platform_body_id",
+    "link_body_ids",
+    "pivot_frames",
+    "actuator_geometry",
+    "platform_axis_abs",
+    "home_progress_m"
+  ],
+  "source_bindings": [
+    {
+      "project_id": "whole_folding_drying_rack_v1",
+      "capsule_id": "drying_rack_scissor_drive",
+      "source_status": "PROJECT_CERTIFIED",
+      "capsule_path": "simulation_ready_cad_workflow/validation_pipeline/planning_templates/provenance/whole_folding_drying_rack_v1/capsule.json",
+      "capsule_sha256": "815e276792f9cea1d76dcd0468e69093be9fda1c72bfab7f32dc5b5e7fc7351b",
+      "family_spec_path": "simulation_ready_cad_workflow/validation_pipeline/planning_templates/provenance/whole_folding_drying_rack_v1/family_spec.json",
+      "family_spec_sha256": "2ea0b62e3b2d1468cf0bcab1cf7d23dd6c3d5d4c30d830a8dce89554c5a0689e"
+    }
+  ],
+  "constraints": [
+    "Link pivots, actuator endpoints, and platform guides must be bound to CAD geometry.",
+    "Platform displacement is measured from the output body rather than inferred from actuator travel alone.",
+    "Joint drift, off-plane motion, and finite capture separation remain bounded."
+  ],
+  "approval": {
+    "status": "APPROVED",
+    "approved_by": "user",
+    "approved_on": "2026-08-02",
+    "basis": "Imported from the completed whole_folding_drying_rack_v1 project at the user's request."
+  }
+}

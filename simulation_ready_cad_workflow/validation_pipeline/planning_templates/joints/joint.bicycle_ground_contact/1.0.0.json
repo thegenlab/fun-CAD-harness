@@ -1,0 +1,93 @@
+{
+  "schema_version": "simulation_ready_cad_joint_template_v1",
+  "kind": "joint",
+  "template_id": "joint.bicycle_ground_contact",
+  "version": "1.0.0",
+  "title": "Guided bicycle wheel-ground contact",
+  "category": "compound_joint",
+  "goal": "Verify that rear-wheel-only torque moves the bicycle chassis over a finite ground surface and causes the unactuated front wheel to roll through native Coulomb contact.",
+  "family": "compound",
+  "capability_variants": [
+    {
+      "variant_id": "mode.guided_straight_roll",
+      "plugin_id": "bicycle_ground_roll_v1",
+      "mechanism_kind": "bicycle_ground_roll",
+      "runtime_status": "ACTIVE",
+      "capability_ids": [
+        "actuation.front_wheel_indirect_only",
+        "bicycle.chassis_ground_translation",
+        "bicycle.front_wheel_passive_rolling",
+        "contact.finite_coulomb_wheel_ground",
+        "fixture.visible_upright_guide"
+      ],
+      "model_boundary_ids": [
+        "bicycle.no_steering_dynamics_claim",
+        "bicycle.no_tire_deformation_claim",
+        "bicycle.no_unassisted_balance_claim"
+      ]
+    }
+  ],
+  "input_wrench_kinds": [
+    "torque"
+  ],
+  "observable_quantities": [
+    "pose_6d",
+    "position_3d",
+    "contact_event",
+    "actuation_log"
+  ],
+  "components": [
+    "finite ground surface",
+    "visible upright test-stand guide",
+    "translating bicycle chassis",
+    "steering assembly",
+    "rear driven wheel",
+    "front passive wheel"
+  ],
+  "required_instance_fields": [
+    "ground_body_id",
+    "chassis_body_id",
+    "steering_body_id",
+    "rear_wheel_body_id",
+    "front_wheel_body_id",
+    "rear_axle_origin_abs_m",
+    "front_axle_origin_abs_m",
+    "steering_origin_abs_m",
+    "wheel_axis_abs",
+    "travel_axis_abs",
+    "ground_normal_abs",
+    "ground_plane_height_m",
+    "rear_wheel_radius_m",
+    "front_wheel_radius_m"
+  ],
+  "source_bindings": [
+    {
+      "project_id": "bicycle_ground_roll_v1",
+      "capsule_id": "bicycle_ground_roll",
+      "source_status": "UNRESOLVED_EXEMPLAR",
+      "capsule_path": "simulation_ready_cad_workflow/validation_pipeline/planning_templates/provenance/bicycle_ground_roll_v1/capsule.json",
+      "capsule_sha256": "e6dc02d2c66368b4f03bd1479ccb002afbe7536e8ce7a91b808e8d2ce6636d0c",
+      "family_spec_path": "simulation_ready_cad_workflow/validation_pipeline/planning_templates/provenance/bicycle_ground_roll_v1/family_spec.json",
+      "family_spec_sha256": "301ca8d26a857378f9ec6805343c35a53d5b70b54a7678896de4e64ff1c730a9"
+    }
+  ],
+  "constraints": [
+    "The fixed body must own separate authored groups for the finite ground surface and the visible upright test-stand guide; the guide is represented by one declared Prismatic support along the travel axis.",
+    "Only the ground body may be fixed; the chassis, steering assembly, rear wheel, and front wheel must remain distinct moving bodies.",
+    "Only the rear wheel may receive task input torque; direct front-wheel or chassis actuation is forbidden.",
+    "Rear and front rolling motion must come from native finite Coulomb contact. Two axle Revolute bearings, one visible-fixture Prismatic guide, and one straight-ahead steering task lock are required; hidden rolling, no-slip, gear, or motion-prescription links are forbidden in the physical branch.",
+    "Wheel radii, axle contact height, and the ground plane must pass the hash-bound STEP geometry preflight before physics starts.",
+    "The validator-owned public load program settles for 0.50 s, applies 15.0 N*m only to the rear wheel for 0.70 s, then observes passive rolling without input for 0.10 s.",
+    "During the 0.50 s contact-settle phase only, the chassis is held by the declared test fixture; the chassis is released and all moving-body velocities are zeroed before the powered phase begins.",
+    "The finite ground surface must cover both initial wheel contacts, a 2.75 m public ground-runout envelope, and at least 0.10 m end margin; the certified chassis-travel target remains 1.50 m.",
+    "Rear-ground and front-ground contact callbacks must each be present in at least 90% of saved powered samples; maximum powered wheel-ground separation is 0.0002 m and includes both vertical gap and distance beyond the finite ground-surface bounds.",
+    "Public v1 acceptance thresholds are fixed at front rotation at least 5.0 rad, chassis travel at least 1.50 m, rolling slip ratio at most 0.12, axle drift at most 0.004 m, guide drift at most 0.006 m, off-axis rotation at most 2 degrees, and ground penetration at most 0.004 m.",
+    "The visible guide certifies a guided upright rolling test only; it does not certify unassisted bicycle balance, tire deformation, or steering dynamics."
+  ],
+  "approval": {
+    "status": "APPROVED",
+    "approved_by": "human:user",
+    "approved_on": "2026-08-04",
+    "basis": "Human approval for global reuse was granted in the Codex task for candidate SHA-256 4bc2a9c1d848205de9aa75180c4c8c99d664dd3aab44002e39b8dd317ee8af8a. The approved candidate already contained the change from finite translational bushings to declared Revolute axle bearings, made after live PyChrono testing showed that compliant axle translation can store the drive load and prevent physical rolling. After approval, only approval metadata was added; all mechanical fields and public contact and motion thresholds are identical to that candidate. 2026-08-26: immutable provenance snapshot for bicycle_ground_roll_v1 attached from the bicycle_visible_selfloop_20260804_a1 workspace (capsule e6dc02d2c66368b4f03bd1479ccb002afbe7536e8ce7a91b808e8d2ce6636d0c, family_spec 301ca8d26a857378f9ec6805343c35a53d5b70b54a7678896de4e64ff1c730a9); mechanical content and public thresholds unchanged."
+  }
+}

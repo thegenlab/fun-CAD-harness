@@ -1,0 +1,91 @@
+{
+  "schema_version": "0.1",
+  "capsule_id": "egg_beater_crown_drive",
+  "name": "Hand-crank crown gear with two counter-rotating beaters",
+  "member_rigid_group_ids": [
+    "group_hand_crank",
+    "group_left_beater",
+    "group_right_beater"
+  ],
+  "boundary_rigid_group_ids": [
+    "group_beater_housing"
+  ],
+  "input_ports": [
+    {
+      "port_id": "hand_crank_torque",
+      "rigid_group_id": "group_hand_crank",
+      "frame_id": "frame_hand_crank",
+      "wrench_type": "torque",
+      "direction_abs": [
+        0.0,
+        1.0,
+        0.0
+      ],
+      "declared_range": {
+        "min": -0.3,
+        "max": 0.3,
+        "unit": "N*m"
+      }
+    }
+  ],
+  "observables": [
+    {
+      "observable_id": "hand_crank_pose",
+      "rigid_group_id": "group_hand_crank",
+      "frame_id": "frame_hand_crank",
+      "quantity": "pose_6d"
+    },
+    {
+      "observable_id": "left_beater_pose",
+      "rigid_group_id": "group_left_beater",
+      "frame_id": "frame_left_beater",
+      "quantity": "pose_6d"
+    },
+    {
+      "observable_id": "right_beater_pose",
+      "rigid_group_id": "group_right_beater",
+      "frame_id": "frame_right_beater",
+      "quantity": "pose_6d"
+    }
+  ],
+  "expected_behavior": {
+    "description": "The side hand crank drives a crown gear which turns two vertical whisk shafts at equal speed in opposite directions.",
+    "dof": [
+      {
+        "motion": "one horizontal input shaft coupled to two vertical output shafts"
+      }
+    ],
+    "failure_conditions": [
+      "either beater stalls",
+      "beaters rotate in the same direction",
+      "speed-up ratio leaves tolerance",
+      "shaft leaves housing support",
+      "direct output actuation is used"
+    ]
+  },
+  "reduced_model_claim": {
+    "verification_status": "UNVERIFIED",
+    "family": "compound",
+    "fixed_group_ids": [
+      "group_beater_housing"
+    ],
+    "moving_group_ids": [
+      "group_hand_crank",
+      "group_left_beater",
+      "group_right_beater"
+    ],
+    "joint_frame_id": "frame_hand_crank",
+    "axis_abs": [
+      0.0,
+      1.0,
+      0.0
+    ],
+    "family_spec_file": "family_specs/egg_beater_crown_drive.json"
+  },
+  "declared_nominal_tests": [
+    {
+      "input_port_id": "hand_crank_torque",
+      "schedule": "Torque only the side crank, observe both vertical beaters and their input/output ratios, reverse, then settle."
+    }
+  ]
+}

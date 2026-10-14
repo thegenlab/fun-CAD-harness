@@ -1,0 +1,369 @@
+{
+  "archive_file": "fixture_payload.zip",
+  "archive_sha256": "8033deb5400196cc80282571f72788397b57c9a0492a4afc38acc39b37e11329",
+  "archive_size_bytes": 2093210,
+  "case_ids": [
+    "task_bicycle_powered_roundtrip",
+    "nominal_powered_roundtrip",
+    "held_out_positive_crank_load",
+    "zero_input_energy_audit",
+    "reverse_or_resisting_crank",
+    "passive_return_to_home"
+  ],
+  "collision_preflight_manifest": "collision_preflight/preflight_manifest.json",
+  "collision_preflight_manifest_sha256": "92137c553a42a5be3cc0a1504a9f77af4f091d692d0a3616d6d40f72aef24fca",
+  "fresh_collision_materialization_required_per_selector": false,
+  "fresh_intake_required_per_selector": true,
+  "fresh_pychrono_required_per_physical_selector": true,
+  "live_pychrono_required": true,
+  "maximum_member_size_bytes": 4438026,
+  "maximum_total_uncompressed_bytes": 13539278,
+  "member_count": 67,
+  "members": [
+    {
+      "path": "collision_preflight/adapter_spec.json",
+      "sha256": "c7df4b7820fd44327f6b459646ebaa7d2f14721c73cb9076636064044f08c684",
+      "size_bytes": 50673
+    },
+    {
+      "path": "collision_preflight/preflight_manifest.json",
+      "sha256": "92137c553a42a5be3cc0a1504a9f77af4f091d692d0a3616d6d40f72aef24fca",
+      "size_bytes": 12039
+    },
+    {
+      "path": "materialized/derived_adapters/bicycle_drivetrain/family_collision/assembly_spatial_connectivity.json",
+      "sha256": "4fad1726565b17f96d8314f90a23544257a02db84473944319534cca242ae5e6",
+      "size_bytes": 2186
+    },
+    {
+      "path": "materialized/derived_adapters/bicycle_drivetrain/family_collision/authored_component_reports/input_crank.solid_2.json",
+      "sha256": "6520bc14f3fbb50cdb5c5389e03329d1ee6f0c15e240aa8d48d762dcc53b8e59",
+      "size_bytes": 29019
+    },
+    {
+      "path": "materialized/derived_adapters/bicycle_drivetrain/family_collision/authored_component_reports/rear_drive_wheel.solid_3.json",
+      "sha256": "66f30a8be65dbebead6d5e86f289c73fcf43a143bea8385d3ba32d72f5b1b5ee",
+      "size_bytes": 32923
+    },
+    {
+      "path": "materialized/derived_adapters/bicycle_drivetrain/family_collision/authored_component_validation/solid_2/component_union.stl",
+      "sha256": "04e88d2e30f75ed32c09c44d811ca6b496a6afee91adcc63730be10da30a4b9c",
+      "size_bytes": 322844
+    },
+    {
+      "path": "materialized/derived_adapters/bicycle_drivetrain/family_collision/authored_component_validation/solid_2/input.chainring_backing.stl",
+      "sha256": "9bbe32013c2d2849761c4a256c3da790f855631d47aa41f9842321d4c6fd80e3",
+      "size_bytes": 63772
+    },
+    {
+      "path": "materialized/derived_adapters/bicycle_drivetrain/family_collision/authored_component_validation/solid_2/input.left_arm.stl",
+      "sha256": "2f792a5844b44d869ef093137196d0eaedc4bdd771f54e308defe243ef9d42a7",
+      "size_bytes": 31388
+    },
+    {
+      "path": "materialized/derived_adapters/bicycle_drivetrain/family_collision/authored_component_validation/solid_2/input.left_pedal.stl",
+      "sha256": "df12db2e4d05f847fc849bc94389dcd8c4da9b71885873c7d007fe25d39695d6",
+      "size_bytes": 3052
+    },
+    {
+      "path": "materialized/derived_adapters/bicycle_drivetrain/family_collision/authored_component_validation/solid_2/input.right_arm.stl",
+      "sha256": "bac829092892cb0253fa966a9a3461056946a4c21d52d65c368805f540c23c7b",
+      "size_bytes": 31388
+    },
+    {
+      "path": "materialized/derived_adapters/bicycle_drivetrain/family_collision/authored_component_validation/solid_2/input.right_pedal.stl",
+      "sha256": "16c724ab7a16141996f868fda0ecc430479d33a3b972c2fab146e28e9192f5bf",
+      "size_bytes": 3052
+    },
+    {
+      "path": "materialized/derived_adapters/bicycle_drivetrain/family_collision/authored_component_validation/solid_2/input.shaft.stl",
+      "sha256": "09a959f3f4349d136e682c1d1947e3a618aca8c04cbd8ac5e6c233466b546f39",
+      "size_bytes": 31388
+    },
+    {
+      "path": "materialized/derived_adapters/bicycle_drivetrain/family_collision/authored_component_validation/solid_3/component_union.stl",
+      "sha256": "3e9c606693a74863a2e4f4f3e2951fca09539c74b483a2533592a39afd98da4a",
+      "size_bytes": 634540
+    },
+    {
+      "path": "materialized/derived_adapters/bicycle_drivetrain/family_collision/authored_component_validation/solid_3/rear.drive_disc.stl",
+      "sha256": "ba517772a51df5ea070470bfb63304c8d3af65ac60631f17550752790a543736",
+      "size_bytes": 63772
+    },
+    {
+      "path": "materialized/derived_adapters/bicycle_drivetrain/family_collision/authored_component_validation/solid_3/rear.hub.stl",
+      "sha256": "599a4d66b231c416ec7a0f585c86f83845e1f3908e1bbcd01446b8e9b8d02d35",
+      "size_bytes": 47580
+    },
+    {
+      "path": "materialized/derived_adapters/bicycle_drivetrain/family_collision/authored_component_validation/solid_3/rear.index_marker.stl",
+      "sha256": "fd1ce067500b8d96737a2ac38b31a69863cfde99f2261cdb99ffdfff4a6f83a6",
+      "size_bytes": 3052
+    },
+    {
+      "path": "materialized/derived_adapters/bicycle_drivetrain/family_collision/authored_component_validation/solid_3/rear.pitch_connector.stl",
+      "sha256": "3a57fb98f381b8dae41a4e65a6d05dce75eb0e2c6ec8fbdddc6e3427d7614948",
+      "size_bytes": 39484
+    },
+    {
+      "path": "materialized/derived_adapters/bicycle_drivetrain/family_collision/authored_component_validation/solid_3/rear.sprocket_backing.stl",
+      "sha256": "270c1920154135f69dbdd852113235b74597378fba8faa0fbc4d51644e954d3f",
+      "size_bytes": 63772
+    },
+    {
+      "path": "materialized/derived_adapters/bicycle_drivetrain/family_collision/authored_component_validation/solid_3/rear.sprocket_cap_negative.stl",
+      "sha256": "3d2c751476fd46a533a39483246f7bf7a6e390a15953e4c001d504510af38721",
+      "size_bytes": 47580
+    },
+    {
+      "path": "materialized/derived_adapters/bicycle_drivetrain/family_collision/authored_component_validation/solid_3/rear.sprocket_cap_positive.stl",
+      "sha256": "d8decfdaf8d80efad9765643f9917f3ace4fa81154716b49d92425da158bb091",
+      "size_bytes": 47580
+    },
+    {
+      "path": "materialized/derived_adapters/bicycle_drivetrain/family_collision/bodies/input_crank/solid_2/input.chainring_backing.obj",
+      "sha256": "728cbd1b1ec0b3e0018c151b953f1cdbdd19025020315b36f6e556b1804de3a4",
+      "size_bytes": 11171
+    },
+    {
+      "path": "materialized/derived_adapters/bicycle_drivetrain/family_collision/bodies/input_crank/solid_2/input.left_arm.obj",
+      "sha256": "e96b10b1729f36bf8b6ed9dbf4c4774cb0ccb815e4df147fca9e6bfe6d245aba",
+      "size_bytes": 5374
+    },
+    {
+      "path": "materialized/derived_adapters/bicycle_drivetrain/family_collision/bodies/input_crank/solid_2/input.left_pedal.obj",
+      "sha256": "447bcda96bef7a11e40628c2558ad51f03ab999ce1327d8188bf9c6f47f63869",
+      "size_bytes": 655
+    },
+    {
+      "path": "materialized/derived_adapters/bicycle_drivetrain/family_collision/bodies/input_crank/solid_2/input.right_arm.obj",
+      "sha256": "3c306620c0a30e5079c4a71c894f48a3adfa2eeeef472a2052531f1ebddb96c6",
+      "size_bytes": 5406
+    },
+    {
+      "path": "materialized/derived_adapters/bicycle_drivetrain/family_collision/bodies/input_crank/solid_2/input.right_pedal.obj",
+      "sha256": "7fec14e2eeccedb5f93f1f6462169903592563d9180abef849570704403b32f0",
+      "size_bytes": 655
+    },
+    {
+      "path": "materialized/derived_adapters/bicycle_drivetrain/family_collision/bodies/input_crank/solid_2/input.shaft.obj",
+      "sha256": "f7aa2c27f83ba83538716f12cff5fa82299bab441b66a2c1a23999b763562ef9",
+      "size_bytes": 5429
+    },
+    {
+      "path": "materialized/derived_adapters/bicycle_drivetrain/family_collision/bodies/laboratory_chassis/solid_1.obj",
+      "sha256": "6367f8a9ce5f255dd0a3df6a1f46e82829c94388cf7644e8903a52a1cffa86fe",
+      "size_bytes": 220257
+    },
+    {
+      "path": "materialized/derived_adapters/bicycle_drivetrain/family_collision/bodies/rear_drive_wheel/solid_3/rear.drive_disc.obj",
+      "sha256": "e88996437c089c70fc21c5acb29ea0db1930ba0c0d402f0715f6aeb528ce5d27",
+      "size_bytes": 11107
+    },
+    {
+      "path": "materialized/derived_adapters/bicycle_drivetrain/family_collision/bodies/rear_drive_wheel/solid_3/rear.hub.obj",
+      "sha256": "0d5943c5378d2e8cea9c602313d3b625b076b99b782ee2dbf4d4dd3fdbbeecb3",
+      "size_bytes": 8165
+    },
+    {
+      "path": "materialized/derived_adapters/bicycle_drivetrain/family_collision/bodies/rear_drive_wheel/solid_3/rear.index_marker.obj",
+      "sha256": "633f671ea029a09f20e550de5da78ec9171486c5c35bb67e80418c16d764007c",
+      "size_bytes": 651
+    },
+    {
+      "path": "materialized/derived_adapters/bicycle_drivetrain/family_collision/bodies/rear_drive_wheel/solid_3/rear.pitch_connector.obj",
+      "sha256": "c194eecee7bfbc7474d6093ede40c1978c3fb479254a3dfcc6f6f802b391195d",
+      "size_bytes": 6838
+    },
+    {
+      "path": "materialized/derived_adapters/bicycle_drivetrain/family_collision/bodies/rear_drive_wheel/solid_3/rear.sprocket_backing.obj",
+      "sha256": "6e49d95e0d47e096304778ce03ce308822d8aa0b1a1c4dbc581591e43b6078aa",
+      "size_bytes": 11171
+    },
+    {
+      "path": "materialized/derived_adapters/bicycle_drivetrain/family_collision/bodies/rear_drive_wheel/solid_3/rear.sprocket_cap_negative.obj",
+      "sha256": "72d274904dd352ae8bee7341c69615ed7f8f0f3e16f1ceaefd01e6280f293170",
+      "size_bytes": 8214
+    },
+    {
+      "path": "materialized/derived_adapters/bicycle_drivetrain/family_collision/bodies/rear_drive_wheel/solid_3/rear.sprocket_cap_positive.obj",
+      "sha256": "8ddf1c6c642a4871be8e652ae3a5626c0c70c59b82a587ecc1ee25c794b80df9",
+      "size_bytes": 8214
+    },
+    {
+      "path": "materialized/derived_adapters/bicycle_drivetrain/family_collision/collider_fidelity.json",
+      "sha256": "a72c09df2b545c95231de41c75680ab0d90cd6d11b0ae73981fb53279e41d3dd",
+      "size_bytes": 33979
+    },
+    {
+      "path": "materialized/derived_adapters/bicycle_drivetrain/family_collision/finite_linear_capture.json",
+      "sha256": "6c58f2aa4416eb4f2d8b063e300905f3ce584b0108fe4e0afad96eb013ca807b",
+      "size_bytes": 286
+    },
+    {
+      "path": "materialized/derived_adapters/bicycle_drivetrain/family_collision/home_interpenetration_audit.json",
+      "sha256": "c6c9c3031ef9bf7e26b772f9c9dca150433b15ebc791eded8e2e90a3b8a34516",
+      "size_bytes": 938
+    },
+    {
+      "path": "materialized/derived_adapters/bicycle_drivetrain/family_collision/provenance.json",
+      "sha256": "a303a442b490479a362753a688338d10c12aace0697525a5cef52d2c76e95e77",
+      "size_bytes": 19378
+    },
+    {
+      "path": "materialized/derived_adapters/bicycle_drivetrain/family_collision/rigid_attachment_proof.json",
+      "sha256": "e0f81307d33e7b344da634fcc665f455cab857ba5ae4bdee7827ce648d6092c4",
+      "size_bytes": 1909
+    },
+    {
+      "path": "materialized/derived_adapters/bicycle_drivetrain/family_collision/source_stl/solid_1.stl",
+      "sha256": "407b238cd6a29eeedb59d4440f9beb2603fcf59f14c6fd0aa34fa85c8ed8ed80",
+      "size_bytes": 1638444
+    },
+    {
+      "path": "materialized/derived_adapters/bicycle_drivetrain/family_collision/source_stl/solid_2.stl",
+      "sha256": "21342eefe9a5ae77562ae49297f44a04d25732fbe570752c0b671d6443169b49",
+      "size_bytes": 727897
+    },
+    {
+      "path": "materialized/derived_adapters/bicycle_drivetrain/family_collision/source_stl/solid_3.stl",
+      "sha256": "8b52d9124118dbec6356b377698f7348416ad770cd73617dce3a168284e6e592",
+      "size_bytes": 502980
+    },
+    {
+      "path": "materialized/derived_adapters/bicycle_drivetrain/family_collision/static_geometry_preflight.json",
+      "sha256": "14ac09795cc7f803ce48defb4c75d4257bb3dd3bde12396895bcba7fef24b1f1",
+      "size_bytes": 2071
+    },
+    {
+      "path": "package/assembly.step",
+      "sha256": "6f9a4f7c30b263258181a14e81844eb6a8afa0f1e8437bfc7c3ac3120327f1e7",
+      "size_bytes": 4438026
+    },
+    {
+      "path": "package/assembly_contract.json",
+      "sha256": "63a06b7e5288d7f79c2c67d1587200ae4ec181bcbf149380222cec9f235297ca",
+      "size_bytes": 6505
+    },
+    {
+      "path": "package/collision_components/input_crank/input.chainring_backing.step",
+      "sha256": "8afa39916143dfe14cdb79d51a99af4b1c21f985261aa23dcee7ce3d78785857",
+      "size_bytes": 568070
+    },
+    {
+      "path": "package/collision_components/input_crank/input.left_arm.step",
+      "sha256": "ce69eb17993bc55106ec24d91dc77fee6b0875a8185e84c8ed38f5943b3a631b",
+      "size_bytes": 279158
+    },
+    {
+      "path": "package/collision_components/input_crank/input.left_pedal.step",
+      "sha256": "c1d568b3c090c9859f1c45763fdaba1a4eacf0bc10370f0554a8ecdcbb709596",
+      "size_bytes": 26290
+    },
+    {
+      "path": "package/collision_components/input_crank/input.right_arm.step",
+      "sha256": "0a5cbc579580620634b14ed45c1eab857e76fbb0a222617ada9c33d78465692e",
+      "size_bytes": 279121
+    },
+    {
+      "path": "package/collision_components/input_crank/input.right_pedal.step",
+      "sha256": "fe3cdef553be4d512d1ecaabd48c893fe375bff1b95db07d9c3fda75b8a46b32",
+      "size_bytes": 26298
+    },
+    {
+      "path": "package/collision_components/input_crank/input.shaft.step",
+      "sha256": "10532cd019044e94c6243dc073d65296150a77dbc56dc5c60a2d37d19cbe9f6e",
+      "size_bytes": 278720
+    },
+    {
+      "path": "package/collision_components/manifest.json",
+      "sha256": "efe3a28c19bdf904e370baac2604f09f3768e38439034395f9676b625a0b0f5d",
+      "size_bytes": 3447
+    },
+    {
+      "path": "package/collision_components/rear_drive_wheel/rear.drive_disc.step",
+      "sha256": "56e10dd2fa48bb4d68545a7cabce1b3abf344c215e0e375c80a701c07b817f94",
+      "size_bytes": 569293
+    },
+    {
+      "path": "package/collision_components/rear_drive_wheel/rear.hub.step",
+      "sha256": "b8e7deb196aa51c5e0beeaa26d743a82c7e48b1ac2efb6601e71d84cbb8213dd",
+      "size_bytes": 421350
+    },
+    {
+      "path": "package/collision_components/rear_drive_wheel/rear.index_marker.step",
+      "sha256": "092cb23b145be070a9d874d0b046e5ad3a10e2ec01ca6377f8ba437db3dd5a92",
+      "size_bytes": 26222
+    },
+    {
+      "path": "package/collision_components/rear_drive_wheel/rear.pitch_connector.step",
+      "sha256": "3b01acce721759a7c2844d8142a8f9db81d4e5489cc47afb620106f7e01c2300",
+      "size_bytes": 350741
+    },
+    {
+      "path": "package/collision_components/rear_drive_wheel/rear.sprocket_backing.step",
+      "sha256": "35df55d6b950df2e01d99cf6f4e3dfb5352d16f12b0aa11e24438db3a4513ea6",
+      "size_bytes": 566998
+    },
+    {
+      "path": "package/collision_components/rear_drive_wheel/rear.sprocket_cap_negative.step",
+      "sha256": "6e05fff7052e15cb823d90330e62ca36c39d0ab46a96d7ed4c64c1672ef19a18",
+      "size_bytes": 423331
+    },
+    {
+      "path": "package/collision_components/rear_drive_wheel/rear.sprocket_cap_positive.step",
+      "sha256": "6673a06d03fc861d51a93d05d21e1736044f34b8e9bb98e7f36265bd7a83b7b3",
+      "size_bytes": 423341
+    },
+    {
+      "path": "package/family_specs/bicycle_chain_sprocket_drive.json",
+      "sha256": "56ceaff256e4b47601ca6a2a4535bb58a70fe1ef1cdf7ac4c0d05bfe49f9e3e5",
+      "size_bytes": 25438
+    },
+    {
+      "path": "package/fixture_provenance.json",
+      "sha256": "f726c49ade535719595dec2a04575418dac7c709eb3da606c902ab9af4761a49",
+      "size_bytes": 1239
+    },
+    {
+      "path": "package/generate_cleanroom_bicycle_drivetrain.py",
+      "sha256": "e938181614458e27cebb1ed8d3c9c727fbb6016f6080b7393c9f7d20a6e980e5",
+      "size_bytes": 17806
+    },
+    {
+      "path": "package/machine_task_mapping.json",
+      "sha256": "9f5c14456bf0611bf5cd124edba7faabd0e04579d3c51b24d21eb1c09b7df93d",
+      "size_bytes": 1600
+    },
+    {
+      "path": "package/mechanism_capsules/bicycle_drivetrain.json",
+      "sha256": "48bae86da38645c35ab4274dd69c4c196800b7c7d855de8733c2baaa4cf2e690",
+      "size_bytes": 4436
+    },
+    {
+      "path": "package/mechanism_coverage.json",
+      "sha256": "63695529486b6259bbbe9eeada879aea0fb895dd2b94b6bb241d4a8fb2d42d93",
+      "size_bytes": 581
+    },
+    {
+      "path": "package/package.json",
+      "sha256": "40e3135e1ede27586f4e6cd6e88567ce50e7b7ec27cec4d01720802a74c4fc5f",
+      "size_bytes": 4420
+    },
+    {
+      "path": "requirements.json",
+      "sha256": "e0d8ae61ba223266bc722e57d14261725a61ece380761680c887a69a2a31fce6",
+      "size_bytes": 4574
+    }
+  ],
+  "release_bound_collision_preflight_required_per_selector": true,
+  "saved_trace_files": [],
+  "schema_version": "bicycle_chain_runtime_fixture_v4",
+  "self_contained": true,
+  "source_authority": {
+    "authoritative_assembly_step_sha256": "6f9a4f7c30b263258181a14e81844eb6a8afa0f1e8437bfc7c3ac3120327f1e7",
+    "kind": "r04_derived_explicitly_revised_installed_runtime_fixture",
+    "materialized_adapter_sha256": "c5a9fee313646274d1567c0f91793c0a4f39154bafbc7af0f005ab2ea9419a6f",
+    "original_r04_package_claimed_to_contain_sidecars": false
+  }
+}

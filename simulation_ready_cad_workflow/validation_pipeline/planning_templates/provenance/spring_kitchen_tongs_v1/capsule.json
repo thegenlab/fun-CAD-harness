@@ -1,0 +1,80 @@
+{
+  "schema_version": "0.1",
+  "capsule_id": "spring_tong_hinge",
+  "name": "Spring-biased kitchen tong hinge",
+  "member_rigid_group_ids": [
+    "group_upper_tong"
+  ],
+  "boundary_rigid_group_ids": [
+    "group_lower_tong"
+  ],
+  "input_ports": [
+    {
+      "port_id": "hand_squeeze_torque",
+      "rigid_group_id": "group_upper_tong",
+      "frame_id": "frame_squeeze_input",
+      "wrench_type": "torque",
+      "direction_abs": [
+        0.0,
+        0.0,
+        1.0
+      ],
+      "declared_range": {
+        "min": 0.0,
+        "max": 1.5,
+        "unit": "N*m"
+      }
+    }
+  ],
+  "observables": [
+    {
+      "observable_id": "upper_jaw_pose",
+      "rigid_group_id": "group_upper_tong",
+      "frame_id": "frame_upper_jaw",
+      "quantity": "pose_6d"
+    },
+    {
+      "observable_id": "jaw_contact_event",
+      "rigid_group_id": "group_upper_tong",
+      "frame_id": "frame_jaw_contact",
+      "quantity": "contact_event"
+    }
+  ],
+  "expected_behavior": {
+    "description": "Positive hand torque closes the upper jaw by 17.3 degrees; with hand torque removed, the torsion spring returns it to the open home pose.",
+    "dof": [
+      {
+        "motion": "rotation_about_joint_axis"
+      }
+    ],
+    "failure_conditions": [
+      "pin or barrel detachment",
+      "test block lacks two-sided jaw contact",
+      "off-axis collapse",
+      "spring fails to reopen or release the block"
+    ]
+  },
+  "reduced_model_claim": {
+    "verification_status": "UNVERIFIED",
+    "family": "revolute",
+    "fixed_group_ids": [
+      "group_lower_tong"
+    ],
+    "moving_group_ids": [
+      "group_upper_tong"
+    ],
+    "joint_frame_id": "frame_tong_hinge",
+    "axis_abs": [
+      0.0,
+      0.0,
+      1.0
+    ],
+    "family_spec_file": "family_specs/tong_axis_spring.json"
+  },
+  "declared_nominal_tests": [
+    {
+      "input_port_id": "hand_squeeze_torque",
+      "schedule": "0.0 s: 0 N*m; 0.5 s: +0.25 N*m; 1.0 s: 0 N*m"
+    }
+  ]
+}

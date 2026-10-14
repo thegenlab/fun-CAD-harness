@@ -1,0 +1,171 @@
+{
+  "mechanism_kind": "crown_bevel_dual_output",
+  "mechanism_id": "household_hand_crank_egg_beater",
+  "bodies": [
+    {
+      "body_id": "housing",
+      "group_ids": [
+        "group_beater_housing"
+      ],
+      "fixed": true,
+      "mass_kg": 0.42,
+      "center_abs_m": [
+        0.0,
+        0.0,
+        0.2
+      ],
+      "size_m": [
+        0.146,
+        0.078,
+        0.276
+      ]
+    },
+    {
+      "body_id": "hand_crank",
+      "group_ids": [
+        "group_hand_crank"
+      ],
+      "fixed": false,
+      "mass_kg": 0.16,
+      "center_abs_m": [
+        0.0,
+        -0.035,
+        0.158
+      ],
+      "size_m": [
+        0.098,
+        0.128,
+        0.142
+      ]
+    },
+    {
+      "body_id": "left_beater",
+      "group_ids": [
+        "group_left_beater"
+      ],
+      "fixed": false,
+      "mass_kg": 0.09,
+      "center_abs_m": [
+        -0.024,
+        0.011,
+        -0.01506573262134856
+      ],
+      "size_m": [
+        0.048,
+        0.036,
+        0.304
+      ]
+    },
+    {
+      "body_id": "right_beater",
+      "group_ids": [
+        "group_right_beater"
+      ],
+      "fixed": false,
+      "mass_kg": 0.09,
+      "center_abs_m": [
+        0.024,
+        -0.019,
+        -0.01506573262134856
+      ],
+      "size_m": [
+        0.048,
+        0.036,
+        0.304
+      ]
+    }
+  ],
+  "shafts": [
+    {
+      "shaft_id": "crank_shaft",
+      "body_id": "hand_crank",
+      "origin_abs_m": [
+        0.0,
+        -0.004,
+        0.15
+      ],
+      "axis_abs": [
+        0.0,
+        1.0,
+        0.0
+      ]
+    },
+    {
+      "shaft_id": "left_beater_shaft",
+      "body_id": "left_beater",
+      "origin_abs_m": [
+        -0.024,
+        0.011,
+        0.11193426737865145
+      ],
+      "axis_abs": [
+        0.0,
+        0.0,
+        1.0
+      ]
+    },
+    {
+      "shaft_id": "right_beater_shaft",
+      "body_id": "right_beater",
+      "origin_abs_m": [
+        0.024,
+        -0.019,
+        0.11193426737865145
+      ],
+      "axis_abs": [
+        0.0,
+        0.0,
+        1.0
+      ]
+    }
+  ],
+  "crown_bevel_meshes": [
+    {
+      "mesh_id": "crown_to_left",
+      "driver_body_id": "hand_crank",
+      "driven_body_id": "left_beater",
+      "driver_teeth": 30,
+      "driven_teeth": 10,
+      "ratio": -3.0,
+      "shaft_angle_rad": 1.5707963267948966,
+      "driver_pitch_radius_m": 0.045,
+      "driven_pitch_radius_m": 0.015,
+      "driver_face_width_m": 0.01,
+      "driven_face_width_m": 0.001,
+      "geometry_contact_tolerance_m": 0.001,
+      "axis_perpendicular_tolerance_rad": 0.02
+    },
+    {
+      "mesh_id": "crown_to_right",
+      "driver_body_id": "hand_crank",
+      "driven_body_id": "right_beater",
+      "driver_teeth": 30,
+      "driven_teeth": 10,
+      "ratio": 3.0,
+      "shaft_angle_rad": 1.5707963267948966,
+      "driver_pitch_radius_m": 0.045,
+      "driven_pitch_radius_m": 0.015,
+      "driver_face_width_m": 0.01,
+      "driven_face_width_m": 0.001,
+      "geometry_contact_tolerance_m": 0.001,
+      "axis_perpendicular_tolerance_rad": 0.02
+    }
+  ],
+  "fixed_body_id": "housing",
+  "input_body_id": "hand_crank",
+  "output_body_ids": [
+    "left_beater",
+    "right_beater"
+  ],
+  "nominal_input_torque_nm": 0.18,
+  "return_input_torque_nm": 0.3,
+  "max_torque_phase_s": 0.8,
+  "max_return_phase_s": 0.8,
+  "settle_phase_s": 0.08,
+  "max_support_drift_m": 0.001,
+  "max_off_axis_rotation_rad": 0.05,
+  "max_mesh_error_rad": 0.08,
+  "minimum_output_travel_rad": 1.0,
+  "output_pair_ratio_tolerance": 0.08,
+  "input_output_ratio_tolerance": 0.2
+}

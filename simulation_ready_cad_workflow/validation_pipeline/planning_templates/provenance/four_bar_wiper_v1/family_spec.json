@@ -1,0 +1,238 @@
+{
+  "linkage_id": "windshield_wiper_crank_rocker_four_bar",
+  "bodies": [
+    {
+      "body_id": "ground",
+      "group_ids": [
+        "group_cowl"
+      ],
+      "fixed": true,
+      "mass_kg": 45.0,
+      "center_abs_m": [
+        0.0,
+        0.037500000000000006,
+        0.04575
+      ],
+      "size_m": [
+        0.72,
+        0.575,
+        0.10450000000000001
+      ],
+      "rotation_abs_quat_wxyz": [
+        1.0,
+        0.0,
+        0.0,
+        0.0
+      ]
+    },
+    {
+      "body_id": "crank",
+      "group_ids": [
+        "group_crank"
+      ],
+      "fixed": false,
+      "mass_kg": 0.47,
+      "center_abs_m": [
+        -0.13833,
+        -0.14826,
+        0.04565
+      ],
+      "size_m": [
+        0.111,
+        0.066,
+        0.0405
+      ],
+      "rotation_abs_quat_wxyz": [
+        0.9659258262890675,
+        0.0,
+        0.0,
+        0.25881904510252346
+      ]
+    },
+    {
+      "body_id": "coupler",
+      "group_ids": [
+        "group_coupler"
+      ],
+      "fixed": false,
+      "mass_kg": 0.419,
+      "center_abs_m": [
+        0.015668,
+        -0.07057,
+        0.061
+      ],
+      "size_m": [
+        0.2602,
+        0.024,
+        0.011
+      ],
+      "rotation_abs_quat_wxyz": [
+        0.9757624875216089,
+        0.0,
+        0.0,
+        0.21883228268617502
+      ]
+    },
+    {
+      "body_id": "rocker",
+      "group_ids": [
+        "group_wiper_arm"
+      ],
+      "fixed": false,
+      "mass_kg": 1.0,
+      "center_abs_m": [
+        0.124982,
+        -0.012337,
+        0.075588
+      ],
+      "size_m": [
+        0.34,
+        0.28,
+        0.089
+      ],
+      "rotation_abs_quat_wxyz": [
+        0.8090169943749475,
+        0.0,
+        0.0,
+        0.5877852522924731
+      ]
+    }
+  ],
+  "mass_properties_method": {
+    "kind": "material_and_component_volume_estimate",
+    "reference_pose": "parked",
+    "materials": {
+      "steel": "shafts, hubs, lower rocker, pins, coupler bushings",
+      "aluminum_6061": "wiper arm and carrier structure",
+      "elastomer": "rubber blade"
+    },
+    "prohibited_fallback": "world_axis_aligned_bounds_as_dynamic_center_or_inertia"
+  },
+  "revolute_joints": [
+    {
+      "joint_id": "crank_ground",
+      "parent_body_id": "ground",
+      "child_body_id": "crank",
+      "origin_abs_m": [
+        -0.15,
+        -0.155,
+        0.044
+      ],
+      "axis_abs": [
+        0.0,
+        0.0,
+        1.0
+      ],
+      "min_angle_rad": -0.2,
+      "max_angle_rad": 2.2
+    },
+    {
+      "joint_id": "crank_coupler",
+      "parent_body_id": "crank",
+      "child_body_id": "coupler",
+      "origin_abs_m": [
+        -0.09111027254265816,
+        -0.121,
+        0.044
+      ],
+      "axis_abs": [
+        0.0,
+        0.0,
+        1.0
+      ]
+    },
+    {
+      "joint_id": "coupler_rocker",
+      "parent_body_id": "coupler",
+      "child_body_id": "rocker",
+      "origin_abs_m": [
+        0.12244678440936949,
+        -0.020139065789008884,
+        0.044
+      ],
+      "axis_abs": [
+        0.0,
+        0.0,
+        1.0
+      ]
+    },
+    {
+      "joint_id": "rocker_ground",
+      "parent_body_id": "ground",
+      "child_body_id": "rocker",
+      "origin_abs_m": [
+        0.09,
+        -0.12,
+        0.044
+      ],
+      "axis_abs": [
+        0.0,
+        0.0,
+        1.0
+      ],
+      "min_angle_rad": -0.035,
+      "max_angle_rad": 0.5066921905584123
+    }
+  ],
+  "input_body_id": "crank",
+  "output_body_id": "rocker",
+  "input_joint_id": "crank_ground",
+  "output_joint_id": "rocker_ground",
+  "input_point_abs_m": [
+    -0.09111027254265816,
+    -0.121,
+    0.044
+  ],
+  "input_force_direction_abs": [
+    -0.5000000000000049,
+    0.8660254037844358,
+    0.0
+  ],
+  "output_observable_point_abs_m": [
+    0.18734035322810844,
+    0.17958280263297338,
+    0.094
+  ],
+  "home_output_angle_rad": 0.0,
+  "outbound_output_angle_rad": 0.4886921905584123,
+  "nominal_input_force_n": 80.0,
+  "return_input_force_n": 60.0,
+  "input_actuation_kind": "joint_torque",
+  "nominal_input_torque_nm": 5.44,
+  "return_input_torque_nm": 4.08,
+  "max_force_phase_s": 0.9,
+  "max_return_phase_s": 1.1,
+  "settle_phase_s": 0.04,
+  "output_angle_tolerance_rad": 0.05235987755982989,
+  "max_joint_drift_m": 0.002,
+  "max_off_plane_rotation_rad": 0.05235987755982989,
+  "friction": 0.06,
+  "compliant_surface_contacts": [
+    {
+      "contact_id": "rubber_blade_glass",
+      "model": "validator_compliant_surface_drag_v1",
+      "fixed_body_id": "ground",
+      "moving_body_id": "rocker",
+      "fixed_component_refs": [
+        "ground/solid_2"
+      ],
+      "moving_component_refs": [
+        "rocker/solid_106"
+      ],
+      "contact_point_abs_m": [
+        0.18734035322810844,
+        0.17958280263297338,
+        0.074
+      ],
+      "normal_abs": [
+        0.0,
+        0.0,
+        1.0
+      ],
+      "normal_load_n": 12.0,
+      "friction_coefficient": 0.55,
+      "tangential_damping_n_s_m": 8.0,
+      "max_penetration_m": 0.00035
+    }
+  ]
+}

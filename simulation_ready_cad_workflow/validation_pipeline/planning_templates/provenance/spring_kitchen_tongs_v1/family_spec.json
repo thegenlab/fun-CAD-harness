@@ -1,0 +1,56 @@
+{
+  "schema_version": "0.1",
+  "mechanism_kind": "axis_spring",
+  "joint_family": "revolute",
+  "rest_position_si": 0.0,
+  "stiffness_si": 0.8,
+  "damping_si": 0.035,
+  "maximum_deflection_si": 0.30194196059501904,
+  "maximum_stop_penetration_si": 0.002617993877991494,
+  "bearing_off_axis_stiffness_si": 14.0,
+  "bearing_off_axis_damping_si": 0.25,
+  "moving_mass_kg": 0.12,
+  "contact_fixture": {
+    "shape": "tabletop_pickup_box",
+    "center_abs_m": [
+      0.158,
+      -0.000965,
+      0.0
+    ],
+    "size_m": [
+      0.012,
+      0.0067,
+      0.01
+    ],
+    "friction": 1.5,
+    "hold_duration_s": 0.35,
+    "mass_kg": 0.01,
+    "grip_torque_nm": 1.1,
+    "table_center_abs_m": [
+      0.158,
+      0.0,
+      -0.007
+    ],
+    "table_size_m": [
+      0.12,
+      0.08,
+      0.004
+    ],
+    "approach_offset_abs_m": [
+      -0.05,
+      0.0,
+      0.003
+    ],
+    "grip_offset_abs_m": [
+      0.0,
+      0.0,
+      0.003
+    ],
+    "lift_offset_abs_m": [
+      0.0,
+      0.0,
+      0.033
+    ],
+    "lift_duration_s": 0.8
+  }
+}

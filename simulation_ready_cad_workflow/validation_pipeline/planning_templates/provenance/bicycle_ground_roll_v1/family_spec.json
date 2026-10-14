@@ -1,0 +1,152 @@
+{
+  "bodies": [
+    {
+      "body_id": "ground",
+      "center_abs_m": [
+        1.375,
+        0,
+        0.3
+      ],
+      "fixed": true,
+      "group_ids": [
+        "ground_group",
+        "guide_group"
+      ],
+      "mass_kg": 1000.0,
+      "size_m": [
+        4.75,
+        0.9,
+        1.2
+      ]
+    },
+    {
+      "body_id": "chassis",
+      "center_abs_m": [
+        -0.05,
+        0,
+        0.75
+      ],
+      "fixed": false,
+      "group_ids": [
+        "chassis_group",
+        "input_crank_group"
+      ],
+      "mass_kg": 13.0,
+      "size_m": [
+        1.45,
+        0.5,
+        1.05
+      ]
+    },
+    {
+      "body_id": "steering",
+      "center_abs_m": [
+        0.67,
+        0,
+        0.8
+      ],
+      "fixed": false,
+      "group_ids": [
+        "steering_group"
+      ],
+      "mass_kg": 3.0,
+      "size_m": [
+        0.45,
+        0.7,
+        0.85
+      ]
+    },
+    {
+      "body_id": "rear_wheel",
+      "center_abs_m": [
+        -0.85,
+        0.0,
+        0.38
+      ],
+      "fixed": false,
+      "group_ids": [
+        "rear_wheel_group"
+      ],
+      "mass_kg": 4.0,
+      "size_m": [
+        0.76,
+        0.14,
+        0.76
+      ]
+    },
+    {
+      "body_id": "front_wheel",
+      "center_abs_m": [
+        0.85,
+        0.0,
+        0.38
+      ],
+      "fixed": false,
+      "group_ids": [
+        "front_wheel_group"
+      ],
+      "mass_kg": 3.5,
+      "size_m": [
+        0.76,
+        0.14,
+        0.76
+      ]
+    }
+  ],
+  "chassis_body_id": "chassis",
+  "front_axle_origin_abs_m": [
+    0.85,
+    0.0,
+    0.38
+  ],
+  "front_wheel_body_id": "front_wheel",
+  "front_wheel_radius_m": 0.38,
+  "ground_body_id": "ground",
+  "ground_friction": 0.85,
+  "ground_normal_abs": [
+    0,
+    0,
+    1
+  ],
+  "ground_plane_height_m": 0.0,
+  "maximum_axle_drift_m": 0.004,
+  "maximum_ground_penetration_m": 0.004,
+  "maximum_ground_separation_m": 0.0002,
+  "maximum_guide_drift_m": 0.006,
+  "maximum_off_axis_rotation_rad": 0.03490658503988659,
+  "maximum_rolling_slip_ratio": 0.12,
+  "mechanism_id": "guided_engineering_bicycle_ground_roll_v1",
+  "mechanism_kind": "bicycle_ground_roll",
+  "minimum_chassis_travel_m": 1.5,
+  "minimum_front_rotation_rad": 5.0,
+  "minimum_powered_contact_coverage": 0.9,
+  "nominal_rear_drive_torque_nm": 15.0,
+  "rear_axle_origin_abs_m": [
+    -0.85,
+    0.0,
+    0.38
+  ],
+  "rear_wheel_body_id": "rear_wheel",
+  "rear_wheel_radius_m": 0.38,
+  "steering_axis_abs": [
+    0,
+    0,
+    1
+  ],
+  "steering_body_id": "steering",
+  "steering_origin_abs_m": [
+    0.55,
+    0.0,
+    1.0
+  ],
+  "travel_axis_abs": [
+    1,
+    0,
+    0
+  ],
+  "wheel_axis_abs": [
+    0,
+    1,
+    0
+  ]
+}

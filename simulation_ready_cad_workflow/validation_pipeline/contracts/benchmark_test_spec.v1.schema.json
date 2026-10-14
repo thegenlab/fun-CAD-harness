@@ -1,0 +1,111 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "simulation_ready_cad_benchmark_test_spec_v1",
+  "title": "Validator-owned benchmark test spec",
+  "description": "A sealed or project-authored test the evaluator may run. Candidate generators may submit a package; they may not modify this document.",
+  "type": "object",
+  "required": [
+    "schema_version",
+    "test_id",
+    "version",
+    "authority",
+    "visibility",
+    "stage",
+    "bindings",
+    "verdict",
+    "evidence"
+  ],
+  "additionalProperties": false,
+  "properties": {
+    "schema_version": {"const": "simulation_ready_cad_benchmark_test_spec_v1"},
+    "test_id": {"type": "string"},
+    "version": {"type": "string"},
+    "authority": {
+      "enum": ["benchmark_validator", "project_authored"]
+    },
+    "visibility": {
+      "enum": ["candidate_visible", "hidden"]
+    },
+    "stage": {"type": "string"},
+    "mechanism_capability": {"type": "string"},
+    "bindings": {
+      "type": "object",
+      "required": [
+        "requirements_sha256",
+        "catalog_sha256",
+        "validator_source_sha256"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "requirements_sha256": {"type": "string"},
+        "package_inventory_sha256": {"type": "string"},
+        "catalog_sha256": {"type": "string"},
+        "validator_source_sha256": {"type": "string"}
+      }
+    },
+    "acceptance": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "load_case_id": {"type": "string"},
+        "metric_id": {"type": "string"},
+        "comparator": {"type": "string"},
+        "target": {"type": ["number", "string", "boolean", "null"]},
+        "unit": {"type": "string"},
+        "tolerance": {"type": ["number", "null"]},
+        "required_branches": {
+          "type": "array",
+          "items": {"type": "string"}
+        }
+      }
+    },
+    "resource_budget": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "cpu_threads": {"type": "integer"},
+        "wall_deadline_seconds": {"type": "number"},
+        "rss_bytes": {"type": "integer"},
+        "disk_bytes": {"type": "integer"},
+        "log_bytes": {"type": "integer"},
+        "output_bytes": {"type": "integer"}
+      }
+    },
+    "determinism": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "policy": {"enum": ["strict", "repeatable", "best_effort"]},
+        "seed": {"type": ["integer", "null"]},
+        "repetition_count": {"type": "integer"}
+      }
+    },
+    "expected_output_files": {
+      "type": "array",
+      "items": {"type": "string"}
+    },
+    "verdict": {
+      "type": "object",
+      "required": ["pass", "fail", "inconclusive", "infra_error"],
+      "additionalProperties": false,
+      "properties": {
+        "pass": {"const": "PASS"},
+        "fail": {"const": "FAIL"},
+        "inconclusive": {"const": "INCONCLUSIVE"},
+        "infra_error": {"const": "INFRA_ERROR"}
+      }
+    },
+    "evidence": {
+      "type": "object",
+      "required": ["required_roles", "missing_evidence"],
+      "additionalProperties": false,
+      "properties": {
+        "required_roles": {
+          "type": "array",
+          "items": {"type": "string"}
+        },
+        "missing_evidence": {"const": "FAIL"}
+      }
+    }
+  }
+}

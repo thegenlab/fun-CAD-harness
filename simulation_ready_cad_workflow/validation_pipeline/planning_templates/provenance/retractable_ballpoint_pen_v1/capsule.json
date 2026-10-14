@@ -1,0 +1,91 @@
+{
+  "schema_version": "0.1",
+  "capsule_id": "ballpoint_click_cam",
+  "name": "Ballpoint push button, indexing click cam, refill and compression spring",
+  "member_rigid_group_ids": [
+    "group_pen_button",
+    "group_pen_click_cam",
+    "group_pen_refill"
+  ],
+  "boundary_rigid_group_ids": [
+    "group_pen_barrel"
+  ],
+  "input_ports": [
+    {
+      "port_id": "top_button_force",
+      "rigid_group_id": "group_pen_button",
+      "frame_id": "frame_push_button",
+      "wrench_type": "force",
+      "direction_abs": [
+        0.0,
+        0.0,
+        -1.0
+      ],
+      "declared_range": {
+        "min": 0.0,
+        "max": 12.0,
+        "unit": "N"
+      }
+    }
+  ],
+  "observables": [
+    {
+      "observable_id": "push_button_pose",
+      "rigid_group_id": "group_pen_button",
+      "frame_id": "frame_push_button",
+      "quantity": "pose_6d"
+    },
+    {
+      "observable_id": "refill_tip_pose",
+      "rigid_group_id": "group_pen_refill",
+      "frame_id": "frame_refill_tip",
+      "quantity": "pose_6d"
+    },
+    {
+      "observable_id": "click_latch_contact",
+      "rigid_group_id": "group_pen_click_cam",
+      "frame_id": "frame_click_cam",
+      "quantity": "contact_event"
+    }
+  ],
+  "expected_behavior": {
+    "description": "Successive button presses index the cam between retracted and extended latch states while finite button-return and refill compression springs restore the released parts.",
+    "dof": [
+      {
+        "motion": "button translation, refill translation, and short cam translation plus indexing rotation"
+      }
+    ],
+    "failure_conditions": [
+      "first click does not latch extended",
+      "second click does not retract",
+      "button fails to return",
+      "cam skips an index",
+      "refill is actuated directly"
+    ]
+  },
+  "reduced_model_claim": {
+    "verification_status": "UNVERIFIED",
+    "family": "compound",
+    "fixed_group_ids": [
+      "group_pen_barrel"
+    ],
+    "moving_group_ids": [
+      "group_pen_button",
+      "group_pen_click_cam",
+      "group_pen_refill"
+    ],
+    "joint_frame_id": "frame_push_button",
+    "axis_abs": [
+      0.0,
+      0.0,
+      -1.0
+    ],
+    "family_spec_file": "family_specs/ballpoint_click_cam.json"
+  },
+  "declared_nominal_tests": [
+    {
+      "input_port_id": "top_button_force",
+      "schedule": "Press and release the button twice for one extend/retract cycle, verify latch contact and spring return, then repeat."
+    }
+  ]
+}

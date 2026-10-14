@@ -1,0 +1,80 @@
+{
+  "schema_version": "0.1",
+  "capsule_id": "pedal_lid_linkage",
+  "name": "Foot pedal to lid four-pivot linkage",
+  "member_rigid_group_ids": [
+    "group_pedal",
+    "group_lift_rod",
+    "group_bin_lid"
+  ],
+  "boundary_rigid_group_ids": [
+    "group_bin_body"
+  ],
+  "input_ports": [
+    {
+      "port_id": "pedal_force",
+      "rigid_group_id": "group_pedal",
+      "frame_id": "frame_pedal_force",
+      "wrench_type": "force",
+      "direction_abs": [
+        0.0,
+        0.0,
+        -1.0
+      ],
+      "declared_range": {
+        "min": -100.0,
+        "max": 100.0,
+        "unit": "N"
+      }
+    }
+  ],
+  "observables": [
+    {
+      "observable_id": "lid_pose",
+      "rigid_group_id": "group_bin_lid",
+      "frame_id": "frame_lid_tip",
+      "quantity": "pose_6d"
+    }
+  ],
+  "expected_behavior": {
+    "description": "A downward pedal force rotates the under-bin pedal crank, pulls the service-side lift rod, opens the retained lid to 70 degrees, and the same four-pivot linkage returns to its closed stops.",
+    "dof": [
+      {
+        "motion": "coupled_planar_revolute_linkage"
+      }
+    ],
+    "failure_conditions": [
+      "pivot detachment",
+      "excess joint drift",
+      "off-plane collapse",
+      "service rod contacts the bin shell",
+      "lid fails to open",
+      "lid fails to return"
+    ]
+  },
+  "reduced_model_claim": {
+    "verification_status": "UNVERIFIED",
+    "family": "compound",
+    "fixed_group_ids": [
+      "group_bin_body"
+    ],
+    "moving_group_ids": [
+      "group_pedal",
+      "group_lift_rod",
+      "group_bin_lid"
+    ],
+    "joint_frame_id": "frame_pedal_ground",
+    "axis_abs": [
+      0.0,
+      -1.0,
+      0.0
+    ],
+    "family_spec_file": "mechanism_capsules/pedal_lid_linkage.family.json"
+  },
+  "declared_nominal_tests": [
+    {
+      "input_port_id": "pedal_force",
+      "schedule": "Press downward with 75 N to the 70 degree lid stop, release, then allow the four-pivot linkage to return to the closed stops."
+    }
+  ]
+}

@@ -1,0 +1,365 @@
+{
+  "mechanism_kind": "hydraulic_scissor_lift",
+  "mechanism_id": "whole_folding_drying_rack_single_tier",
+  "bodies": [
+    {
+      "body_id": "base_frame",
+      "group_ids": [
+        "group_base_frame"
+      ],
+      "fixed": true,
+      "mass_kg": 3.5,
+      "center_abs_m": [
+        0.288094,
+        0.0,
+        0.017276
+      ],
+      "size_m": [
+        0.66,
+        0.46,
+        0.136
+      ],
+      "rotation_abs_quat_wxyz": [
+        1.0,
+        0.0,
+        0.0,
+        0.0
+      ]
+    },
+    {
+      "body_id": "outer_frame",
+      "group_ids": [
+        "group_outer_scissor_frame"
+      ],
+      "fixed": false,
+      "mass_kg": 1.2,
+      "center_abs_m": [
+        0.296734,
+        0.0,
+        0.19563
+      ],
+      "size_m": [
+        0.546181,
+        0.316,
+        0.405329
+      ],
+      "rotation_abs_quat_wxyz": [
+        0.981627183447664,
+        0.0,
+        -0.1908089953765448,
+        0.0
+      ]
+    },
+    {
+      "body_id": "inner_frame",
+      "group_ids": [
+        "group_inner_scissor_frame"
+      ],
+      "fixed": false,
+      "mass_kg": 1.2,
+      "center_abs_m": [
+        0.314046,
+        0.0,
+        0.184662
+      ],
+      "size_m": [
+        0.546181,
+        0.324,
+        0.405329
+      ],
+      "rotation_abs_quat_wxyz": [
+        0.981627183447664,
+        0.0,
+        0.1908089953765448,
+        0.0
+      ]
+    },
+    {
+      "body_id": "lift_platform",
+      "group_ids": [
+        "group_lift_platform"
+      ],
+      "fixed": false,
+      "mass_kg": 3.0,
+      "center_abs_m": [
+        0.317836,
+        0.0,
+        0.350929
+      ],
+      "size_m": [
+        0.625592,
+        0.42,
+        0.254
+      ],
+      "rotation_abs_quat_wxyz": [
+        1.0,
+        0.0,
+        0.0,
+        0.0
+      ]
+    },
+    {
+      "body_id": "cylinder_barrel",
+      "group_ids": [
+        "group_cylinder_barrel"
+      ],
+      "fixed": false,
+      "mass_kg": 0.45,
+      "center_abs_m": [
+        0.3552968587756087,
+        0.0,
+        0.0921979473947184
+      ],
+      "size_m": [
+        0.103,
+        0.1285,
+        0.041
+      ],
+      "rotation_abs_quat_wxyz": [
+        0.47456398830547186,
+        0.5242032249076726,
+        -0.5242032249076726,
+        -0.47456398830547186
+      ]
+    },
+    {
+      "body_id": "cylinder_rod",
+      "group_ids": [
+        "group_cylinder_rod"
+      ],
+      "fixed": false,
+      "mass_kg": 0.25,
+      "center_abs_m": [
+        0.35113870408211517,
+        0.0,
+        0.1339267329909411
+      ],
+      "size_m": [
+        0.1048,
+        0.139626517,
+        0.036212191
+      ],
+      "rotation_abs_quat_wxyz": [
+        0.47456398830547186,
+        0.5242032249076726,
+        -0.5242032249076726,
+        -0.47456398830547186
+      ]
+    }
+  ],
+  "fixed_body_id": "base_frame",
+  "revolute_joints": [
+    {
+      "joint_id": "outer_base_pin",
+      "parent_body_id": "base_frame",
+      "child_body_id": "outer_frame",
+      "origin_abs_m": [
+        0.06,
+        0.0,
+        0.1
+      ],
+      "axis_abs": [
+        0.0,
+        -1.0,
+        0.0
+      ],
+      "min_angle_rad": -0.02618,
+      "max_angle_rad": 0.514872
+    },
+    {
+      "joint_id": "inner_platform_pin",
+      "parent_body_id": "lift_platform",
+      "child_body_id": "inner_frame",
+      "origin_abs_m": [
+        0.06,
+        0.0,
+        0.287303296707956
+      ],
+      "axis_abs": [
+        0.0,
+        -1.0,
+        0.0
+      ]
+    },
+    {
+      "joint_id": "scissor_center_pivot",
+      "parent_body_id": "outer_frame",
+      "child_body_id": "inner_frame",
+      "origin_abs_m": [
+        0.29179596364169685,
+        0.0,
+        0.19365164835397802
+      ],
+      "axis_abs": [
+        0.0,
+        -1.0,
+        0.0
+      ]
+    },
+    {
+      "joint_id": "cylinder_barrel_trunnion",
+      "parent_body_id": "base_frame",
+      "child_body_id": "cylinder_barrel",
+      "origin_abs_m": [
+        0.36,
+        0.0,
+        0.045
+      ],
+      "axis_abs": [
+        0.0,
+        -1.0,
+        0.0
+      ]
+    },
+    {
+      "joint_id": "cylinder_rod_clevis",
+      "parent_body_id": "inner_frame",
+      "child_body_id": "cylinder_rod",
+      "origin_abs_m": [
+        0.34742699491570417,
+        0.0,
+        0.1711752527490233
+      ],
+      "axis_abs": [
+        0.0,
+        -1.0,
+        0.0
+      ]
+    }
+  ],
+  "prismatic_joints": [
+    {
+      "joint_id": "outer_top_roller_track",
+      "parent_body_id": "lift_platform",
+      "child_body_id": "outer_frame",
+      "origin_abs_m": [
+        0.5235919272833938,
+        0.0,
+        0.287303296707956
+      ],
+      "axis_abs": [
+        1.0,
+        0.0,
+        0.0
+      ]
+    },
+    {
+      "joint_id": "inner_bottom_roller_track",
+      "parent_body_id": "base_frame",
+      "child_body_id": "inner_frame",
+      "origin_abs_m": [
+        0.5235919272833938,
+        0.0,
+        0.1
+      ],
+      "axis_abs": [
+        1.0,
+        0.0,
+        0.0
+      ]
+    }
+  ],
+  "cylindrical_joint": {
+    "joint_id": "cylinder_barrel_rod",
+    "parent_body_id": "cylinder_barrel",
+    "child_body_id": "cylinder_rod",
+    "origin_abs_m": [
+      0.34742699491570417,
+      0.0,
+      0.1711752527490233
+    ],
+    "axis_abs": [
+      -0.099156084,
+      0.0,
+      0.995071892
+    ],
+    "min_length_m": 0.1228,
+    "max_length_m": 0.228427
+  },
+  "finite_linear_captures": [
+    {
+      "schema_version": "finite_linear_capture_v1",
+      "capture_id": "cylinder_barrel_rod",
+      "parent_body_id": "cylinder_barrel",
+      "child_body_id": "cylinder_rod",
+      "parent_anchor_abs_m": [
+        0.36,
+        0.0,
+        0.045
+      ],
+      "child_anchor_abs_m": [
+        0.34742699491570417,
+        0.0,
+        0.1711752527490233
+      ],
+      "axis_abs": [
+        -0.099156084,
+        0.0,
+        0.995071892
+      ],
+      "parent_capture_solid_ids": [
+        "solid_59",
+        "solid_60",
+        "solid_61",
+        "solid_62"
+      ],
+      "child_capture_solid_ids": [
+        "solid_67"
+      ],
+      "minimum_overlap_m": 0.0095,
+      "maximum_separation_m": 0.228427
+    }
+  ],
+  "actuator": {
+    "kind": "hydraulic_cylinder_force_pair",
+    "barrel_body_id": "cylinder_barrel",
+    "rod_body_id": "cylinder_rod",
+    "barrel_anchor_abs_m": [
+      0.36,
+      0.0,
+      0.045
+    ],
+    "rod_anchor_abs_m": [
+      0.34742699491570417,
+      0.0,
+      0.1711752527490233
+    ],
+    "free_axial_rotation": true,
+    "min_length_m": 0.1228,
+    "max_length_m": 0.228427
+  },
+  "output_body_id": "lift_platform",
+  "output_axis_abs": [
+    0.0,
+    0.0,
+    1.0
+  ],
+  "output_reference_point_abs_m": [
+    0.21,
+    0.0,
+    0.387303
+  ],
+  "home_progress_m": 0.0,
+  "outbound_progress_m": 0.195719,
+  "nominal_input_force_n": 480.0,
+  "return_input_force_n": 800.0,
+  "max_force_phase_s": 1.2,
+  "max_return_phase_s": 1.5,
+  "settle_phase_s": 0.5,
+  "output_progress_tolerance_m": 0.004,
+  "max_joint_drift_m": 0.002,
+  "max_off_plane_rotation_rad": 0.05235987755982989,
+  "platform_level_tolerance_rad": 0.04363323129985824,
+  "friction": 0.08,
+  "geometry_reference": {
+    "arm_length_m": 0.5,
+    "home_scissor_angle_deg": 22.0,
+    "outbound_scissor_angle_deg": 50.0,
+    "platform_travel_m": 0.195719,
+    "cylinder_home_length_m": 0.1268,
+    "cylinder_outbound_length_m": 0.224427,
+    "cylinder_attach_fraction": 0.38,
+    "payload_estimate_kg": 3.0,
+    "product_interpretation": "full freestanding X-frame clothes drying rack with top grid and telescoping opening brace"
+  }
+}

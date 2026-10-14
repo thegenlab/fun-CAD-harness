@@ -1,0 +1,808 @@
+{
+  "schema_version": "simulation_ready_cad_bicycle_chain_sprocket_drive_family_v2_proposed",
+  "mechanism_kind": "bicycle_chain_sprocket_drive",
+  "capability_state": "INSTALLED_BUILTIN_ACTIVE",
+  "mechanism_id": "cleanroom_bicycle_drivetrain_amended_v2_r04",
+  "units": {
+    "length": "m",
+    "mass": "kg",
+    "time": "s",
+    "angle": "rad",
+    "force": "N",
+    "torque": "N*m"
+  },
+  "bodies": [
+    {
+      "body_id": "laboratory_chassis",
+      "rigid_group_id": "laboratory_chassis_group",
+      "source_solid_ids": [
+        "solid_1"
+      ],
+      "role": "fixed",
+      "fixed": true,
+      "mass_kg": 1000.0,
+      "center_of_mass_abs_m": [
+        0.0,
+        0.0,
+        0.45
+      ],
+      "inertia_diagonal_kg_m2": [
+        100.0,
+        100.0,
+        100.0
+      ],
+      "initial_position_abs_m": [
+        0.0,
+        0.0,
+        0.45
+      ],
+      "initial_orientation_wxyz": [
+        1.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "initial_linear_velocity_abs_m_s": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "initial_angular_velocity_abs_rad_s": [
+        0.0,
+        0.0,
+        0.0
+      ]
+    },
+    {
+      "body_id": "input_crank",
+      "rigid_group_id": "input_crank_group",
+      "source_solid_ids": [
+        "solid_2"
+      ],
+      "role": "input",
+      "fixed": false,
+      "mass_kg": 2.0,
+      "center_of_mass_abs_m": [
+        -0.25,
+        0.0,
+        0.34
+      ],
+      "inertia_diagonal_kg_m2": [
+        0.018,
+        0.03,
+        0.018
+      ],
+      "initial_position_abs_m": [
+        -0.25,
+        0.0,
+        0.34
+      ],
+      "initial_orientation_wxyz": [
+        1.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "initial_linear_velocity_abs_m_s": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "initial_angular_velocity_abs_rad_s": [
+        0.0,
+        0.0,
+        0.0
+      ]
+    },
+    {
+      "body_id": "rear_drive_wheel",
+      "rigid_group_id": "rear_drive_wheel_group",
+      "source_solid_ids": [
+        "solid_3"
+      ],
+      "role": "unique_task_target",
+      "fixed": false,
+      "mass_kg": 4.0,
+      "center_of_mass_abs_m": [
+        -0.85,
+        0.0,
+        0.38
+      ],
+      "inertia_diagonal_kg_m2": [
+        0.25,
+        0.45,
+        0.25
+      ],
+      "initial_position_abs_m": [
+        -0.85,
+        0.0,
+        0.38
+      ],
+      "initial_orientation_wxyz": [
+        1.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "initial_linear_velocity_abs_m_s": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "initial_angular_velocity_abs_rad_s": [
+        0.0,
+        0.0,
+        0.0
+      ]
+    }
+  ],
+  "degrees_of_freedom": [
+    {
+      "dof_id": "input_crank_rotation",
+      "body_id": "input_crank",
+      "coordinate_id": "theta_input_rad",
+      "motion_kind": "revolute",
+      "origin_abs_m": [
+        -0.25,
+        0.0,
+        0.34
+      ],
+      "axis_abs": [
+        0.0,
+        1.0,
+        0.0
+      ],
+      "range_kind": "continuous_unwrapped",
+      "positive_direction": "right_hand_rule_about_world_positive_Y"
+    },
+    {
+      "dof_id": "rear_drive_wheel_rotation",
+      "body_id": "rear_drive_wheel",
+      "coordinate_id": "theta_output_rad",
+      "motion_kind": "revolute",
+      "origin_abs_m": [
+        -0.85,
+        0.0,
+        0.38
+      ],
+      "axis_abs": [
+        0.0,
+        1.0,
+        0.0
+      ],
+      "range_kind": "continuous_unwrapped",
+      "positive_direction": "right_hand_rule_about_world_positive_Y"
+    }
+  ],
+  "finite_bearing_supports": [
+    {
+      "support_id": "input_crank_finite_bearing",
+      "fixed_body_id": "laboratory_chassis",
+      "moving_body_id": "input_crank",
+      "frame_id": "input_crank_axis",
+      "axis_abs": [
+        0.0,
+        1.0,
+        0.0
+      ],
+      "constitutive_model": "finite_6d_linear_support_with_passive_primary_axis_centering",
+      "translation_stiffness_n_m": [
+        250000.0,
+        250000.0,
+        250000.0
+      ],
+      "translation_damping_n_s_m": [
+        900.0,
+        900.0,
+        900.0
+      ],
+      "off_axis_rotation_stiffness_nm_rad": [
+        8000.0,
+        0.0,
+        8000.0
+      ],
+      "off_axis_rotation_damping_nm_s_rad": [
+        60.0,
+        0.0,
+        60.0
+      ],
+      "primary_axis_home_rad": 0.0,
+      "primary_axis_centering_stiffness_nm_rad": 1.2,
+      "primary_axis_damping_nm_s_rad": 1.6,
+      "maximum_force_n": 5000.0,
+      "maximum_total_support_torque_nm": 80.0,
+      "primary_axis_maximum_abs_torque_nm": 8.0,
+      "zero_state_stored_energy_j": 0.0
+    },
+    {
+      "support_id": "rear_wheel_finite_bearing",
+      "fixed_body_id": "laboratory_chassis",
+      "moving_body_id": "rear_drive_wheel",
+      "frame_id": "rear_drive_wheel_axis",
+      "axis_abs": [
+        0.0,
+        1.0,
+        0.0
+      ],
+      "constitutive_model": "finite_6d_linear_support_with_free_damped_primary_axis",
+      "translation_stiffness_n_m": [
+        250000.0,
+        250000.0,
+        250000.0
+      ],
+      "translation_damping_n_s_m": [
+        900.0,
+        900.0,
+        900.0
+      ],
+      "off_axis_rotation_stiffness_nm_rad": [
+        8000.0,
+        0.0,
+        8000.0
+      ],
+      "off_axis_rotation_damping_nm_s_rad": [
+        60.0,
+        0.0,
+        60.0
+      ],
+      "primary_axis_home_rad": 0.0,
+      "primary_axis_centering_stiffness_nm_rad": 0.0,
+      "primary_axis_damping_nm_s_rad": 0.03,
+      "maximum_force_n": 5000.0,
+      "maximum_total_support_torque_nm": 80.0,
+      "zero_state_stored_energy_j": 0.0
+    }
+  ],
+  "sprockets": [
+    {
+      "sprocket_id": "input_chainring",
+      "body_id": "input_crank",
+      "shaft_frame_id": "input_crank_axis",
+      "pitch_loop_surface_kind": "toroidal_centerline",
+      "pitch_loop_center_abs_m": [
+        -0.25,
+        -0.078,
+        0.34
+      ],
+      "pitch_axis_abs": [
+        0.0,
+        1.0,
+        0.0
+      ],
+      "pitch_radius_m": 0.08,
+      "toroidal_minor_radius_m": 0.008,
+      "step_solid_id": "solid_2",
+      "contact_collision_component_ids": [
+        "input.chainring_backing"
+      ]
+    },
+    {
+      "sprocket_id": "rear_sprocket",
+      "body_id": "rear_drive_wheel",
+      "shaft_frame_id": "rear_drive_wheel_axis",
+      "pitch_loop_surface_kind": "toroidal_centerline",
+      "pitch_loop_center_abs_m": [
+        -0.85,
+        -0.078,
+        0.38
+      ],
+      "pitch_axis_abs": [
+        0.0,
+        1.0,
+        0.0
+      ],
+      "pitch_radius_m": 0.04,
+      "toroidal_minor_radius_m": 0.005,
+      "step_solid_id": "solid_3",
+      "contact_collision_component_ids": [
+        "rear.sprocket_backing"
+      ],
+      "backing_geometry": {
+        "kind": "intersecting_fused_disc",
+        "outer_radius_m": 0.036,
+        "axial_length_m": 0.014,
+        "required_connection": "positive_material_intersection_with_pitch_torus_and_rear_wheel_spokes",
+        "surface_exposure_policy": "at_least_one_40_mm_major_5_mm_minor_toroidal_face_remains_exposed_after_fusion"
+      }
+    }
+  ],
+  "chain_transmission": {
+    "transmission_id": "finite_bicycle_chain_coordinate",
+    "driver_body_id": "input_crank",
+    "driven_body_id": "rear_drive_wheel",
+    "input_coordinate_id": "theta_input_rad",
+    "output_coordinate_id": "theta_output_rad",
+    "input_pitch_radius_m": 0.08,
+    "output_pitch_radius_m": 0.04,
+    "signed_output_per_input": 2.0,
+    "chain_error_coordinate": "e_m = 0.08 * theta_input_rad - 0.04 * theta_output_rad",
+    "chain_error_rate": "e_dot_m_s = 0.08 * omega_input_rad_s - 0.04 * omega_output_rad_s",
+    "constitutive_law": "F_chain_N = clamp(100000.0 * e_m + 700.0 * e_dot_m_s, -300.0, 300.0)",
+    "input_transmission_torque": "tau_input_chain_Nm = -0.08 * F_chain_N",
+    "output_transmission_torque": "tau_output_chain_Nm = +0.04 * F_chain_N",
+    "chain_stiffness_n_m": 100000.0,
+    "chain_damping_n_s_m": 700.0,
+    "maximum_abs_chain_force_n": 300.0,
+    "maximum_abs_chain_error_m": 0.004,
+    "initial_chain_error_m": 0.0,
+    "initial_chain_error_rate_m_s": 0.0,
+    "initial_stored_energy_j": 0.0,
+    "physical_link_kind": "finite_compliant_force_pair",
+    "ideal_constraint_in_physical_branch": false,
+    "preload_allowed": false,
+    "output_feedforward_allowed": false,
+    "geometry_gate_id": "bicycle_sprocket_pitch_geometry_gate"
+  },
+  "geometry_gates": [
+    {
+      "gate_id": "bicycle_sprocket_pitch_geometry_gate",
+      "evidence_source": "assembly.step",
+      "required_step_entities": [
+        {
+          "body_id": "input_crank",
+          "step_solid_id": "solid_2",
+          "surface_kind": "torus",
+          "major_radius_m": 0.08,
+          "minor_radius_m": 0.008,
+          "center_abs_m": [
+            -0.25,
+            -0.078,
+            0.34
+          ],
+          "axis_abs": [
+            0.0,
+            1.0,
+            0.0
+          ],
+          "surface_exposure_required": true,
+          "minimum_exposed_face_count": 1
+        },
+        {
+          "body_id": "rear_drive_wheel",
+          "step_solid_id": "solid_3",
+          "surface_kind": "torus",
+          "major_radius_m": 0.04,
+          "minor_radius_m": 0.005,
+          "center_abs_m": [
+            -0.85,
+            -0.078,
+            0.38
+          ],
+          "axis_abs": [
+            0.0,
+            1.0,
+            0.0
+          ],
+          "surface_exposure_required": true,
+          "minimum_exposed_face_count": 1
+        }
+      ],
+      "pitch_radius_tolerance_m": 0.0002,
+      "pitch_center_tolerance_m": 0.0002,
+      "maximum_axis_parallel_error_rad": 0.002,
+      "maximum_pitch_plane_offset_m": 0.0005,
+      "visible_chain_part_id": "visible_closed_chain_path",
+      "maximum_chain_sprocket_separation_m": 0.002,
+      "visible_chain_wrap_band_m": 0.012,
+      "minimum_visible_chain_wrap_angle_rad": 1.5,
+      "minimum_visible_chain_wrap_sample_count": 12,
+      "active_condition": "all declared STEP torus centerlines, radii, centers, axes, body bindings, finite-bearing frames, and any declared visible-chain geometry satisfy their public tolerances",
+      "inactive_condition": "any required geometry, body binding, visible-chain seating or wrap, alignment, or finite-support invariant is absent or outside tolerance",
+      "zero_transmission_wrench_when_inactive": true
+    }
+  ],
+  "input_ports": [
+    {
+      "port_id": "input_crank_torque",
+      "target_body_id": "input_crank",
+      "frame_id": "input_crank_axis",
+      "wrench_kind": "torque",
+      "direction_abs": [
+        0.0,
+        1.0,
+        0.0
+      ],
+      "minimum_magnitude_nm": 0.0,
+      "maximum_magnitude_nm": 5.0,
+      "validator_owned": true
+    }
+  ],
+  "unique_task_targets": [
+    {
+      "task_id": "powered_bicycle_drive_roundtrip",
+      "target_body_id": "rear_drive_wheel",
+      "pose_observable_id": "rear_drive_wheel_pose_6d",
+      "actuation_observable_id": "rear_drive_wheel_actuation_log",
+      "coordinate_id": "theta_output_rad",
+      "unique": true
+    }
+  ],
+  "task_program_policy": {
+    "program_id": "task_bicycle_powered_roundtrip",
+    "integration_step_s": 0.00025,
+    "saved_sample_stride_steps": 1,
+    "maximum_sample_gap_cadences": 1.0,
+    "minimum_powered_sample_count": 3,
+    "initial_state_policy": "zero_displacement_zero_velocity_zero_preload",
+    "phases": [
+      {
+        "phase_id": "finite_engagement_settle",
+        "wrench_kind": "torque",
+        "direction_abs": [
+          0.0,
+          1.0,
+          0.0
+        ],
+        "magnitude_si": 3.2,
+        "duration_s": 0.6
+      },
+      {
+        "phase_id": "measured_powered_drive",
+        "wrench_kind": "torque",
+        "direction_abs": [
+          0.0,
+          1.0,
+          0.0
+        ],
+        "magnitude_si": 3.2,
+        "duration_s": 1.6
+      },
+      {
+        "phase_id": "passive_return",
+        "wrench_kind": "none",
+        "direction_abs": null,
+        "magnitude_si": 0.0,
+        "duration_s": 8.0
+      },
+      {
+        "phase_id": "return_settle",
+        "wrench_kind": "none",
+        "direction_abs": null,
+        "magnitude_si": 0.0,
+        "duration_s": 2.0
+      }
+    ],
+    "engagement_phase_ids": [
+      "finite_engagement_settle"
+    ],
+    "powered_phase_ids": [
+      "measured_powered_drive"
+    ],
+    "return_phase_ids": [
+      "passive_return",
+      "return_settle"
+    ],
+    "adaptive_phase_ids": [],
+    "return_input_policy": "zero",
+    "engagement_policy": {
+      "kind": "fixed_duration_fully_traced",
+      "validator_owned_duration_s": 0.6,
+      "task_motion_credit": false,
+      "ratio_metric_credit": false,
+      "adaptive_termination": false,
+      "hidden_preload": false,
+      "phase_label_is_evidence": false,
+      "measurement_boundary": "last saved finite_engagement_settle sample is the zero-displacement baseline for measured powered motion",
+      "fail_closed_behavior": "the measured window opens at the fixed boundary without extension; any persisting lag causes the first or later full-cadence ratio check to fail"
+    },
+    "powered_measurement_policy": {
+      "motion_baseline": "saved boundary between finite_engagement_settle and measured_powered_drive",
+      "minimum_output_rotation_rad": 2.8,
+      "signed_ratio_target": 2.0,
+      "signed_ratio_tolerance": 0.02,
+      "ratio_sampling": "every saved measured_powered_drive sample after the boundary baseline and every adjacent saved-sample increment",
+      "sample_thinning_allowed": false,
+      "interpolation_substitution_allowed": false,
+      "engagement_motion_credit_allowed": false
+    },
+    "return_measurement_policy": {
+      "home_baseline": "initial t0 rear-drive-wheel orientation",
+      "task_input_exact_zero": true,
+      "maximum_rear_home_error_rad": 0.25,
+      "measurement_sample": "last saved return_settle sample"
+    }
+  },
+  "held_out_validation_domain": {
+    "case_id": "held_out_positive_task_torque_closed_interval",
+    "case_kind": "held_out_load",
+    "selection_authority": "validator_release_bound",
+    "varied_parameters": [
+      {
+        "parameter_id": "coupled_positive_crank_task_torque_nm",
+        "field_bindings": [
+          "task_program_policy.phases[finite_engagement_settle].magnitude_si",
+          "task_program_policy.phases[measured_powered_drive].magnitude_si"
+        ],
+        "minimum": 3.18,
+        "nominal": 3.2,
+        "maximum": 3.22,
+        "unit": "N*m",
+        "minimum_is_strictly_positive": true,
+        "coupling_policy": "one validator-selected value is applied identically in both non-return phases"
+      }
+    ],
+    "fixed_parameters": [
+      {
+        "parameter_id": "input_crank_primary_axis_inertia",
+        "field_binding": "bodies[input_crank].inertia_diagonal_kg_m2[1]",
+        "value": 0.03,
+        "unit": "kg*m^2"
+      },
+      {
+        "parameter_id": "rear_drive_wheel_primary_axis_inertia",
+        "field_binding": "bodies[rear_drive_wheel].inertia_diagonal_kg_m2[1]",
+        "value": 0.45,
+        "unit": "kg*m^2"
+      },
+      {
+        "parameter_id": "chain_stiffness",
+        "field_binding": "chain_transmission.chain_stiffness_n_m",
+        "value": 100000.0,
+        "unit": "N/m"
+      },
+      {
+        "parameter_id": "chain_damping",
+        "field_binding": "chain_transmission.chain_damping_n_s_m",
+        "value": 700.0,
+        "unit": "N*s/m"
+      },
+      {
+        "parameter_id": "input_primary_axis_bearing_damping",
+        "field_binding": "finite_bearing_supports[input_crank_finite_bearing].primary_axis_damping_nm_s_rad",
+        "value": 1.6,
+        "unit": "N*m*s/rad"
+      },
+      {
+        "parameter_id": "rear_primary_axis_bearing_damping",
+        "field_binding": "finite_bearing_supports[rear_wheel_finite_bearing].primary_axis_damping_nm_s_rad",
+        "value": 0.03,
+        "unit": "N*m*s/rad"
+      }
+    ],
+    "required_evidence_points_after_implementation_before_activation": [
+      {
+        "point_id": "release_bound_held_out_upper_corner",
+        "selection_authority": "validator_release_bound",
+        "coupled_positive_crank_task_torque_nm": 3.22
+      }
+    ],
+    "evidence_obligations": [
+      "both physical and ideal-reference branches are required at every evidence point",
+      "the fully traced 0.6 s engagement interval is never credited toward powered motion or ratio",
+      "measured rear-wheel rotation is at least 2.8 rad after the engagement boundary",
+      "signed output-to-input ratio is +2.0 within 0.02 at every saved measured sample and adjacent increment",
+      "task input is exactly zero throughout passive_return and return_settle",
+      "final rear-wheel home error is at most 0.25 rad"
+    ],
+    "no_other_parameter_may_vary": true,
+    "no_hidden_defaults": true,
+    "design_claim_boundary": "These are typed post-implementation activation-test obligations, not submitter-authored physical results."
+  },
+  "ideal_reference_branch": {
+    "required": true,
+    "branch_id": "ideal_reference",
+    "relation": "theta_output_rad - theta_output_baseline_rad = 2.0 * (theta_input_rad - theta_input_baseline_rad)",
+    "signed_output_per_input": 2.0,
+    "physical_state_write_allowed": false,
+    "physical_wrench_allowed": false,
+    "physical_motion_evidence_allowed": false,
+    "thresholds_shared_with_physical_branch": true
+  },
+  "wrench_policy": {
+    "allowed": [
+      {
+        "wrench_id": "validator_crank_task_torque",
+        "owner": "bicycle_chain_sprocket_drive_v2",
+        "category": "task_input",
+        "target_body_id": "input_crank",
+        "active_phase_ids": [
+          "finite_engagement_settle",
+          "measured_powered_drive"
+        ],
+        "maximum_abs_torque_nm": 5.0
+      },
+      {
+        "wrench_id": "finite_chain_input_torque",
+        "owner": "bicycle_chain_sprocket_drive_v2",
+        "category": "transmission",
+        "target_body_id": "input_crank",
+        "active_phase_ids": [
+          "finite_engagement_settle",
+          "measured_powered_drive",
+          "passive_return",
+          "return_settle"
+        ],
+        "geometry_gate_id": "bicycle_sprocket_pitch_geometry_gate",
+        "maximum_abs_torque_nm": 24.0
+      },
+      {
+        "wrench_id": "finite_chain_output_torque",
+        "owner": "bicycle_chain_sprocket_drive_v2",
+        "category": "transmission",
+        "target_body_id": "rear_drive_wheel",
+        "active_phase_ids": [
+          "finite_engagement_settle",
+          "measured_powered_drive",
+          "passive_return",
+          "return_settle"
+        ],
+        "geometry_gate_id": "bicycle_sprocket_pitch_geometry_gate",
+        "maximum_abs_torque_nm": 12.0
+      },
+      {
+        "wrench_id": "input_finite_support_wrench",
+        "owner": "bicycle_chain_sprocket_drive_v2",
+        "category": "finite_support",
+        "target_body_id": "input_crank",
+        "active_phase_ids": [
+          "finite_engagement_settle",
+          "measured_powered_drive",
+          "passive_return",
+          "return_settle"
+        ],
+        "maximum_abs_total_torque_nm": 80.0,
+        "primary_axis_maximum_abs_torque_nm": 8.0,
+        "maximum_abs_force_n": 5000.0
+      },
+      {
+        "wrench_id": "output_finite_support_wrench",
+        "owner": "bicycle_chain_sprocket_drive_v2",
+        "category": "finite_support",
+        "target_body_id": "rear_drive_wheel",
+        "active_phase_ids": [
+          "finite_engagement_settle",
+          "measured_powered_drive",
+          "passive_return",
+          "return_settle"
+        ],
+        "maximum_abs_total_torque_nm": 80.0,
+        "maximum_abs_force_n": 5000.0
+      }
+    ],
+    "forbidden_classes": [
+      "DIRECT_TASK_OUTPUT_ACTUATION",
+      "IDEAL_STATE_SETTER",
+      "UNGATED_ANALYTICAL_TRANSMISSION",
+      "UNREGISTERED_WRENCH_LAW",
+      "PRELOADED_HIDDEN_ENERGY",
+      "OUTPUT_FEEDFORWARD",
+      "PHASE_LABEL_MOTION_EVIDENCE"
+    ],
+    "rear_wheel_task_input_allowed": false,
+    "all_wrenches_require_full_cadence_audit": true,
+    "energy_balance_required": true
+  },
+  "validator_metrics": [
+    {
+      "requirement_id": "rear_wheel_powered_rotation",
+      "metric_id": "continuous_rotation_rad",
+      "threshold_source": "frozen_requirements",
+      "branch_ids": [
+        "physical",
+        "ideal_reference"
+      ],
+      "comparator": "at_least",
+      "value": 2.8,
+      "unit": "rad",
+      "window": "measured_powered_drive_only"
+    },
+    {
+      "requirement_id": "rear_to_crank_angular_ratio",
+      "metric_id": "angular_ratio",
+      "threshold_source": "frozen_requirements",
+      "branch_ids": [
+        "physical",
+        "ideal_reference"
+      ],
+      "comparator": "within",
+      "value": 2.0,
+      "tolerance": 0.02,
+      "unit": "ratio",
+      "window": "every_saved_measured_powered_drive_sample_and_increment"
+    },
+    {
+      "requirement_id": "rear_wheel_return_home",
+      "metric_id": "return_to_start_rad",
+      "threshold_source": "frozen_requirements",
+      "branch_ids": [
+        "physical",
+        "ideal_reference"
+      ],
+      "comparator": "at_most",
+      "value": 0.25,
+      "unit": "rad",
+      "window": "last_saved_return_settle_sample_relative_to_t0"
+    },
+    {
+      "requirement_id": "crank_only_actuation",
+      "metric_id": "actuation_provenance",
+      "threshold_source": "frozen_requirements",
+      "branch_ids": [
+        "physical"
+      ],
+      "comparator": "equals",
+      "value": "indirect_only",
+      "unit": "enum",
+      "window": "entire_trace"
+    }
+  ],
+  "required_negative_tests": [
+    "DIRECT_OUTPUT_DRIVE_REJECTED",
+    "GEOMETRY_GATE_OFF_ZERO_WRENCH",
+    "OBSERVABLE_CHANNEL_BODY_FRAME_AXIS_MISMATCH_REJECTED",
+    "PHASE_COVERAGE_AND_BOUNDARIES_REQUIRED",
+    "PHYSICAL_AUDIT_FAIL_CANNOT_TASK_PASS",
+    "POST_RELEASE_EXCURSION_NOT_POWERED",
+    "POWERED_RATIO_ALL_SAMPLES",
+    "RETURN_PHASE_TASK_INPUT_NONZERO_REJECTED",
+    "SAME_BODY_RATIO_ALIAS_REJECTED",
+    "SEMANTIC_RUNTIME_BODY_SWAP_REJECTED",
+    "SPARSE_OR_DUPLICATE_TIME_TRACE_INCONCLUSIVE",
+    "THRESHOLD_TAMPER_REJECTED",
+    "UNKNOWN_FIELD_REJECTED",
+    "UNRELATED_DIRECT_FALSE_NOT_PROVENANCE",
+    "VISIBLE_CHAIN_PATH_FLOATING_REJECTED",
+    "WRENCH_AUDIT_CONTEXT_MISMATCH_REJECTED",
+    "WRONG_DIRECTION_FAILS",
+    "ZERO_INPUT_NO_ENERGY"
+  ],
+  "negative_test_assertions": [
+    {
+      "kind": "PHASE_COVERAGE_AND_BOUNDARIES_REQUIRED",
+      "required_attacks": [
+        "omit finite_engagement_settle samples",
+        "truncate finite_engagement_settle below 0.6 s",
+        "adaptively extend or shorten finite_engagement_settle",
+        "relabel startup samples as measured_powered_drive",
+        "credit any finite_engagement_settle displacement toward the 2.8 rad threshold",
+        "use any finite_engagement_settle sample in the powered ratio metric"
+      ],
+      "required_assertion": "reject unless the complete fixed 0.6 s engagement trace exists, the saved boundary sample is the measured-motion baseline, and engagement contributes exactly zero task-motion or ratio credit"
+    },
+    {
+      "kind": "ZERO_INPUT_NO_ENERGY",
+      "required_attacks": [
+        "nonzero initial crank displacement or angular velocity",
+        "nonzero initial rear-wheel displacement or angular velocity",
+        "nonzero initial chain error or chain error rate",
+        "preloaded chain or bearing stored energy",
+        "nonzero task-input sample during passive_return or return_settle"
+      ],
+      "required_assertion": "reject unless all authored and runtime initial states have zero displacement, velocity, preload, and stored energy and every return task-input sample is exact numeric zero"
+    },
+    {
+      "kind": "VISIBLE_CHAIN_PATH_FLOATING_REJECTED",
+      "required_attacks": [
+        "declare a visible chain path separated by more than 0.002 m from either sprocket",
+        "declare less than 1.5 rad of visible wrap or fewer than 12 near-pitch samples around either sprocket",
+        "place the visible chain thickness center plane more than 0.0005 m from either governed sprocket pitch plane",
+        "hide arbitrarily deep matching-sprocket penetration inside a fixed flex zone instead of respecting the public chain-and-sprocket-geometry-derived penetration cap",
+        "rename, omit, duplicate, or overlap the required visible_closed_chain_path STEP-solid binding",
+        "tamper with the public visible-chain thresholds or measured semantic evidence"
+      ],
+      "required_assertion": "reject unless exactly one required visible chain is declared and authoritative STEP-solid measurements prove seating, wrap, pitch-plane alignment, unique ownership, bounded matching-sprocket penetration, and untampered public evidence around both sprockets"
+    }
+  ],
+  "current_release_compatibility": {
+    "generic_load_phase_fields_used": [
+      "phase_id",
+      "wrench_kind",
+      "direction_abs",
+      "magnitude_si",
+      "duration_s"
+    ],
+    "generic_task_program_policy_fields_used": [
+      "powered_phase_ids",
+      "return_phase_ids",
+      "adaptive_phase_ids",
+      "return_input_policy",
+      "minimum_powered_sample_count",
+      "maximum_sample_gap_cadences"
+    ],
+    "generic_phase_policy_representable_without_new_fields": true,
+    "convergence_adaptive_engagement_requested": false,
+    "mechanism_specific_schema_registered": true,
+    "mechanism_specific_runtime_available": true,
+    "required_governed_action": "none_installed_builtin"
+  }
+}

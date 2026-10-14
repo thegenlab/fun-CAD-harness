@@ -1,0 +1,117 @@
+{
+  "mechanism_kind": "nail_clipper_compound_lever",
+  "project_adapter_file": "mechanism_templates/nail_clipper_compound_lever.py",
+  "bodies": [
+    {
+      "body_id": "stationary_cutting_jaw",
+      "group_ids": [
+        "group_stationary_cutting_jaw"
+      ],
+      "fixed": true,
+      "mass_kg": 0.02921,
+      "center_abs_m": [
+        0.032,
+        0.0,
+        0.0032
+      ],
+      "size_m": [
+        0.058,
+        0.011,
+        0.0064
+      ]
+    },
+    {
+      "body_id": "actuating_lever",
+      "group_ids": [
+        "group_actuating_lever"
+      ],
+      "fixed": false,
+      "mass_kg": 0.01633,
+      "center_abs_m": [
+        0.015,
+        0.0,
+        0.019
+      ],
+      "size_m": [
+        0.026,
+        0.011,
+        0.006
+      ]
+    },
+    {
+      "body_id": "moving_cutting_jaw",
+      "group_ids": [
+        "group_moving_cutting_jaw"
+      ],
+      "fixed": false,
+      "mass_kg": 0.01902,
+      "center_abs_m": [
+        0.04,
+        0.0,
+        0.012
+      ],
+      "size_m": [
+        0.04,
+        0.011,
+        0.006
+      ]
+    }
+  ],
+  "revolute_joints": [
+    {
+      "joint_id": "jaw_revolute",
+      "parent_body_id": "stationary_cutting_jaw",
+      "child_body_id": "moving_cutting_jaw",
+      "origin_abs_m": [
+        0.048,
+        0.0,
+        0.007
+      ],
+      "axis_abs": [
+        0.0,
+        1.0,
+        0.0
+      ]
+    },
+    {
+      "joint_id": "lever_revolute",
+      "parent_body_id": "moving_cutting_jaw",
+      "child_body_id": "actuating_lever",
+      "origin_abs_m": [
+        0.022,
+        0.0,
+        0.012
+      ],
+      "axis_abs": [
+        0.0,
+        1.0,
+        0.0
+      ]
+    }
+  ],
+  "restoring_spring": {
+    "body_a_id": "stationary_cutting_jaw",
+    "body_b_id": "moving_cutting_jaw",
+    "origin_abs_m": [
+      0.048,
+      0.0,
+      0.007
+    ],
+    "axis_abs": [
+      0.0,
+      1.0,
+      0.0
+    ],
+    "stiffness_n_m_rad": 0.1,
+    "damping_n_m_s_rad": 0.02,
+    "rest_angle_rad": 0.0
+  },
+  "input_body_id": "actuating_lever",
+  "output_body_id": "moving_cutting_jaw",
+  "contact_point_abs_m": [
+    0.008,
+    0.0,
+    0.007
+  ],
+  "cutting_edge_radius_m": 0.04
+}

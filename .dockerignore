@@ -1,0 +1,6 @@
+.git
+.runtime_runs
+runs
+.env
+**/__pycache__
+**/*.pyc

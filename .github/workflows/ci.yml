@@ -1,0 +1,30 @@
+name: tests
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  unit:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 60
+    env:
+      PYTHONNOUSERSITE: "1"
+    steps:
+      - uses: actions/checkout@v4
+      - uses: mamba-org/setup-micromamba@v2
+        with:
+          environment-file: environment-cad.yml
+          cache-environment: true
+      - name: Python tests (PyChrono tests are skipped without the physics environment)
+        shell: bash -el {0}
+        run: |
+          export LD_LIBRARY_PATH="$CONDA_PREFIX/lib"
+          python -X utf8 scripts/run_tests.py
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Dashboard script tests
+        # test_workbench_parts.cjs needs a locally bundled viewer module (PARTS_MODULE) and three.js.
+        run: node --test $(ls simulation_ready_cad_workflow/validation_pipeline/tests/*.cjs | grep -v test_workbench_parts.cjs)

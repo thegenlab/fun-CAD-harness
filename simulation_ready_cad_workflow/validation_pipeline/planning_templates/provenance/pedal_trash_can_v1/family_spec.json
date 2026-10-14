@@ -1,0 +1,207 @@
+{
+  "linkage_id": "pedal_trash_can_four_pivot_linkage",
+  "bodies": [
+    {
+      "body_id": "ground",
+      "group_ids": [
+        "group_bin_body"
+      ],
+      "fixed": true,
+      "mass_kg": 11.0,
+      "center_abs_m": [
+        -0.014499999999999999,
+        -0.011499999999999996,
+        0.252
+      ],
+      "size_m": [
+        0.41700000000000004,
+        0.359,
+        0.52
+      ],
+      "rotation_abs_quat_wxyz": [
+        1.0,
+        0.0,
+        0.0,
+        0.0
+      ]
+    },
+    {
+      "body_id": "pedal",
+      "group_ids": [
+        "group_pedal"
+      ],
+      "fixed": false,
+      "mass_kg": 0.65,
+      "center_abs_m": [
+        0.155,
+        -0.022499999999999992,
+        0.061499999999999944
+      ],
+      "size_m": [
+        0.16199999999999998,
+        0.315,
+        0.014999999999999937
+      ],
+      "rotation_abs_quat_wxyz": [
+        1.0,
+        0.0,
+        0.0,
+        0.0
+      ]
+    },
+    {
+      "body_id": "rod",
+      "group_ids": [
+        "group_lift_rod"
+      ],
+      "fixed": false,
+      "mass_kg": 0.24,
+      "center_abs_m": [
+        -0.017000000000000015,
+        -0.165,
+        0.27749999999999997
+      ],
+      "size_m": [
+        0.37202055252622196,
+        0.010000000000000009,
+        0.4530205525262219
+      ],
+      "rotation_abs_quat_wxyz": [
+        0.942237471192951,
+        0.0,
+        -0.3349455894319448,
+        0.0
+      ]
+    },
+    {
+      "body_id": "lid",
+      "group_ids": [
+        "group_bin_lid"
+      ],
+      "fixed": false,
+      "mass_kg": 0.95,
+      "center_abs_m": [
+        -0.0173055900776221,
+        -0.014499999999999999,
+        0.5033747212204839
+      ],
+      "size_m": [
+        0.3873888198447558,
+        0.33099999999999996,
+        0.030765427739140483
+      ],
+      "rotation_abs_quat_wxyz": [
+        1.0,
+        0.0,
+        0.0,
+        0.0
+      ]
+    }
+  ],
+  "revolute_joints": [
+    {
+      "joint_id": "pedal_ground",
+      "parent_body_id": "ground",
+      "child_body_id": "pedal",
+      "origin_abs_m": [
+        0.08,
+        -0.165,
+        0.06
+      ],
+      "axis_abs": [
+        0.0,
+        -1.0,
+        0.0
+      ],
+      "free_axis_damping_n_m_s_rad": 0.15,
+      "limit_stiffness_n_m_rad": 15000.0,
+      "limit_damping_n_m_s_rad": 25.0,
+      "min_angle_rad": -0.5235987755982988,
+      "max_angle_rad": 0.05235987755982989
+    },
+    {
+      "joint_id": "pedal_rod",
+      "parent_body_id": "pedal",
+      "child_body_id": "rod",
+      "origin_abs_m": [
+        0.16,
+        -0.165,
+        0.06
+      ],
+      "axis_abs": [
+        0.0,
+        -1.0,
+        0.0
+      ],
+      "free_axis_damping_n_m_s_rad": 0.08
+    },
+    {
+      "joint_id": "rod_lid",
+      "parent_body_id": "rod",
+      "child_body_id": "lid",
+      "origin_abs_m": [
+        -0.194,
+        -0.165,
+        0.495
+      ],
+      "axis_abs": [
+        0.0,
+        -1.0,
+        0.0
+      ],
+      "free_axis_damping_n_m_s_rad": 0.08
+    },
+    {
+      "joint_id": "lid_ground",
+      "parent_body_id": "ground",
+      "child_body_id": "lid",
+      "origin_abs_m": [
+        -0.174,
+        -0.165,
+        0.5
+      ],
+      "axis_abs": [
+        0.0,
+        -1.0,
+        0.0
+      ],
+      "free_axis_damping_n_m_s_rad": 0.35,
+      "limit_stiffness_n_m_rad": 20000.0,
+      "limit_damping_n_m_s_rad": 55.0,
+      "limit_approach_zone_rad": 0.4,
+      "limit_approach_damping_n_m_s_rad": 15.0,
+      "min_angle_rad": 0.0,
+      "max_angle_rad": 1.2217304763960306
+    }
+  ],
+  "input_body_id": "pedal",
+  "output_body_id": "lid",
+  "input_joint_id": "pedal_ground",
+  "output_joint_id": "lid_ground",
+  "input_point_abs_m": [
+    0.195,
+    0.0,
+    0.064
+  ],
+  "input_force_direction_abs": [
+    0.0,
+    0.0,
+    -1.0
+  ],
+  "output_observable_point_abs_m": [
+    0.175,
+    0.0,
+    0.5145
+  ],
+  "home_output_angle_rad": 0.0,
+  "outbound_output_angle_rad": 1.2217304763960306,
+  "nominal_input_force_n": 75.0,
+  "return_input_force_n": 2.0,
+  "max_force_phase_s": 2.0,
+  "max_return_phase_s": 3.0,
+  "settle_phase_s": 0.04,
+  "output_angle_tolerance_rad": 0.06,
+  "max_joint_drift_m": 0.002,
+  "max_off_plane_rotation_rad": 0.05235987755982989,
+  "friction": 0.08
+}

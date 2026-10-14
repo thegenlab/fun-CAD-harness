@@ -1,0 +1,78 @@
+{
+  "schema_version": "0.1",
+  "capsule_id": "rack_pinion_gate_drive",
+  "name": "Engineering hand-crank rack-and-pinion lift gate",
+  "member_rigid_group_ids": [
+    "group_pinion_crank",
+    "group_rack_gate"
+  ],
+  "boundary_rigid_group_ids": [
+    "group_gate_frame"
+  ],
+  "input_ports": [
+    {
+      "port_id": "manual_crank_torque",
+      "rigid_group_id": "group_pinion_crank",
+      "frame_id": "frame_crank_input",
+      "wrench_type": "torque",
+      "direction_abs": [
+        0.0,
+        -1.0,
+        0.0
+      ],
+      "declared_range": {
+        "min": -22.0,
+        "max": 22.0,
+        "unit": "N*m"
+      }
+    }
+  ],
+  "observables": [
+    {
+      "observable_id": "gate_vertical_pose",
+      "rigid_group_id": "group_rack_gate",
+      "frame_id": "frame_rack_output",
+      "quantity": "pose_6d"
+    }
+  ],
+  "expected_behavior": {
+    "description": "Negative torque about the declared +Y pinion axis raises the module-5 rack and guided gate 180 mm along +Z; reverse torque returns it to the lower hard stops.",
+    "dof": [
+      {
+        "motion": "coupled_pinion_rotation_and_vertical_rack_translation"
+      }
+    ],
+    "failure_conditions": [
+      "pinion bearing drift",
+      "rack leaves the guide shoes",
+      "rack-pinion phase error",
+      "gate twists out of plane",
+      "gate misses either hard stop",
+      "uncontrolled gravity drop"
+    ]
+  },
+  "reduced_model_claim": {
+    "verification_status": "UNVERIFIED",
+    "family": "compound",
+    "fixed_group_ids": [
+      "group_gate_frame"
+    ],
+    "moving_group_ids": [
+      "group_pinion_crank",
+      "group_rack_gate"
+    ],
+    "joint_frame_id": "frame_pinion_axis",
+    "axis_abs": [
+      0.0,
+      1.0,
+      0.0
+    ],
+    "family_spec_file": "mechanism_capsules/rack_pinion_gate_drive.family.json"
+  },
+  "declared_nominal_tests": [
+    {
+      "input_port_id": "manual_crank_torque",
+      "schedule": "Apply lift-direction crank torque, settle at 180 mm, then apply reverse torque and settle on the lower hard stops."
+    }
+  ]
+}

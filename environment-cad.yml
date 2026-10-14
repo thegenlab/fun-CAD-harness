@@ -1,0 +1,29 @@
+# CAD / geometry environment for FunCAD-Harness (Linux x86-64 and Windows x86-64).
+# Runs the harness itself, the dashboard, CAD builds, STEP export and previews.
+name: funcad-cad
+channels:
+  - conda-forge
+dependencies:
+  - python=3.12.13
+  - pip=25.1.1
+  - ffmpeg=8.1.2
+  - pip:
+      - build123d==0.10.0
+      # build123d 0.10.0 requires cadquery-ocp<7.9; ocp_gordon>=0.3 needs OCP>=8.
+      - cadquery-ocp==7.8.1.1.post1
+      - ocp_gordon==0.2.2
+      - coacd==1.0.13
+      - cryptography==50.0.0
+      - jsonschema==4.25.1
+      - matplotlib==3.11.1
+      - networkx==3.6.1
+      - numpy==2.3.2
+      - pillow==12.3.0
+      - psutil==7.2.2
+      - pymeshlab==2025.7.post1
+      - python-fcl==0.7.0.11
+      - rtree==1.4.1
+      - scipy==1.16.2
+      - shapely==2.1.2
+      - trimesh==4.9.0
+      - typing_extensions==4.15.0

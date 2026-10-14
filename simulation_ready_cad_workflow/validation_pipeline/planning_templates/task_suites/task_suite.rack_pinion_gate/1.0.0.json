@@ -1,0 +1,237 @@
+{
+  "schema_version": "simulation_ready_cad_machine_task_suite_v1",
+  "kind": "task_suite",
+  "template_id": "task_suite.rack_pinion_gate",
+  "version": "1.0.0",
+  "title": "Rack-and-pinion gate task suite",
+  "machine_family": "rack_pinion_gate",
+  "goal": "Verify gate raising, return to the bottom position, and zero-input resistance to uncontrolled downward motion in one shared rack-and-pinion scenario. Superseded by task_suite.rack_pinion_gate@1.1.0 (anti-drop task ACTIVE); this version is retained for provenance and must not be selected for new plans.",
+  "joint_template_refs": [
+    {
+      "template_id": "joint.rack_pinion_drive",
+      "version": "1.0.0",
+      "variant_id": "drive.rack_pinion",
+      "sha256": "f748f7d79230b2b798d75275ee5973eac15dc9d33e27a9960c3f90971f5a01dd"
+    }
+  ],
+  "profiles": [
+    {
+      "profile_id": "profile.rack_pinion_gate_v1",
+      "title": "Rack-and-pinion gate v1",
+      "description": "The historical gate profile extended with user-approved final-position tolerances and a zero-input anti-drop interval."
+    }
+  ],
+  "scenarios": [
+    {
+      "scenario_id": "scenario.gate_roundtrip_and_hold",
+      "title": "Raise, lower, and hold the gate",
+      "test_program": "task_rack_roundtrip",
+      "test_load_case_id": "task_rack_roundtrip",
+      "profile_ids": [
+        "profile.rack_pinion_gate_v1"
+      ],
+      "required_branches": [
+        "physical",
+        "ideal_reference"
+      ],
+      "runtime_status": "IMPLEMENTATION_REQUIRED",
+      "task_ids": [
+        "raise_gate",
+        "lower_gate_to_bottom",
+        "prevent_gate_drop_after_release"
+      ],
+      "execution_requirements": [
+        "Execute raising, lowering, and the zero-input hold interval in one continuous scenario.",
+        "Measure gate displacement directly from the guided output body rather than inferring it only from pinion rotation.",
+        "After input release, record at least 0.5 seconds with all commanded input held at zero."
+      ]
+    }
+  ],
+  "fixtures": [],
+  "tasks": [
+    {
+      "task_id": "raise_gate",
+      "title": "Raise the gate",
+      "goal": "Raise the gate to the approved upper position.",
+      "scenario_id": "scenario.gate_roundtrip_and_hold",
+      "profile_ids": [
+        "profile.rack_pinion_gate_v1"
+      ],
+      "runtime_status": "ACTIVE",
+      "criteria": [
+        {
+          "criterion_id": "raised_position_target",
+          "description": "The gate reaches 180 mm above its starting position within an absolute tolerance of 4 mm.",
+          "disposition": "PASS",
+          "evaluator_kind": "registered_metric",
+          "evaluator_id": "signed_displacement_m",
+          "observable_quantity": "pose_6d",
+          "comparator": "equals",
+          "expected": 0.18,
+          "unit": "m",
+          "tolerance": {
+            "mode": "absolute",
+            "value": 0.004,
+            "unit": "m"
+          }
+        }
+      ],
+      "failure_diagnostics": [
+        {
+          "code": "RAISED_POSITION_OUT_OF_TOLERANCE",
+          "description": "The upper gate position is outside the approved 176 to 184 mm interval."
+        }
+      ],
+      "evidence_obligations": [
+        "Preserve the physical and ideal-reference gate displacement traces and the evaluated upper position."
+      ]
+    },
+    {
+      "task_id": "lower_gate_to_bottom",
+      "title": "Lower the gate to the bottom position",
+      "goal": "Return the gate to its approved bottom position after raising it.",
+      "scenario_id": "scenario.gate_roundtrip_and_hold",
+      "profile_ids": [
+        "profile.rack_pinion_gate_v1"
+      ],
+      "runtime_status": "ACTIVE",
+      "criteria": [
+        {
+          "criterion_id": "bottom_position_target",
+          "description": "The final signed gate displacement returns to 0 mm within an absolute tolerance of 4 mm.",
+          "disposition": "PASS",
+          "evaluator_kind": "registered_metric",
+          "evaluator_id": "signed_displacement_m",
+          "observable_quantity": "pose_6d",
+          "comparator": "equals",
+          "expected": 0.0,
+          "unit": "m",
+          "tolerance": {
+            "mode": "absolute",
+            "value": 0.004,
+            "unit": "m"
+          }
+        },
+        {
+          "criterion_id": "historical_roundtrip_travel",
+          "description": "Report whether cumulative gate travel reaches the historical 340 mm proxy value; final position remains authoritative.",
+          "disposition": "WARNING",
+          "evaluator_kind": "registered_metric",
+          "evaluator_id": "cumulative_travel_m",
+          "observable_quantity": "pose_6d",
+          "comparator": "at_least",
+          "expected": 0.34,
+          "unit": "m",
+          "tolerance": {
+            "mode": "none",
+            "value": null,
+            "unit": null
+          }
+        }
+      ],
+      "failure_diagnostics": [
+        {
+          "code": "BOTTOM_POSITION_OUT_OF_TOLERANCE",
+          "description": "The gate finishes more than 4 mm from its approved bottom position."
+        },
+        {
+          "code": "HISTORICAL_TRAVEL_PROXY_MISSED",
+          "description": "The cumulative travel is below the historical 340 mm proxy; this is reported as a warning and does not replace the final-position decision."
+        }
+      ],
+      "evidence_obligations": [
+        "Preserve the final physical and ideal-reference gate positions and the full cumulative-travel trace."
+      ]
+    },
+    {
+      "task_id": "prevent_gate_drop_after_release",
+      "title": "Prevent uncontrolled gate drop after release",
+      "goal": "Hold the gate against uncontrolled downward motion after commanded input is removed.",
+      "scenario_id": "scenario.gate_roundtrip_and_hold",
+      "profile_ids": [
+        "profile.rack_pinion_gate_v1"
+      ],
+      "runtime_status": "IMPLEMENTATION_REQUIRED",
+      "criteria": [
+        {
+          "criterion_id": "zero_input_hold",
+          "description": "All commanded gate-drive input remains zero during the anti-drop observation interval.",
+          "disposition": "PASS",
+          "evaluator_kind": "suite_predicate",
+          "evaluator_id": "gate_zero_input_hold",
+          "observable_quantity": "actuation_log",
+          "comparator": "equals",
+          "expected": true,
+          "unit": "bool",
+          "tolerance": {
+            "mode": "none",
+            "value": null,
+            "unit": null
+          }
+        },
+        {
+          "criterion_id": "minimum_hold_duration",
+          "description": "The zero-input observation interval lasts at least 0.5 seconds.",
+          "disposition": "PASS",
+          "evaluator_kind": "suite_predicate",
+          "evaluator_id": "gate_zero_input_hold_duration_s",
+          "observable_quantity": "actuation_log",
+          "comparator": "at_least",
+          "expected": 0.5,
+          "unit": "s",
+          "tolerance": {
+            "mode": "none",
+            "value": null,
+            "unit": null
+          }
+        },
+        {
+          "criterion_id": "maximum_downward_slip",
+          "description": "Downward gate slip during the zero-input interval is at most 4 mm.",
+          "disposition": "PASS",
+          "evaluator_kind": "suite_predicate",
+          "evaluator_id": "gate_maximum_downward_slip_m",
+          "observable_quantity": "pose_6d",
+          "comparator": "at_most",
+          "expected": 0.004,
+          "unit": "m",
+          "tolerance": {
+            "mode": "none",
+            "value": null,
+            "unit": null
+          }
+        }
+      ],
+      "failure_diagnostics": [
+        {
+          "code": "NONZERO_INPUT_DURING_ANTI_DROP_CHECK",
+          "description": "Commanded input was not held at zero throughout the anti-drop observation interval."
+        },
+        {
+          "code": "ANTI_DROP_INTERVAL_TOO_SHORT",
+          "description": "The recorded zero-input interval is shorter than 0.5 seconds."
+        },
+        {
+          "code": "GATE_DROP_EXCEEDED",
+          "description": "The gate moved downward by more than 4 mm while commanded input was zero."
+        }
+      ],
+      "evidence_obligations": [
+        "Preserve the complete actuation log and direct gate-position samples for the zero-input interval."
+      ]
+    }
+  ],
+  "source_projects": [
+    {
+      "project_id": "rack_pinion_gate_v1",
+      "evidence_status": "CERTIFICATE_SEMANTIC_GAP",
+      "note": "The historical certificate covers upper displacement and cumulative travel, but it does not certify the newly approved final bottom-position tolerance or zero-input anti-drop task."
+    }
+  ],
+  "approval": {
+    "status": "APPROVED",
+    "approved_by": "user",
+    "approved_on": "2026-08-02",
+    "basis": "The user approved a 180 plus-or-minus 4 mm raised position, a 0 plus-or-minus 4 mm bottom position, and a 0.5 second zero-input anti-drop check with no more than 4 mm downward slip."
+  }
+}

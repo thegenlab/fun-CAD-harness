@@ -1,0 +1,64 @@
+{
+  "schema_version": "simulation_ready_cad_joint_template_v1",
+  "kind": "joint",
+  "template_id": "joint.generic_revolute",
+  "version": "1.0.0",
+  "title": "Generic revolute joint",
+  "category": "primitive_joint",
+  "goal": "Constrain one moving rigid group to rotate about one physical axis relative to one fixed rigid group.",
+  "family": "revolute",
+  "capability_variants": [
+    {
+      "variant_id": "mode.bounded",
+      "plugin_id": "plain_revolute_v1",
+      "mechanism_kind": null,
+      "runtime_status": "ACTIVE"
+    },
+    {
+      "variant_id": "mode.continuous_unwrapped",
+      "plugin_id": null,
+      "mechanism_kind": null,
+      "runtime_status": "IMPLEMENTATION_REQUIRED"
+    }
+  ],
+  "input_wrench_kinds": [
+    "torque"
+  ],
+  "observable_quantities": [
+    "pose_6d"
+  ],
+  "components": [],
+  "required_instance_fields": [
+    "fixed_rigid_group_id",
+    "moving_rigid_group_id",
+    "joint_axis_frame_id",
+    "input_frame_id",
+    "observable_frame_id",
+    "axis_abs",
+    "rotation_mode",
+    "torque_range_nm"
+  ],
+  "source_bindings": [
+    {
+      "project_id": "hinged_toolbox_v1",
+      "capsule_id": "lid_revolute",
+      "source_status": "PROJECT_CERTIFIED",
+      "capsule_path": "simulation_ready_cad_workflow/validation_pipeline/planning_templates/provenance/hinged_toolbox_v1/capsule.json",
+      "capsule_sha256": "4d02ccd5197d6ba5e3ef835492abfcd816be93dbab9b7d3b476083ee7087c1bb",
+      "family_spec_path": null,
+      "family_spec_sha256": null
+    }
+  ],
+  "constraints": [
+    "Fixed and moving rigid groups must not overlap.",
+    "Input direction and reduced-model axis must be identical and must coincide with the physical CAD axis.",
+    "Continuous mode requires an unwrapped accumulated angle and may not be dispatched until its runtime capability is implemented.",
+    "Collision auditing remains active at every simulation time step."
+  ],
+  "approval": {
+    "status": "APPROVED",
+    "approved_by": "user",
+    "approved_on": "2026-08-02",
+    "basis": "User approved replacing bicycle-specific steering and wheel drafts with one generic revolute joint template."
+  }
+}

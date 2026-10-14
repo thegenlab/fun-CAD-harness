@@ -1,0 +1,363 @@
+{
+  "schema_version": "simulation_ready_cad_machine_task_suite_v1",
+  "kind": "task_suite",
+  "template_id": "task_suite.auto_lock_utility_knife",
+  "version": "1.0.0",
+  "title": "Auto-lock utility-knife task suite",
+  "machine_family": "auto_lock_utility_knife",
+  "goal": "Verify the working detent, loaded holding behavior, second detent, and complete blade retraction of an auto-lock utility knife.",
+  "joint_template_refs": [
+    {
+      "template_id": "joint.prismatic_detent_latch",
+      "version": "1.0.0",
+      "variant_id": "latch.prismatic_detent",
+      "sha256": "209cc6d490fa0008e61d443293f1108ddb265437e0bcd2e35fa5b6cf416a9a82"
+    }
+  ],
+  "profiles": [
+    {
+      "profile_id": "profile.auto_lock_utility_knife_v1",
+      "title": "Forty-five-millimetre auto-lock knife",
+      "description": "The approved legacy profile with 45 mm and 25 mm detents and a 30 N reverse-load check."
+    }
+  ],
+  "scenarios": [
+    {
+      "scenario_id": "scenario.extend_to_working_detent",
+      "title": "Extend to the working detent",
+      "test_program": "task_detent_extend",
+      "test_load_case_id": "task_detent_extend",
+      "profile_ids": [
+        "profile.auto_lock_utility_knife_v1"
+      ],
+      "required_branches": [
+        "physical",
+        "ideal_reference"
+      ],
+      "runtime_status": "ACTIVE",
+      "task_ids": [
+        "task.extend_to_working_position"
+      ],
+      "execution_requirements": [
+        "Actuate only the authored thumb input and detent mechanism.",
+        "Measure blade-carriage displacement from its frozen prismatic home position."
+      ]
+    },
+    {
+      "scenario_id": "scenario.hold_under_reverse_load",
+      "title": "Hold the working detent under reverse load",
+      "test_program": "task_detent_hold_under_load",
+      "test_load_case_id": "task_detent_hold_under_load",
+      "profile_ids": [
+        "profile.auto_lock_utility_knife_v1"
+      ],
+      "required_branches": [
+        "physical",
+        "ideal_reference"
+      ],
+      "runtime_status": "ACTIVE",
+      "task_ids": [
+        "task.hold_working_position_under_load"
+      ],
+      "execution_requirements": [
+        "Reach and latch the working detent before applying the reverse load.",
+        "Apply a fixed 30 N reverse axial load for 0.3 s without following or repositioning the blade.",
+        "Record maximum blade slip during the complete holding interval."
+      ]
+    },
+    {
+      "scenario_id": "scenario.select_second_detent",
+      "title": "Select the second detent",
+      "test_program": "task_detent_second_position",
+      "test_load_case_id": "task_detent_second_position",
+      "profile_ids": [
+        "profile.auto_lock_utility_knife_v1"
+      ],
+      "required_branches": [
+        "physical",
+        "ideal_reference"
+      ],
+      "runtime_status": "ACTIVE",
+      "task_ids": [
+        "task.select_second_position"
+      ],
+      "execution_requirements": [
+        "Use the physical detent path to reach the second position; do not set the blade pose directly.",
+        "Evaluate the final latched blade-carriage position."
+      ]
+    },
+    {
+      "scenario_id": "scenario.complete_retraction_cycle",
+      "title": "Complete extension and retraction cycle",
+      "test_program": "task_detent_cycle",
+      "test_load_case_id": "task_detent_cycle",
+      "profile_ids": [
+        "profile.auto_lock_utility_knife_v1"
+      ],
+      "required_branches": [
+        "physical",
+        "ideal_reference"
+      ],
+      "runtime_status": "ACTIVE",
+      "task_ids": [
+        "task.retract_blade"
+      ],
+      "execution_requirements": [
+        "Complete extension and retraction through the authored latch and detent motions.",
+        "Use final home position as the pass authority; cumulative travel is supporting evidence only."
+      ]
+    }
+  ],
+  "fixtures": [],
+  "tasks": [
+    {
+      "task_id": "task.extend_to_working_position",
+      "title": "Extend the blade to the working position",
+      "goal": "Latch the blade carriage at the 45 mm working detent.",
+      "scenario_id": "scenario.extend_to_working_detent",
+      "profile_ids": [
+        "profile.auto_lock_utility_knife_v1"
+      ],
+      "runtime_status": "ACTIVE",
+      "criteria": [
+        {
+          "criterion_id": "criterion.working_position",
+          "description": "The blade carriage finishes at 0.045 m from home within 0.0015 m.",
+          "disposition": "PASS",
+          "evaluator_kind": "registered_metric",
+          "evaluator_id": "signed_displacement_m",
+          "observable_quantity": "pose_6d",
+          "comparator": "within",
+          "expected": 0.045,
+          "unit": "m",
+          "tolerance": {
+            "mode": "absolute",
+            "value": 0.0015,
+            "unit": "m"
+          }
+        }
+      ],
+      "failure_diagnostics": [
+        {
+          "code": "WORKING_DETENT_NOT_REACHED",
+          "description": "The blade did not finish within the approved working-position range."
+        },
+        {
+          "code": "WORKING_DETENT_NOT_LATCHED",
+          "description": "The carriage reached the region but did not remain physically latched."
+        }
+      ],
+      "evidence_obligations": [
+        "Report final signed blade displacement from the frozen home frame.",
+        "Preserve latch-contact evidence together with the physical and ideal-reference traces."
+      ]
+    },
+    {
+      "task_id": "task.hold_working_position_under_load",
+      "title": "Hold the working position under reverse load",
+      "goal": "Keep the blade latched at the working position while a fixed reverse axial load is applied.",
+      "scenario_id": "scenario.hold_under_reverse_load",
+      "profile_ids": [
+        "profile.auto_lock_utility_knife_v1"
+      ],
+      "runtime_status": "ACTIVE",
+      "criteria": [
+        {
+          "criterion_id": "criterion.reverse_load_magnitude",
+          "description": "The test applies the approved 30 N reverse axial load.",
+          "disposition": "PASS",
+          "evaluator_kind": "suite_predicate",
+          "evaluator_id": "utility_knife_reverse_load_magnitude",
+          "observable_quantity": "actuation_log",
+          "comparator": "equals",
+          "expected": 30.0,
+          "unit": "N",
+          "tolerance": {
+            "mode": "none",
+            "value": null,
+            "unit": null
+          }
+        },
+        {
+          "criterion_id": "criterion.loaded_hold_duration",
+          "description": "The complete 30 N load is held for at least 0.3 s.",
+          "disposition": "PASS",
+          "evaluator_kind": "suite_predicate",
+          "evaluator_id": "utility_knife_loaded_hold_duration",
+          "observable_quantity": "actuation_log",
+          "comparator": "at_least",
+          "expected": 0.3,
+          "unit": "s",
+          "tolerance": {
+            "mode": "none",
+            "value": null,
+            "unit": null
+          }
+        },
+        {
+          "criterion_id": "criterion.maximum_loaded_slip",
+          "description": "Blade-carriage slip during the loaded hold does not exceed 0.0015 m.",
+          "disposition": "PASS",
+          "evaluator_kind": "suite_predicate",
+          "evaluator_id": "utility_knife_maximum_loaded_slip",
+          "observable_quantity": "pose_6d",
+          "comparator": "at_most",
+          "expected": 0.0015,
+          "unit": "m",
+          "tolerance": {
+            "mode": "none",
+            "value": null,
+            "unit": null
+          }
+        },
+        {
+          "criterion_id": "criterion.loaded_final_position",
+          "description": "After the hold, the blade remains at 0.045 m from home within 0.0015 m.",
+          "disposition": "PASS",
+          "evaluator_kind": "registered_metric",
+          "evaluator_id": "signed_displacement_m",
+          "observable_quantity": "pose_6d",
+          "comparator": "within",
+          "expected": 0.045,
+          "unit": "m",
+          "tolerance": {
+            "mode": "absolute",
+            "value": 0.0015,
+            "unit": "m"
+          }
+        }
+      ],
+      "failure_diagnostics": [
+        {
+          "code": "REVERSE_LOAD_INCORRECT",
+          "description": "The applied reverse load magnitude or duration did not match the approved profile."
+        },
+        {
+          "code": "DETENT_SLIPPED_UNDER_LOAD",
+          "description": "The blade moved farther than the allowed slip while loaded."
+        },
+        {
+          "code": "LOADED_FINAL_POSITION_MISSED",
+          "description": "The blade no longer occupied the accepted working-position range after the hold."
+        }
+      ],
+      "evidence_obligations": [
+        "Preserve the fixed-direction 30 N actuation trace for the full 0.3 s interval.",
+        "Report both maximum loaded slip and final blade displacement."
+      ]
+    },
+    {
+      "task_id": "task.select_second_position",
+      "title": "Select the second blade position",
+      "goal": "Latch the blade carriage at the 25 mm second detent.",
+      "scenario_id": "scenario.select_second_detent",
+      "profile_ids": [
+        "profile.auto_lock_utility_knife_v1"
+      ],
+      "runtime_status": "ACTIVE",
+      "criteria": [
+        {
+          "criterion_id": "criterion.second_position",
+          "description": "The blade carriage finishes at 0.025 m from home within 0.0015 m.",
+          "disposition": "PASS",
+          "evaluator_kind": "registered_metric",
+          "evaluator_id": "signed_displacement_m",
+          "observable_quantity": "pose_6d",
+          "comparator": "within",
+          "expected": 0.025,
+          "unit": "m",
+          "tolerance": {
+            "mode": "absolute",
+            "value": 0.0015,
+            "unit": "m"
+          }
+        }
+      ],
+      "failure_diagnostics": [
+        {
+          "code": "SECOND_DETENT_NOT_REACHED",
+          "description": "The blade did not finish within the approved second-position range."
+        },
+        {
+          "code": "SECOND_DETENT_NOT_LATCHED",
+          "description": "The carriage reached the region but did not remain physically latched."
+        }
+      ],
+      "evidence_obligations": [
+        "Report final signed blade displacement and the second-detent contact state.",
+        "Retain physical and ideal-reference results."
+      ]
+    },
+    {
+      "task_id": "task.retract_blade",
+      "title": "Retract the blade completely",
+      "goal": "Return the blade carriage to the home position after an extension cycle.",
+      "scenario_id": "scenario.complete_retraction_cycle",
+      "profile_ids": [
+        "profile.auto_lock_utility_knife_v1"
+      ],
+      "runtime_status": "ACTIVE",
+      "criteria": [
+        {
+          "criterion_id": "criterion.retracted_home_position",
+          "description": "The final blade-carriage position is 0 m from home within 0.0015 m.",
+          "disposition": "PASS",
+          "evaluator_kind": "registered_metric",
+          "evaluator_id": "signed_displacement_m",
+          "observable_quantity": "pose_6d",
+          "comparator": "within",
+          "expected": 0.0,
+          "unit": "m",
+          "tolerance": {
+            "mode": "absolute",
+            "value": 0.0015,
+            "unit": "m"
+          }
+        },
+        {
+          "criterion_id": "criterion.extension_retraction_travel",
+          "description": "The cycle accumulates at least 0.09 m of blade travel; this is supporting evidence and cannot replace the final home-position check.",
+          "disposition": "WARNING",
+          "evaluator_kind": "registered_metric",
+          "evaluator_id": "cumulative_travel_m",
+          "observable_quantity": "pose_6d",
+          "comparator": "at_least",
+          "expected": 0.09,
+          "unit": "m",
+          "tolerance": {
+            "mode": "none",
+            "value": null,
+            "unit": null
+          }
+        }
+      ],
+      "failure_diagnostics": [
+        {
+          "code": "BLADE_NOT_RETRACTED",
+          "description": "The blade did not return within the approved home-position tolerance."
+        },
+        {
+          "code": "CYCLE_TRAVEL_LOW",
+          "description": "The supporting cumulative-travel result was below 0.09 m."
+        }
+      ],
+      "evidence_obligations": [
+        "Report final home-position error independently from cumulative travel.",
+        "Preserve the full physical extension-and-retraction trace."
+      ]
+    }
+  ],
+  "source_projects": [
+    {
+      "project_id": "auto_lock_utility_knife_v1",
+      "evidence_status": "TASK_CERTIFIED",
+      "note": "The source project supplied certified detent task evidence. The 30 N load remains specific to this approved profile rather than a universal utility-knife constant."
+    }
+  ],
+  "approval": {
+    "status": "APPROVED",
+    "approved_by": "user",
+    "approved_on": "2026-08-02",
+    "basis": "The user approved the reviewed utility-knife task package with explicit position, load, hold-duration, slip, and retraction tolerances."
+  }
+}

@@ -1,0 +1,239 @@
+{
+  "schema_version": "simulation_ready_cad_machine_task_suite_v1",
+  "kind": "task_suite",
+  "template_id": "task_suite.pedal_trash_can",
+  "version": "1.0.0",
+  "title": "Pedal trash-can task suite",
+  "machine_family": "pedal_trash_can",
+  "goal": "Verify pedal-driven lid opening and lid return under a bounded, non-following initial push followed by zero commanded input.",
+  "joint_template_refs": [
+    {
+      "template_id": "joint.closed_revolute_linkage",
+      "version": "1.0.0",
+      "variant_id": "profile.pedal_lid",
+      "sha256": "dbdbe7677ce4fc0e8f79d83ba66a460fc79852316f4d544c5b6d15a74df5c279"
+    }
+  ],
+  "profiles": [
+    {
+      "profile_id": "profile.pedal_trash_can_v1",
+      "title": "Pedal trash can v1",
+      "description": "The historical pedal-lid profile revised to use the user-approved 60 degree opening target and a bounded world-fixed return impulse."
+    }
+  ],
+  "scenarios": [
+    {
+      "scenario_id": "scenario.pedal_lid_roundtrip",
+      "title": "Open and return the pedal-driven lid",
+      "test_program": "task_output_angle_roundtrip",
+      "test_load_case_id": "task_output_angle_roundtrip",
+      "profile_ids": [
+        "profile.pedal_trash_can_v1"
+      ],
+      "required_branches": [
+        "physical",
+        "ideal_reference"
+      ],
+      "runtime_status": "IMPLEMENTATION_REQUIRED",
+      "task_ids": [
+        "open_lid_by_pedal",
+        "return_lid_after_release"
+      ],
+      "execution_requirements": [
+        "Execute opening and return in one continuous output-angle roundtrip.",
+        "During opening, drive the pedal linkage and measure motion at the lid output.",
+        "During at most the first 0.5 seconds of return, an optional push of no more than 6 N may be applied along a direction and line fixed in world coordinates.",
+        "The optional push direction and line of action must not be re-aimed, translated, or otherwise made to follow lid motion.",
+        "After the initial 0.5 second return interval, all commanded return assistance must remain zero."
+      ]
+    }
+  ],
+  "fixtures": [],
+  "tasks": [
+    {
+      "task_id": "open_lid_by_pedal",
+      "title": "Open the lid with the pedal",
+      "goal": "Use the pedal linkage to open the lid to the approved minimum angle.",
+      "scenario_id": "scenario.pedal_lid_roundtrip",
+      "profile_ids": [
+        "profile.pedal_trash_can_v1"
+      ],
+      "runtime_status": "ACTIVE",
+      "criteria": [
+        {
+          "criterion_id": "minimum_open_angle",
+          "description": "The lid reaches at least 60 degrees, with the approved 3 degree shortfall tolerance.",
+          "disposition": "PASS",
+          "evaluator_kind": "registered_metric",
+          "evaluator_id": "continuous_rotation_rad",
+          "observable_quantity": "pose_6d",
+          "comparator": "at_least",
+          "expected": 1.0471975511965976,
+          "unit": "rad",
+          "tolerance": {
+            "mode": "shortfall",
+            "value": 0.05235987755982989,
+            "unit": "rad"
+          }
+        }
+      ],
+      "failure_diagnostics": [
+        {
+          "code": "INSUFFICIENT_LID_OPENING",
+          "description": "The measured lid opening is less than the accepted 57 degree lower bound."
+        }
+      ],
+      "evidence_obligations": [
+        "Preserve the physical and ideal-reference output-angle traces and the pedal actuation record."
+      ]
+    },
+    {
+      "task_id": "return_lid_after_release",
+      "title": "Return the lid after pedal release",
+      "goal": "Return the lid to its initial position using only the approved bounded initial push and subsequent zero input.",
+      "scenario_id": "scenario.pedal_lid_roundtrip",
+      "profile_ids": [
+        "profile.pedal_trash_can_v1"
+      ],
+      "runtime_status": "IMPLEMENTATION_REQUIRED",
+      "criteria": [
+        {
+          "criterion_id": "maximum_return_error",
+          "description": "The final lid return error is at most 3.5 degrees.",
+          "disposition": "PASS",
+          "evaluator_kind": "registered_metric",
+          "evaluator_id": "return_to_start_rad",
+          "observable_quantity": "pose_6d",
+          "comparator": "at_most",
+          "expected": 0.061086523819801536,
+          "unit": "rad",
+          "tolerance": {
+            "mode": "none",
+            "value": null,
+            "unit": null
+          }
+        },
+        {
+          "criterion_id": "maximum_initial_push_force",
+          "description": "Peak magnitude of the optional initial return push is at most 6 N.",
+          "disposition": "PASS",
+          "evaluator_kind": "suite_predicate",
+          "evaluator_id": "return_push_peak_force_n",
+          "observable_quantity": "actuation_log",
+          "comparator": "at_most",
+          "expected": 6.0,
+          "unit": "N",
+          "tolerance": {
+            "mode": "none",
+            "value": null,
+            "unit": null
+          }
+        },
+        {
+          "criterion_id": "maximum_initial_push_duration",
+          "description": "The optional return push is active for no more than the first 0.5 seconds after release.",
+          "disposition": "PASS",
+          "evaluator_kind": "suite_predicate",
+          "evaluator_id": "return_push_duration_s",
+          "observable_quantity": "actuation_log",
+          "comparator": "at_most",
+          "expected": 0.5,
+          "unit": "s",
+          "tolerance": {
+            "mode": "none",
+            "value": null,
+            "unit": null
+          }
+        },
+        {
+          "criterion_id": "world_fixed_push_direction",
+          "description": "The optional push direction remains fixed in world coordinates and does not follow lid motion.",
+          "disposition": "PASS",
+          "evaluator_kind": "suite_predicate",
+          "evaluator_id": "return_push_world_direction_fixed",
+          "observable_quantity": "actuation_log",
+          "comparator": "equals",
+          "expected": true,
+          "unit": "bool",
+          "tolerance": {
+            "mode": "none",
+            "value": null,
+            "unit": null
+          }
+        },
+        {
+          "criterion_id": "world_fixed_push_line",
+          "description": "The optional push line of action remains fixed in world coordinates and does not translate with the lid.",
+          "disposition": "PASS",
+          "evaluator_kind": "suite_predicate",
+          "evaluator_id": "return_push_world_line_fixed",
+          "observable_quantity": "actuation_log",
+          "comparator": "equals",
+          "expected": true,
+          "unit": "bool",
+          "tolerance": {
+            "mode": "none",
+            "value": null,
+            "unit": null
+          }
+        },
+        {
+          "criterion_id": "zero_input_after_assist_window",
+          "description": "All commanded return assistance remains zero after the initial 0.5 second window.",
+          "disposition": "PASS",
+          "evaluator_kind": "suite_predicate",
+          "evaluator_id": "return_post_window_zero_input",
+          "observable_quantity": "actuation_log",
+          "comparator": "equals",
+          "expected": true,
+          "unit": "bool",
+          "tolerance": {
+            "mode": "none",
+            "value": null,
+            "unit": null
+          }
+        }
+      ],
+      "failure_diagnostics": [
+        {
+          "code": "LID_RETURN_ERROR_EXCEEDED",
+          "description": "The final lid angle remains more than 3.5 degrees from its initial position."
+        },
+        {
+          "code": "RETURN_PUSH_FORCE_EXCEEDED",
+          "description": "The optional initial return push exceeded 6 N."
+        },
+        {
+          "code": "RETURN_PUSH_WINDOW_EXCEEDED",
+          "description": "Return assistance remained active beyond the allowed initial 0.5 second window."
+        },
+        {
+          "code": "RETURN_PUSH_FOLLOWED_LID",
+          "description": "The return push direction or line of action changed with lid motion instead of remaining fixed in world coordinates."
+        },
+        {
+          "code": "NONZERO_RETURN_ASSISTANCE_AFTER_WINDOW",
+          "description": "Commanded return assistance was nonzero after the initial 0.5 second window."
+        }
+      ],
+      "evidence_obligations": [
+        "Preserve the complete return-phase force log with force vector, world line of action, magnitude, and time.",
+        "Preserve the physical and ideal-reference lid-angle traces through the final return sample.",
+        "Demonstrate from the actuation log that no return assistance remains after 0.5 seconds."
+      ]
+    }
+  ],
+  "source_projects": [
+    {
+      "project_id": "pedal_trash_can_v1",
+      "evidence_status": "CERTIFICATE_SEMANTIC_GAP",
+      "note": "The historical opening evidence remains relevant, but the historical return used a moving reverse assist and therefore does not certify this suite's world-fixed, time-bounded return rule."
+    }
+  ],
+  "approval": {
+    "status": "APPROVED",
+    "approved_by": "user",
+    "approved_on": "2026-08-02",
+    "basis": "The user approved a 60 degree lid opening target with 3 degrees of shortfall tolerance, a 3.5 degree return limit, and an optional world-fixed non-following push of at most 6 N for only the first 0.5 seconds followed by zero input."
+  }
+}

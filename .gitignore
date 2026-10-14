@@ -1,0 +1,12 @@
+# Run outputs (GUI, CLI and Docker)
+.runtime_runs/
+runs/
+
+# Local environment written by scripts/setup_conda.*
+.env
+
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.ruff_cache/
+node_modules/

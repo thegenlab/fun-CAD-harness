@@ -1,0 +1,77 @@
+{
+  "schema_version": "0.1",
+  "capsule_id": "lid_revolute",
+  "name": "Toolbox lid plain pin hinge",
+  "member_rigid_group_ids": [
+    "group_toolbox_lid"
+  ],
+  "boundary_rigid_group_ids": [
+    "group_toolbox_body"
+  ],
+  "input_ports": [
+    {
+      "port_id": "lid_hinge_torque",
+      "rigid_group_id": "group_toolbox_lid",
+      "frame_id": "frame_lid_torque_input",
+      "wrench_type": "torque",
+      "direction_abs": [
+        0.0,
+        -1.0,
+        0.0
+      ],
+      "declared_range": {
+        "min": -2.0,
+        "max": 2.0,
+        "unit": "N*m"
+      }
+    }
+  ],
+  "observables": [
+    {
+      "observable_id": "lid_pose",
+      "rigid_group_id": "group_toolbox_lid",
+      "frame_id": "frame_lid_front_observable",
+      "quantity": "pose_6d"
+    }
+  ],
+  "expected_behavior": {
+    "description": "The lid rotates about the fixed pin axis from 0 rad to 85 degrees and returns while the contact-bearing barrel remains captured.",
+    "dof": [
+      {
+        "motion": "rotation_about_joint_axis"
+      }
+    ],
+    "failure_conditions": [
+      "hinge detachment",
+      "excess pivot drift",
+      "off-axis rotation",
+      "jam"
+    ]
+  },
+  "reduced_model_claim": {
+    "verification_status": "UNVERIFIED",
+    "family": "revolute",
+    "fixed_group_ids": [
+      "group_toolbox_body"
+    ],
+    "moving_group_ids": [
+      "group_toolbox_lid"
+    ],
+    "joint_frame_id": "frame_hinge_axis",
+    "axis_abs": [
+      0.0,
+      -1.0,
+      0.0
+    ]
+  },
+  "declared_nominal_tests": [
+    {
+      "input_port_id": "lid_hinge_torque",
+      "schedule": "0.0 s: 0 N*m; 1.0 s: +0.08 N*m; 2.0 s: 0 N*m"
+    },
+    {
+      "input_port_id": "lid_hinge_torque",
+      "schedule": "0.0 s: 0 N*m; 1.0 s: -0.09 N*m; 2.0 s: 0 N*m"
+    }
+  ]
+}

@@ -1,0 +1,424 @@
+{
+  "schema_version": "simulation_ready_cad_machine_task_suite_v1",
+  "kind": "task_suite",
+  "template_id": "task_suite.spring_kitchen_tongs",
+  "version": "1.0.0",
+  "title": "Spring kitchen tongs task suite",
+  "machine_family": "spring_kitchen_tongs",
+  "goal": "Verify that spring kitchen tongs pick up, hold, and release a frozen tabletop test block through two-sided physical contact and passive spring return.",
+  "joint_template_refs": [
+    {
+      "template_id": "joint.axis_spring_revolute",
+      "version": "1.0.0",
+      "variant_id": "revolute.axis_spring",
+      "sha256": "dd6a8a650aeb679b777ebdd6df7e67f9028f2defea89d8c1d5f0a28c6fc05482"
+    }
+  ],
+  "profiles": [
+    {
+      "profile_id": "tongs.spring_tabletop",
+      "title": "Spring-return tabletop pickup",
+      "description": "A hand input closes the jaws around the frozen test block, the spring-biased hinge maintains the authored support, and removing the hand input reopens the jaws so the block returns to the table."
+    }
+  ],
+  "scenarios": [
+    {
+      "scenario_id": "tongs.tabletop_pickup",
+      "title": "Pick up the standard block from the table",
+      "test_program": "tong_tabletop_pickup",
+      "test_load_case_id": "tong_tabletop_pickup",
+      "profile_ids": [
+        "tongs.spring_tabletop"
+      ],
+      "required_branches": [
+        "physical",
+        "ideal_reference"
+      ],
+      "runtime_status": "ACTIVE",
+      "task_ids": [
+        "tongs.pickup_standard_block"
+      ],
+      "execution_requirements": [
+        "Settle the frozen standard block on the table before applying the hand input.",
+        "Drive only the authored hand input; never apply a force, pose target, or scripted displacement directly to the test block.",
+        "Preserve two-sided contact identity, table contact, object position, joint travel, and per-step penetration evidence."
+      ]
+    },
+    {
+      "scenario_id": "tongs.tabletop_hold",
+      "title": "Hold the standard block above the table",
+      "test_program": "tong_tabletop_hold",
+      "test_load_case_id": "tong_tabletop_hold",
+      "profile_ids": [
+        "tongs.spring_tabletop"
+      ],
+      "required_branches": [
+        "physical"
+      ],
+      "runtime_status": "ACTIVE",
+      "task_ids": [
+        "tongs.hold_standard_block"
+      ],
+      "execution_requirements": [
+        "Use the same frozen block geometry, mass, and friction values as the pickup scenario.",
+        "Begin the hold window only after the block is clear of the table and two-sided jaw contact is established.",
+        "Record the block position relative to the tongs throughout the full 0.35 s hold window."
+      ]
+    },
+    {
+      "scenario_id": "tongs.tabletop_release",
+      "title": "Release the standard block back to the table",
+      "test_program": "tong_tabletop_release",
+      "test_load_case_id": "tong_tabletop_release",
+      "profile_ids": [
+        "tongs.spring_tabletop"
+      ],
+      "required_branches": [
+        "physical",
+        "ideal_reference"
+      ],
+      "runtime_status": "ACTIVE",
+      "task_ids": [
+        "tongs.release_standard_block"
+      ],
+      "execution_requirements": [
+        "Set the hand input wrench to zero before the passive-release measurement window.",
+        "Record both jaw contacts, table contact, block height, and joint return throughout release.",
+        "Do not assist the block or jaws with any direct release actuation."
+      ]
+    }
+  ],
+  "fixtures": [
+    {
+      "fixture_id": "fixture.standard_tong_block_v1",
+      "title": "Frozen standard kitchen-tong test block",
+      "parameters": [
+        {
+          "parameter_id": "block.mass",
+          "value": 0.01,
+          "unit": "kg",
+          "description": "Frozen test-block mass."
+        },
+        {
+          "parameter_id": "block.size",
+          "value": [
+            0.012,
+            0.0067,
+            0.01
+          ],
+          "unit": "m",
+          "description": "Frozen axis-aligned test-block dimensions in x, y, and z order."
+        },
+        {
+          "parameter_id": "block.friction_coefficient",
+          "value": 1.5,
+          "unit": "ratio",
+          "description": "Frozen contact friction coefficient for the standard block fixture."
+        }
+      ]
+    }
+  ],
+  "tasks": [
+    {
+      "task_id": "tongs.pickup_standard_block",
+      "title": "Pick up the standard block",
+      "goal": "Establish a real two-sided grip and lift the frozen standard block clear of the table without directly actuating the block.",
+      "scenario_id": "tongs.tabletop_pickup",
+      "profile_ids": [
+        "tongs.spring_tabletop"
+      ],
+      "runtime_status": "ACTIVE",
+      "criteria": [
+        {
+          "criterion_id": "tongs.block_starts_on_table",
+          "description": "The standard block is settled on the table before pickup begins.",
+          "disposition": "PASS",
+          "evaluator_kind": "registered_metric",
+          "evaluator_id": "tong_object_starts_on_table",
+          "observable_quantity": "contact_event",
+          "comparator": "equals",
+          "expected": true,
+          "unit": "bool",
+          "tolerance": {
+            "mode": "none",
+            "value": null,
+            "unit": null
+          }
+        },
+        {
+          "criterion_id": "tongs.bilateral_grip",
+          "description": "The standard block has effective contact with both jaws in the verified pickup state.",
+          "disposition": "PASS",
+          "evaluator_kind": "registered_metric",
+          "evaluator_id": "tong_two_sided_grip",
+          "observable_quantity": "contact_event",
+          "comparator": "equals",
+          "expected": true,
+          "unit": "bool",
+          "tolerance": {
+            "mode": "none",
+            "value": null,
+            "unit": null
+          }
+        },
+        {
+          "criterion_id": "tongs.minimum_pickup_lift",
+          "description": "The standard block rises by at least 0.02 m from its settled tabletop position.",
+          "disposition": "PASS",
+          "evaluator_kind": "registered_metric",
+          "evaluator_id": "tong_pickup_lift_m",
+          "observable_quantity": "pose_6d",
+          "comparator": "at_least",
+          "expected": 0.02,
+          "unit": "m",
+          "tolerance": {
+            "mode": "none",
+            "value": null,
+            "unit": null
+          }
+        },
+        {
+          "criterion_id": "tongs.block_clears_table",
+          "description": "The standard block no longer contacts the table and has positive table clearance at pickup verification.",
+          "disposition": "PASS",
+          "evaluator_kind": "registered_metric",
+          "evaluator_id": "tong_pickup_table_clear",
+          "observable_quantity": "contact_event",
+          "comparator": "equals",
+          "expected": true,
+          "unit": "bool",
+          "tolerance": {
+            "mode": "none",
+            "value": null,
+            "unit": null
+          }
+        },
+        {
+          "criterion_id": "tongs.block_not_directly_actuated",
+          "description": "The standard block moves only through jaw contact and environmental forces, never through direct test actuation.",
+          "disposition": "PASS",
+          "evaluator_kind": "registered_metric",
+          "evaluator_id": "actuation_provenance",
+          "observable_quantity": "actuation_log",
+          "comparator": "equals",
+          "expected": "indirect_only",
+          "unit": "enum",
+          "tolerance": {
+            "mode": "none",
+            "value": null,
+            "unit": null
+          }
+        },
+        {
+          "criterion_id": "tongs.historical_jaw_travel_reference",
+          "description": "Report whether jaw travel reached the historical 17 degree observation point; this is diagnostic evidence and never a PASS gate for pickup.",
+          "disposition": "WARNING",
+          "evaluator_kind": "registered_metric",
+          "evaluator_id": "continuous_rotation_rad",
+          "observable_quantity": "pose_6d",
+          "comparator": "at_least",
+          "expected": 0.29670597283903605,
+          "unit": "rad",
+          "tolerance": {
+            "mode": "none",
+            "value": null,
+            "unit": null
+          }
+        }
+      ],
+      "failure_diagnostics": [
+        {
+          "code": "NOT_GRIPPED",
+          "description": "The block lacked effective two-sided contact or did not lift clear of the table."
+        },
+        {
+          "code": "OVER_CLOSED",
+          "description": "The jaws reached a hard stop, exceeded the permitted penetration envelope, or moved beyond the effective grip region."
+        },
+        {
+          "code": "DIRECT_OBJECT_ACTUATION",
+          "description": "The test block was moved by direct actuation rather than by the tongs."
+        }
+      ],
+      "evidence_obligations": [
+        "Preserve the settled tabletop state and the final pickup state.",
+        "Record distinct fixed-jaw and moving-jaw contacts rather than infer grip from jaw angle.",
+        "Retain the wrench audit proving no direct test-block actuation.",
+        "Retain per-time-step penetration evidence so OVER_CLOSED can be distinguished from NOT_GRIPPED.",
+        "Treat the historical 17 degree observation only as a warning metric."
+      ]
+    },
+    {
+      "task_id": "tongs.hold_standard_block",
+      "title": "Hold the standard block above the table",
+      "goal": "Maintain the established physical grip for 0.35 s while limiting block slip relative to the tongs.",
+      "scenario_id": "tongs.tabletop_hold",
+      "profile_ids": [
+        "tongs.spring_tabletop"
+      ],
+      "runtime_status": "ACTIVE",
+      "criteria": [
+        {
+          "criterion_id": "tongs.minimum_hold_duration",
+          "description": "The verified hold window lasts at least 0.35 s.",
+          "disposition": "PASS",
+          "evaluator_kind": "suite_predicate",
+          "evaluator_id": "tongs.hold_duration_s",
+          "observable_quantity": "contact_event",
+          "comparator": "at_least",
+          "expected": 0.35,
+          "unit": "s",
+          "tolerance": {
+            "mode": "none",
+            "value": null,
+            "unit": null
+          }
+        },
+        {
+          "criterion_id": "tongs.maximum_relative_slip",
+          "description": "The standard block slips no more than 0.003 m relative to the tongs during the hold window.",
+          "disposition": "PASS",
+          "evaluator_kind": "registered_metric",
+          "evaluator_id": "tong_hold_relative_slip_m",
+          "observable_quantity": "pose_6d",
+          "comparator": "at_most",
+          "expected": 0.003,
+          "unit": "m",
+          "tolerance": {
+            "mode": "none",
+            "value": null,
+            "unit": null
+          }
+        }
+      ],
+      "failure_diagnostics": [
+        {
+          "code": "HOLD_WINDOW_SHORT",
+          "description": "The evidence did not contain the full approved hold duration."
+        },
+        {
+          "code": "BLOCK_SLIP_EXCEEDED",
+          "description": "The block moved too far relative to the tongs during the hold window."
+        }
+      ],
+      "evidence_obligations": [
+        "Measure slip relative to the tongs rather than only in world coordinates.",
+        "Preserve the full 0.35 s physical hold trace with bounded sampling gaps.",
+        "Use the same frozen standard-block fixture as pickup and release."
+      ]
+    },
+    {
+      "task_id": "tongs.release_standard_block",
+      "title": "Release the standard block to the table",
+      "goal": "Remove the hand input, allow the spring to reopen the jaws, clear both jaw contacts, return the block to the table, and restore the joint to its zero position within three degrees.",
+      "scenario_id": "tongs.tabletop_release",
+      "profile_ids": [
+        "tongs.spring_tabletop"
+      ],
+      "runtime_status": "ACTIVE",
+      "criteria": [
+        {
+          "criterion_id": "tongs.hand_input_zero_during_release",
+          "description": "The authored hand input wrench remains zero throughout the passive-release verification window.",
+          "disposition": "PASS",
+          "evaluator_kind": "suite_predicate",
+          "evaluator_id": "tongs.release_input_zero",
+          "observable_quantity": "actuation_log",
+          "comparator": "equals",
+          "expected": true,
+          "unit": "bool",
+          "tolerance": {
+            "mode": "none",
+            "value": null,
+            "unit": null
+          }
+        },
+        {
+          "criterion_id": "tongs.both_jaw_contacts_clear",
+          "description": "Both jaw contacts with the standard block are clear at release verification.",
+          "disposition": "PASS",
+          "evaluator_kind": "registered_metric",
+          "evaluator_id": "tong_release_contact_clear",
+          "observable_quantity": "contact_event",
+          "comparator": "equals",
+          "expected": true,
+          "unit": "bool",
+          "tolerance": {
+            "mode": "none",
+            "value": null,
+            "unit": null
+          }
+        },
+        {
+          "criterion_id": "tongs.block_returns_to_table",
+          "description": "The standard block returns to tabletop contact at release verification.",
+          "disposition": "PASS",
+          "evaluator_kind": "registered_metric",
+          "evaluator_id": "tong_release_returns_to_table",
+          "observable_quantity": "contact_event",
+          "comparator": "equals",
+          "expected": true,
+          "unit": "bool",
+          "tolerance": {
+            "mode": "none",
+            "value": null,
+            "unit": null
+          }
+        },
+        {
+          "criterion_id": "tongs.joint_returns_to_zero",
+          "description": "The spring-loaded jaw joint returns to 0 rad within an absolute tolerance of three degrees.",
+          "disposition": "PASS",
+          "evaluator_kind": "registered_metric",
+          "evaluator_id": "return_to_start_rad",
+          "observable_quantity": "pose_6d",
+          "comparator": "within",
+          "expected": 0.0,
+          "unit": "rad",
+          "tolerance": {
+            "mode": "absolute",
+            "value": 0.05235987755982989,
+            "unit": "rad"
+          }
+        }
+      ],
+      "failure_diagnostics": [
+        {
+          "code": "RELEASE_INPUT_NOT_ZERO",
+          "description": "The hand input remained active during the passive-release verification window."
+        },
+        {
+          "code": "JAW_CONTACT_DID_NOT_CLEAR",
+          "description": "At least one jaw remained in contact with the block after release."
+        },
+        {
+          "code": "BLOCK_DID_NOT_RETURN_TO_TABLE",
+          "description": "The released block did not regain the required tabletop contact."
+        },
+        {
+          "code": "SPRING_RETURN_OUT_OF_TOLERANCE",
+          "description": "The jaw joint did not return to its zero position within three degrees."
+        }
+      ],
+      "evidence_obligations": [
+        "Preserve the hand-input trace proving zero input throughout passive release.",
+        "Record each jaw contact independently at the final release state.",
+        "Record tabletop contact and block height together.",
+        "Retain physical and ideal-reference jaw-return traces under the same frozen release schedule."
+      ]
+    }
+  ],
+  "source_projects": [
+    {
+      "project_id": "spring_kitchen_tongs_v1",
+      "evidence_status": "TASK_CERTIFIED",
+      "note": "The source project has typed physical evidence for pickup, hold, and release under the same block mass, dimensions, friction, and 0.35 s hold duration. The source certificate used a 17 degree pickup gate; this approved suite intentionally demotes that angle to WARNING and keeps actual two-sided grip, table clearance, lift, and indirect actuation as PASS criteria."
+    }
+  ],
+  "approval": {
+    "status": "APPROVED",
+    "approved_by": "user",
+    "approved_on": "2026-08-02",
+    "basis": "The user approved the three-task kitchen-tong package, removal of the 17 degree PASS gate, the frozen standard-block fixture, the 0.35 s and 0.003 m hold checks, and the three-degree passive-return tolerance."
+  }
+}

@@ -1,0 +1,77 @@
+{
+  "schema_version": "0.1",
+  "capsule_id": "nail_clipper_compound_lever",
+  "name": "Handheld nail-clipper compound lever",
+  "member_rigid_group_ids": [
+    "group_actuating_lever",
+    "group_moving_cutting_jaw"
+  ],
+  "boundary_rigid_group_ids": [
+    "group_stationary_cutting_jaw"
+  ],
+  "input_ports": [
+    {
+      "port_id": "actuating_lever",
+      "rigid_group_id": "group_actuating_lever",
+      "frame_id": "frame_lever_input",
+      "wrench_type": "torque",
+      "direction_abs": [
+        0.0,
+        1.0,
+        0.0
+      ],
+      "declared_range": {
+        "min": -1.0,
+        "max": 1.0,
+        "unit": "N*m"
+      }
+    }
+  ],
+  "observables": [
+    {
+      "observable_id": "moving_cutting_jaw",
+      "rigid_group_id": "group_moving_cutting_jaw",
+      "frame_id": "frame_jaw_observable",
+      "quantity": "pose_6d"
+    }
+  ],
+  "expected_behavior": {
+    "description": "A squeeze torque on the actuating lever is transmitted through the compound lever into rotation of the moving cutting jaw toward the stationary anvil. Releasing the lever lets the restoring spring return the moving jaw to the open start pose. The moving jaw is never driven directly.",
+    "dof": [
+      {
+        "motion": "coupled_compound_revolute_close_and_return"
+      }
+    ],
+    "failure_conditions": [
+      "lever torque does not rotate the moving jaw",
+      "moving jaw is actuated directly",
+      "cutting edges fail to approach",
+      "jaws fail to return after release",
+      "unintended penetration between lever and stationary handle boxes"
+    ]
+  },
+  "reduced_model_claim": {
+    "verification_status": "UNVERIFIED",
+    "family": "compound",
+    "fixed_group_ids": [
+      "group_stationary_cutting_jaw"
+    ],
+    "moving_group_ids": [
+      "group_actuating_lever",
+      "group_moving_cutting_jaw"
+    ],
+    "joint_frame_id": "frame_jaw_joint",
+    "axis_abs": [
+      0.0,
+      1.0,
+      0.0
+    ],
+    "family_spec_file": "mechanism_capsules/nail_clipper_compound_lever.family.json"
+  },
+  "declared_nominal_tests": [
+    {
+      "input_port_id": "actuating_lever",
+      "schedule": "task_output_angle_roundtrip: 0.45 s close-press torque, 0.10 s hold, 0.55 s release settle"
+    }
+  ]
+}

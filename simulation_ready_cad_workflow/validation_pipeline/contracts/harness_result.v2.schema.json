@@ -1,0 +1,200 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "simulation_ready_cad_harness_result_v2",
+  "title": "Simulation-ready CAD harness result",
+  "description": "The single document the Harness (and, after a visual review decision, the Loop) writes to <run>/run_status.json. The status vocabulary is closed; per-status required fields are enforced below. Producers may add further evidence fields, but every field named here must have the declared shape.",
+  "type": "object",
+  "required": ["schema_version", "status"],
+  "properties": {
+    "schema_version": {"const": "simulation_ready_cad_harness_result_v2"},
+    "status": {
+      "enum": [
+        "RUNNING",
+        "RESOURCE_BLOCKED",
+        "PHYSICAL_PREFLIGHT_FAILED",
+        "FAILED",
+        "TERMINATED",
+        "NOT_CERTIFIED",
+        "KINEMATIC_CERTIFIED",
+        "TASK_CERTIFIED",
+        "WHOLE_MACHINE_TASK_PASSED",
+        "WHOLE_MACHINE_TASK_FAILED",
+        "WHOLE_MACHINE_TASK_INCONCLUSIVE",
+        "ITERATION_SCOPE_PASSED",
+        "ITERATION_SCOPE_FAILED",
+        "REQUIREMENT_OBLIGATIONS_FAILED",
+        "REQUIREMENT_VISUAL_REVIEW_REQUIRED",
+        "REQUIREMENT_VISUAL_REVIEW_REJECTED"
+      ]
+    },
+    "last_completed_stage": {"type": "string"},
+    "failure_reason": {"type": "string"},
+    "error_code": {"type": "string"},
+    "message": {"type": "string"},
+    "resource_blocked": {"type": "boolean"},
+    "resource_kind": {"type": "string"},
+    "retry_mode": {"type": "string"},
+    "queue_status": {"type": ["string", "null"]},
+    "queue_summary": {"type": "object"},
+    "physical_queue_status": {"type": ["string", "null"]},
+    "physical_queue_summary": {"type": "object"},
+    "authored_test_summary": {"type": "object"},
+    "physical_preflight": {"type": "object"},
+    "ideal_reference": {"type": "object"},
+    "branch_queues": {"type": "object"},
+    "issues": {"type": "array", "items": {"type": "object"}},
+    "mechanisms": {"type": "array", "items": {"type": "object"}},
+    "whole_machine_results": {"type": "array", "items": {"type": "object"}},
+    "visualization": {"type": "object"},
+    "iteration_diagnostic_status": {"type": "string"},
+    "iteration_verdict": {"enum": ["PASS", "FAIL"]},
+    "mechanical_status_before_requirement_execution": {"type": "string"},
+    "reuse": {
+      "description": "Lane-level cross-run reuse summary derived from results/reuse_manifest.json: which physical lanes were preserved through sign-off receipts, which recomputed, and which planned tests reran their physics. Acceptance evaluation and certificates always re-derive in finalize regardless of lane reuse.",
+      "type": "object",
+      "required": [
+        "preserved_lane_count",
+        "recomputed_lane_count",
+        "preserved",
+        "recomputed",
+        "tests"
+      ],
+      "properties": {
+        "preserved_lane_count": {"type": "integer"},
+        "recomputed_lane_count": {"type": "integer"},
+        "preserved": {"type": "array", "items": {"type": "object"}},
+        "recomputed": {"type": "array", "items": {"type": "object"}},
+        "tests": {"type": "array", "items": {"type": "object"}}
+      }
+    },
+    "evidence_index": {
+      "description": "Hash-bound reference to the versioned Evidence Index the Harness published next to this result. Consumers locate evidence through this index instead of scanning the run directory.",
+      "type": "object",
+      "required": ["schema_version", "path", "sha256"],
+      "properties": {
+        "schema_version": {"const": "simulation_ready_cad_evidence_index_v1"},
+        "path": {"type": "string"},
+        "sha256": {"type": "string"},
+        "entry_count": {"type": "integer"}
+      },
+      "additionalProperties": false
+    },
+    "requirement_execution": {
+      "type": "object",
+      "required": [
+        "status",
+        "passed",
+        "failed_obligation_ids",
+        "review_required_obligation_ids",
+        "report",
+        "report_sha256"
+      ],
+      "properties": {
+        "status": {"enum": ["PASS", "FAIL", "REVIEW_REQUIRED"]},
+        "passed": {"type": "boolean"},
+        "failed_obligation_ids": {"type": "array", "items": {"type": "string"}},
+        "review_required_obligation_ids": {
+          "type": "array",
+          "items": {"type": "string"}
+        },
+        "report": {"type": "string"},
+        "report_sha256": {"type": "string"}
+      }
+    },
+    "visual_review": {
+      "type": "object",
+      "required": ["decision", "reviewer", "reviewer_type", "path", "sha256"],
+      "properties": {
+        "decision": {"enum": ["APPROVE", "REVISE"]},
+        "reviewer": {"type": "string"},
+        "reviewer_type": {"enum": ["worker_ai", "reviewer_ai", "human"]},
+        "path": {"type": "string"},
+        "sha256": {"type": "string"},
+        "certification_authority": {"const": "visual_obligations_only"}
+      }
+    }
+  },
+  "allOf": [
+    {
+      "if": {"properties": {"status": {"const": "RESOURCE_BLOCKED"}}},
+      "then": {
+        "required": [
+          "resource_blocked",
+          "resource_kind",
+          "retry_mode",
+          "last_completed_stage"
+        ],
+        "properties": {"resource_blocked": {"const": true}}
+      }
+    },
+    {
+      "if": {"properties": {"status": {"const": "FAILED"}}},
+      "then": {"required": ["failure_reason", "last_completed_stage"]}
+    },
+    {
+      "if": {"properties": {"status": {"const": "PHYSICAL_PREFLIGHT_FAILED"}}},
+      "then": {
+        "required": [
+          "failure_reason",
+          "last_completed_stage",
+          "physical_preflight"
+        ]
+      }
+    },
+    {
+      "if": {"properties": {"status": {"const": "TERMINATED"}}},
+      "then": {"required": ["error_code", "message", "last_completed_stage"]}
+    },
+    {
+      "if": {"properties": {"status": {"const": "REQUIREMENT_OBLIGATIONS_FAILED"}}},
+      "then": {
+        "required": [
+          "failure_reason",
+          "requirement_execution",
+          "mechanical_status_before_requirement_execution"
+        ]
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "status": {"const": "REQUIREMENT_VISUAL_REVIEW_REQUIRED"}
+        }
+      },
+      "then": {
+        "required": [
+          "requirement_execution",
+          "mechanical_status_before_requirement_execution"
+        ]
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "status": {"const": "REQUIREMENT_VISUAL_REVIEW_REJECTED"}
+        }
+      },
+      "then": {"required": ["failure_reason", "visual_review", "issues"]}
+    },
+    {
+      "if": {
+        "properties": {
+          "status": {
+            "enum": [
+              "KINEMATIC_CERTIFIED",
+              "TASK_CERTIFIED",
+              "WHOLE_MACHINE_TASK_PASSED",
+              "ITERATION_SCOPE_PASSED"
+            ]
+          }
+        }
+      },
+      "then": {
+        "required": [
+          "requirement_execution",
+          "mechanical_status_before_requirement_execution"
+        ]
+      }
+    }
+  ]
+}

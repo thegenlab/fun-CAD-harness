@@ -1,0 +1,68 @@
+{
+  "schema_version": "simulation_ready_cad_joint_template_v1",
+  "kind": "joint",
+  "template_id": "joint.spur_gear_clock_train",
+  "version": "1.0.0",
+  "title": "Multi-function spur-gear clock train compound joint",
+  "category": "compound_joint",
+  "goal": "Couple a spring barrel, clock hands, setting clutch, alarm target, and hammer through finite gear and cam interactions.",
+  "family": "compound",
+  "capability_variants": [
+    {
+      "variant_id": "clock.multifunction",
+      "plugin_id": "spur_gear_clock_v1",
+      "mechanism_kind": "spur_gear_clock",
+      "runtime_status": "ACTIVE",
+      "capability_ids": [
+        "clock.finite_gear_train",
+        "clock.independent_alarm_power_paths"
+      ],
+      "model_boundary_ids": []
+    }
+  ],
+  "input_wrench_kinds": [
+    "torque"
+  ],
+  "observable_quantities": [
+    "pose_6d"
+  ],
+  "components": [
+    "timekeeping gear train",
+    "hour minute and second shafts",
+    "manual setting clutch",
+    "alarm target cam",
+    "independent alarm drive and hammer"
+  ],
+  "required_instance_fields": [
+    "fixed_body_id",
+    "time_input_body_id",
+    "hand_body_ids",
+    "gear_meshes",
+    "setting_clutch",
+    "alarm_cam_followers",
+    "alarm_input_body_id"
+  ],
+  "source_bindings": [
+    {
+      "project_id": "mechanical_alarm_clock_v1",
+      "capsule_id": "clock_gear_train",
+      "source_status": "PROJECT_CERTIFIED",
+      "capsule_path": "simulation_ready_cad_workflow/validation_pipeline/planning_templates/provenance/mechanical_alarm_clock_v1/capsule.json",
+      "capsule_sha256": "234b62262411580f50b37a42c24023c67e4e24798c1b7ae9418166e9374a32c8",
+      "family_spec_path": "simulation_ready_cad_workflow/validation_pipeline/planning_templates/provenance/mechanical_alarm_clock_v1/family_spec.json",
+      "family_spec_sha256": "07cf3440819fba7c3d28dc549f48dc1b787adbb48985527f62176783b6cc50bc"
+    }
+  ],
+  "constraints": [
+    "Every hand and alarm output must move through the authored gear, clutch, or cam path rather than direct actuation.",
+    "All measured ratios come from shaft traces and not scripted display animation.",
+    "Timekeeping, manual setting, alarm-target adjustment, target latching, and alarm actuation preserve separate input ownership.",
+    "The complete multifunction profile uses distinct timekeeping and alarm power roots plus the dedicated hour-hand alarm-target clutch."
+  ],
+  "approval": {
+    "status": "APPROVED",
+    "approved_by": "user",
+    "approved_on": "2026-08-08",
+    "basis": "The user designated the complete mechanical_alarm_clock_v1 multifunction mechanism as the sole formal clock entry."
+  }
+}

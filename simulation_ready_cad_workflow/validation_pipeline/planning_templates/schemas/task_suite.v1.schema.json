@@ -1,0 +1,514 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "simulation_ready_cad_machine_task_suite_v1",
+  "title": "Simulation-ready CAD machine task suite",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "kind",
+    "template_id",
+    "version",
+    "title",
+    "machine_family",
+    "goal",
+    "joint_template_refs",
+    "profiles",
+    "scenarios",
+    "fixtures",
+    "tasks",
+    "source_projects",
+    "approval"
+  ],
+  "properties": {
+    "schema_version": {
+      "const": "simulation_ready_cad_machine_task_suite_v1"
+    },
+    "kind": {
+      "const": "task_suite"
+    },
+    "template_id": {
+      "$ref": "#/$defs/identifier"
+    },
+    "version": {
+      "$ref": "#/$defs/version"
+    },
+    "title": {
+      "$ref": "#/$defs/text"
+    },
+    "machine_family": {
+      "$ref": "#/$defs/identifier"
+    },
+    "goal": {
+      "$ref": "#/$defs/text"
+    },
+    "joint_template_refs": {
+      "type": "array",
+      "minItems": 1,
+      "maxItems": 32,
+      "uniqueItems": true,
+      "items": {
+        "$ref": "#/$defs/jointRef"
+      }
+    },
+    "profiles": {
+      "type": "array",
+      "minItems": 1,
+      "maxItems": 32,
+      "items": {
+        "$ref": "#/$defs/profile"
+      }
+    },
+    "scenarios": {
+      "type": "array",
+      "minItems": 1,
+      "maxItems": 64,
+      "items": {
+        "$ref": "#/$defs/scenario"
+      }
+    },
+    "fixtures": {
+      "type": "array",
+      "maxItems": 32,
+      "items": {
+        "$ref": "#/$defs/fixture"
+      }
+    },
+    "tasks": {
+      "type": "array",
+      "minItems": 1,
+      "maxItems": 128,
+      "items": {
+        "$ref": "#/$defs/task"
+      }
+    },
+    "source_projects": {
+      "type": "array",
+      "minItems": 1,
+      "maxItems": 32,
+      "items": {
+        "$ref": "#/$defs/sourceProject"
+      }
+    },
+    "approval": {
+      "$ref": "#/$defs/approval"
+    }
+  },
+  "$defs": {
+    "identifier": {
+      "type": "string",
+      "pattern": "^[a-z][a-z0-9]*(?:[._-][a-z0-9]+)+$",
+      "maxLength": 128
+    },
+    "version": {
+      "type": "string",
+      "pattern": "^(0|[1-9][0-9]*)\\.(0|[1-9][0-9]*)\\.(0|[1-9][0-9]*)$"
+    },
+    "text": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 8192
+    },
+    "stringList": {
+      "type": "array",
+      "minItems": 1,
+      "maxItems": 256,
+      "uniqueItems": true,
+      "items": {
+        "type": "string",
+        "minLength": 1,
+        "maxLength": 1024
+      }
+    },
+    "runtimeStatus": {
+      "enum": [
+        "ACTIVE",
+        "IMPLEMENTATION_REQUIRED"
+      ]
+    },
+    "jointRef": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "template_id",
+        "version",
+        "variant_id",
+        "sha256"
+      ],
+      "properties": {
+        "template_id": {
+          "$ref": "#/$defs/identifier"
+        },
+        "version": {
+          "$ref": "#/$defs/version"
+        },
+        "variant_id": {
+          "$ref": "#/$defs/identifier"
+        },
+        "sha256": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        }
+      }
+    },
+    "profile": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "profile_id",
+        "title",
+        "description"
+      ],
+      "properties": {
+        "profile_id": {
+          "$ref": "#/$defs/identifier"
+        },
+        "title": {
+          "$ref": "#/$defs/text"
+        },
+        "description": {
+          "$ref": "#/$defs/text"
+        }
+      }
+    },
+    "scenario": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "scenario_id",
+        "title",
+        "test_program",
+        "test_load_case_id",
+        "profile_ids",
+        "required_branches",
+        "runtime_status",
+        "task_ids",
+        "execution_requirements"
+      ],
+      "properties": {
+        "scenario_id": {
+          "$ref": "#/$defs/identifier"
+        },
+        "title": {
+          "$ref": "#/$defs/text"
+        },
+        "test_program": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128
+        },
+        "test_load_case_id": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128
+        },
+        "profile_ids": {
+          "$ref": "#/$defs/stringList"
+        },
+        "required_branches": {
+          "type": "array",
+          "minItems": 1,
+          "maxItems": 3,
+          "uniqueItems": true,
+          "items": {
+            "enum": [
+              "physical",
+              "ideal_reference",
+              "ideal_dynamics"
+            ]
+          }
+        },
+        "runtime_status": {
+          "$ref": "#/$defs/runtimeStatus"
+        },
+        "task_ids": {
+          "$ref": "#/$defs/stringList"
+        },
+        "execution_requirements": {
+          "$ref": "#/$defs/stringList"
+        }
+      }
+    },
+    "fixture": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "fixture_id",
+        "title",
+        "parameters"
+      ],
+      "properties": {
+        "fixture_id": {
+          "$ref": "#/$defs/identifier"
+        },
+        "title": {
+          "$ref": "#/$defs/text"
+        },
+        "parameters": {
+          "type": "array",
+          "minItems": 1,
+          "maxItems": 64,
+          "items": {
+            "$ref": "#/$defs/fixtureParameter"
+          }
+        }
+      }
+    },
+    "fixtureParameter": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "parameter_id",
+        "value",
+        "unit",
+        "description"
+      ],
+      "properties": {
+        "parameter_id": {
+          "$ref": "#/$defs/identifier"
+        },
+        "value": {
+          "type": [
+            "number",
+            "string",
+            "boolean",
+            "array",
+            "null"
+          ]
+        },
+        "unit": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 64
+        },
+        "description": {
+          "$ref": "#/$defs/text"
+        }
+      }
+    },
+    "task": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "task_id",
+        "title",
+        "goal",
+        "scenario_id",
+        "profile_ids",
+        "runtime_status",
+        "criteria",
+        "failure_diagnostics",
+        "evidence_obligations"
+      ],
+      "properties": {
+        "task_id": {
+          "$ref": "#/$defs/identifier"
+        },
+        "title": {
+          "$ref": "#/$defs/text"
+        },
+        "goal": {
+          "$ref": "#/$defs/text"
+        },
+        "scenario_id": {
+          "$ref": "#/$defs/identifier"
+        },
+        "profile_ids": {
+          "$ref": "#/$defs/stringList"
+        },
+        "runtime_status": {
+          "$ref": "#/$defs/runtimeStatus"
+        },
+        "criteria": {
+          "type": "array",
+          "minItems": 1,
+          "maxItems": 64,
+          "items": {
+            "$ref": "#/$defs/criterion"
+          }
+        },
+        "failure_diagnostics": {
+          "type": "array",
+          "maxItems": 32,
+          "items": {
+            "$ref": "#/$defs/diagnostic"
+          }
+        },
+        "evidence_obligations": {
+          "$ref": "#/$defs/stringList"
+        }
+      }
+    },
+    "criterion": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "criterion_id",
+        "description",
+        "disposition",
+        "evaluator_kind",
+        "evaluator_id",
+        "observable_quantity",
+        "comparator",
+        "expected",
+        "unit",
+        "tolerance"
+      ],
+      "properties": {
+        "criterion_id": {
+          "$ref": "#/$defs/identifier"
+        },
+        "description": {
+          "$ref": "#/$defs/text"
+        },
+        "disposition": {
+          "enum": [
+            "PASS",
+            "WARNING"
+          ]
+        },
+        "evaluator_kind": {
+          "enum": [
+            "registered_metric",
+            "suite_predicate"
+          ]
+        },
+        "evaluator_id": {
+          "$ref": "#/$defs/identifier"
+        },
+        "observable_quantity": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128
+        },
+        "comparator": {
+          "enum": [
+            "at_least",
+            "at_most",
+            "equals",
+            "within",
+            "sequence_equals"
+          ]
+        },
+        "expected": {
+          "type": [
+            "number",
+            "string",
+            "boolean",
+            "array",
+            "null"
+          ]
+        },
+        "unit": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 64
+        },
+        "tolerance": {
+          "$ref": "#/$defs/tolerance"
+        }
+      }
+    },
+    "tolerance": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "mode",
+        "value",
+        "unit"
+      ],
+      "properties": {
+        "mode": {
+          "enum": [
+            "none",
+            "absolute",
+            "shortfall",
+            "relative_percent"
+          ]
+        },
+        "value": {
+          "type": [
+            "number",
+            "null"
+          ],
+          "minimum": 0
+        },
+        "unit": {
+          "type": [
+            "string",
+            "null"
+          ]
+        }
+      }
+    },
+    "diagnostic": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "code",
+        "description"
+      ],
+      "properties": {
+        "code": {
+          "type": "string",
+          "pattern": "^[A-Z][A-Z0-9_]*$"
+        },
+        "description": {
+          "$ref": "#/$defs/text"
+        }
+      }
+    },
+    "sourceProject": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "project_id",
+        "evidence_status",
+        "note"
+      ],
+      "properties": {
+        "project_id": {
+          "$ref": "#/$defs/identifier"
+        },
+        "evidence_status": {
+          "enum": [
+            "TASK_CERTIFIED",
+            "LEGACY_UNTYPED",
+            "CERTIFICATE_SEMANTIC_GAP",
+            "DEMO_DIAGNOSTIC_ONLY",
+            "PHYSICAL_PREFLIGHT_FAILED",
+            "CAPABILITY_CERTIFIED"
+          ]
+        },
+        "note": {
+          "$ref": "#/$defs/text"
+        }
+      }
+    },
+    "approval": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "status",
+        "approved_by",
+        "approved_on",
+        "basis"
+      ],
+      "properties": {
+        "status": {
+          "const": "APPROVED"
+        },
+        "approved_by": {
+          "$ref": "#/$defs/text"
+        },
+        "approved_on": {
+          "type": "string",
+          "format": "date"
+        },
+        "basis": {
+          "$ref": "#/$defs/text"
+        }
+      }
+    }
+  }
+}

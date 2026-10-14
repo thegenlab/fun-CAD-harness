@@ -1,0 +1,165 @@
+{
+  "schema_version": "simulation_ready_cad_machine_task_suite_v1",
+  "kind": "task_suite",
+  "template_id": "task_suite.folding_drying_rack",
+  "version": "1.0.0",
+  "title": "Folding drying-rack task suite",
+  "machine_family": "folding_drying_rack",
+  "goal": "Verify that a complete folding drying rack deploys and returns to its folded home position through one shared scissor-linkage roundtrip.",
+  "joint_template_refs": [
+    {
+      "template_id": "joint.scissor_lift",
+      "version": "1.0.0",
+      "variant_id": "linkage.scissor_lift",
+      "sha256": "c6f75eeee27b8ddd09645b7bf8c948bccd7355539336bbad3205702e3ced9411"
+    }
+  ],
+  "profiles": [
+    {
+      "profile_id": "profile.whole_folding_drying_rack_v1",
+      "title": "Whole folding drying rack",
+      "description": "The approved whole-machine profile derived from whole_folding_drying_rack_v1."
+    }
+  ],
+  "scenarios": [
+    {
+      "scenario_id": "scenario.platform_roundtrip",
+      "title": "Deploy and fold roundtrip",
+      "test_program": "task_platform_roundtrip",
+      "test_load_case_id": "task_platform_roundtrip",
+      "profile_ids": [
+        "profile.whole_folding_drying_rack_v1"
+      ],
+      "required_branches": [
+        "physical",
+        "ideal_reference"
+      ],
+      "runtime_status": "ACTIVE",
+      "task_ids": [
+        "task.deploy_rack",
+        "task.fold_rack"
+      ],
+      "execution_requirements": [
+        "Execute deployment and folding once as one continuous roundtrip; do not rerun the mechanism separately for each task result.",
+        "Measure platform displacement from the authored output body rather than inferring it from actuator travel.",
+        "Preserve per-time-step physical collision evidence for the complete roundtrip."
+      ]
+    }
+  ],
+  "fixtures": [],
+  "tasks": [
+    {
+      "task_id": "task.deploy_rack",
+      "title": "Deploy the drying rack",
+      "goal": "Move the rack platform to the approved deployed displacement.",
+      "scenario_id": "scenario.platform_roundtrip",
+      "profile_ids": [
+        "profile.whole_folding_drying_rack_v1"
+      ],
+      "runtime_status": "ACTIVE",
+      "criteria": [
+        {
+          "criterion_id": "criterion.deployed_displacement",
+          "description": "The platform reaches the approved 0.18 m deployment target, with no more than 0.004 m shortfall.",
+          "disposition": "PASS",
+          "evaluator_kind": "registered_metric",
+          "evaluator_id": "signed_displacement_m",
+          "observable_quantity": "pose_6d",
+          "comparator": "at_least",
+          "expected": 0.18,
+          "unit": "m",
+          "tolerance": {
+            "mode": "shortfall",
+            "value": 0.004,
+            "unit": "m"
+          }
+        }
+      ],
+      "failure_diagnostics": [
+        {
+          "code": "DEPLOYMENT_SHORTFALL",
+          "description": "The platform did not reach the accepted deployment range."
+        },
+        {
+          "code": "SCISSOR_LINKAGE_JAMMED",
+          "description": "The scissor linkage stopped before the deployment target was reached."
+        }
+      ],
+      "evidence_obligations": [
+        "Report the measured platform displacement and the accepted lower bound.",
+        "Retain both physical and ideal-reference traces from the shared roundtrip."
+      ]
+    },
+    {
+      "task_id": "task.fold_rack",
+      "title": "Fold the drying rack",
+      "goal": "Return the deployed rack to its folded home position.",
+      "scenario_id": "scenario.platform_roundtrip",
+      "profile_ids": [
+        "profile.whole_folding_drying_rack_v1"
+      ],
+      "runtime_status": "ACTIVE",
+      "criteria": [
+        {
+          "criterion_id": "criterion.folded_home_position",
+          "description": "The platform finishes at the folded home position within 0.004 m.",
+          "disposition": "PASS",
+          "evaluator_kind": "registered_metric",
+          "evaluator_id": "signed_displacement_m",
+          "observable_quantity": "pose_6d",
+          "comparator": "within",
+          "expected": 0.0,
+          "unit": "m",
+          "tolerance": {
+            "mode": "absolute",
+            "value": 0.004,
+            "unit": "m"
+          }
+        },
+        {
+          "criterion_id": "criterion.roundtrip_travel",
+          "description": "The roundtrip accumulates 0.36 m of platform travel, allowing 0.004 m numerical shortfall; this is supporting evidence and does not replace the final home-position result.",
+          "disposition": "WARNING",
+          "evaluator_kind": "registered_metric",
+          "evaluator_id": "cumulative_travel_m",
+          "observable_quantity": "pose_6d",
+          "comparator": "at_least",
+          "expected": 0.36,
+          "unit": "m",
+          "tolerance": {
+            "mode": "shortfall",
+            "value": 0.004,
+            "unit": "m"
+          }
+        }
+      ],
+      "failure_diagnostics": [
+        {
+          "code": "FOLDED_HOME_MISSED",
+          "description": "The platform did not finish within the approved folded-home tolerance."
+        },
+        {
+          "code": "ROUNDTRIP_TRAVEL_LOW",
+          "description": "The supporting cumulative-travel measurement was below its accepted range."
+        }
+      ],
+      "evidence_obligations": [
+        "Report final home-position error independently from cumulative travel.",
+        "Do not award a pass from cumulative travel when the final folded position fails."
+      ]
+    }
+  ],
+  "source_projects": [
+    {
+      "project_id": "whole_folding_drying_rack_v1",
+      "evidence_status": "TASK_CERTIFIED",
+      "note": "The source project supplied certified scissor-lift task evidence; the user approved the explicit final-home tolerance during task-suite review."
+    }
+  ],
+  "approval": {
+    "status": "APPROVED",
+    "approved_by": "user",
+    "approved_on": "2026-08-02",
+    "basis": "The user approved the grouped drying-rack task suite, including 0.004 m deployment shortfall and folded-home tolerances."
+  }
+}
