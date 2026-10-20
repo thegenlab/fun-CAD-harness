@@ -281,6 +281,7 @@ failures until they are fixed.
 @article{zhang2026funcad,
   title   = {Can It Actually Work? Synthesizing Functional CAD Mechanisms},
   author  = {Zhang, Wenqian and Huang, Yangyi and Xu, Zigeng and Liu, Weiyang and Liu, Zhen},
+  journal = {arXiv preprint arXiv:2610.26861},
   year    = {2026}
 }
 ```
