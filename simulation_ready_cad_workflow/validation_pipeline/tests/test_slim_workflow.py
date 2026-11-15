@@ -46,6 +46,93 @@ class SlimWorkflowTests(unittest.TestCase):
     def workflow(self,**kwargs):
         return SlimWorkflow(self.workspace,self.project,**kwargs)
 
+    def test_interrupted_revision_copy_does_not_block_same_session_resume(self):
+        workflow = self.workflow()
+        workflow.state.update(phase='geometry', author_session_id='original-session')
+        workflow.template_mode = {'mode': 'benchmark'}
+        workflow.run_revision = Mock(return_value={'status': 'NEEDS_REVISION', 'issues': ['fixture failure']})
+        workflow._budget_revision = Mock(return_value={'status': 'INCOMPLETE_EVIDENCE'})
+        original = self.source.read_bytes()
+        destination = self.project/'runs/r02/design'
+
+        def interrupted_copy(source, target, **kwargs):
+            Path(target).mkdir(parents=True)
+            (Path(target)/'part.step').write_bytes(b'partial copy')
+            raise OSError('Disk quota exceeded while copying revision')
+
+        with patch('simulation_ready_cad_workflow.validation_pipeline.slim_harness.workflow.shutil.copytree',
+                   side_effect=interrupted_copy):
+            with self.assertRaisesRegex(OSError, 'Disk quota exceeded'):
+                workflow._run()
+        self.assertFalse(destination.exists(), 'An interrupted copy must not claim the next revision')
+        self.assertEqual(self.source.read_bytes(), original)
+        self.assertEqual(workflow._run()['status'], 'INCOMPLETE_EVIDENCE')
+        self.assertEqual((destination/'part.step').read_bytes(), original)
+        self.assertEqual(workflow.state['author_session_id'], 'original-session')
+
+    def test_new_revision_shares_cached_draft_meshes_instead_of_copying_them(self):
+        attempt=self.run/'design/.cadharness-draft/.runtime_runs/author_tools/build-a'
+        (attempt/'geometry').mkdir(parents=True)
+        (attempt/'geometry/body.obj').write_bytes(b'cached mesh')
+        (attempt/'result.json').write_text('{"status":"BUILT"}')
+        design=self.workflow()._new_revision_design()
+        shared=design/'.cadharness-draft/.runtime_runs/author_tools/build-a'
+        self.assertEqual((shared/'geometry/body.obj').read_bytes(),b'cached mesh')
+        self.assertEqual((shared/'result.json').read_text(),'{"status":"BUILT"}')
+        self.assertEqual((design/'part.step').read_bytes(),self.source.read_bytes())
+        # Draft records keep naming the earlier revision's path, so it must stay; the bytes exist once.
+        self.assertEqual((attempt/'geometry/body.obj').read_bytes(),b'cached mesh')
+        self.assertEqual((attempt/'geometry/body.obj').stat().st_ino,(shared/'geometry/body.obj').stat().st_ino)
+        self.assertNotEqual((attempt/'result.json').stat().st_ino,(shared/'result.json').stat().st_ino)
+        self.assertEqual(self.source.read_text(encoding='utf-8'),'a geometry-file snapshot')
+
+    def test_stop_while_sharing_meshes_leaves_no_half_created_revision(self):
+        geometry=self.run/'design/.cadharness-draft/.runtime_runs/author_tools/build-a/geometry'
+        geometry.mkdir(parents=True)
+        for name in ('a.obj','b.obj','c.glb'):(geometry/name).write_bytes(name.encode())
+        workflow=self.workflow()
+        import os as _os
+        actual=_os.link;calls=[]
+        def stopped(source,target):
+            calls.append(target)
+            if len(calls)==2:raise KeyboardInterrupt
+            return actual(source,target)
+        with patch('simulation_ready_cad_workflow.validation_pipeline.slim_harness.draft_meshes.os.link',side_effect=stopped):
+            with self.assertRaises(KeyboardInterrupt):
+                workflow._new_revision_design()
+        self.assertFalse((self.project/'runs/r02/design').exists(),'A stopped revision must not block the next resume')
+        self.assertEqual(sorted(p.name for p in geometry.iterdir()),['a.obj','b.obj','c.glb'])
+        self.assertTrue(all((geometry/name).stat().st_nlink==1 for name in ('a.obj','b.obj','c.glb')))
+        design=workflow._new_revision_design()
+        self.assertEqual((design/'.cadharness-draft/.runtime_runs/author_tools/build-a/geometry/b.obj').read_bytes(),b'b.obj')
+
+    def test_existing_next_revision_is_never_overwritten(self):
+        workflow = self.workflow()
+        workflow.state['phase'] = 'geometry'
+        workflow.run_revision = Mock(return_value={'status': 'NEEDS_REVISION', 'issues': []})
+        destination = self.project/'runs/r02/design'
+        destination.mkdir(parents=True)
+        (destination/'source.py').write_text('preserve authored work')
+        with self.assertRaisesRegex(RuntimeError, 'Next revision already exists'):
+            workflow._run()
+        self.assertEqual((destination/'source.py').read_text(), 'preserve authored work')
+
+    def test_author_reserve_is_checked_before_copying_another_revision(self):
+        from ..slim_harness.test_coverage import FirstPassReserveReached
+        workflow = self.workflow()
+        workflow.state['phase'] = 'geometry'
+        workflow.building = True
+        workflow.construction = Mock()
+        workflow.run_revision = Mock(return_value={'status': 'NEEDS_REVISION', 'issues': ['missing scene']})
+        workflow._annotate_budget = lambda value: value
+        with patch('simulation_ready_cad_workflow.validation_pipeline.slim_harness.construction.author_turn_timeout',
+                   side_effect=FirstPassReserveReached('first coverage reserve')), \
+                patch.object(workflow, '_new_revision_design') as copy_revision:
+            with self.assertRaises(FirstPassReserveReached):
+                workflow._run()
+        copy_revision.assert_not_called()
+        self.assertFalse((self.project/'runs/r02').exists())
+
 
     def _numerical_metadata(self,test=None,max_step_s=.001):
         initial=effective_initial_step_seconds(test or {},max_step_s)

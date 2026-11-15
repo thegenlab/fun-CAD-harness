@@ -100,7 +100,7 @@ def _tier_name(tier):
 
 
 @after_run
-def start(workspace,project_id,task=None,*,title=None,scene_path=None,executable="codex",experiment_path=None,worker_provider="codex",model=None,tier=None,task_adjustable=False,reasoning=None,reasoning_effort=None,budget_config=None,chrono_python=None,construction=None,mode=None,reviewer_provider=None,reviewer_model=None,reviewer_executable=None,reviewer_reasoning=None,feedback_mode="full",author_visual_policy="full"):
+def start(workspace,project_id,task=None,*,title=None,scene_path=None,executable="codex",experiment_path=None,worker_provider="codex",model=None,tier=None,task_adjustable=False,reasoning=None,reasoning_effort=None,budget_config=None,chrono_python=None,construction=None,mode=None,reviewer_provider=None,reviewer_model=None,reviewer_executable=None,reviewer_reasoning=None,feedback_mode="full",author_visual_policy="full",context_window=None,reviewer_context_window=None):
     from ..benchmark_sandbox.visual_policy import validate as validate_visual_policy, WORKER_NO_VISUALS
     author_visual_policy=validate_visual_policy(author_visual_policy)
     if author_visual_policy == WORKER_NO_VISUALS and normalize_worker_provider(worker_provider) != "codex":
@@ -125,6 +125,14 @@ def start(workspace,project_id,task=None,*,title=None,scene_path=None,executable
         raise ValueError("Adjustable task tradeoffs require an explicit budget tier")
     if experiment_path is not None:
         validate_experiment(json.loads(Path(experiment_path).read_text(encoding="utf-8-sig")),task)
+    if context_window is not None and normalize_worker_provider(worker_provider) not in {"codex", "dsh"}:
+        raise ValueError("Explicit context windows require Codex or DSH")
+    context_reviewer = normalize_worker_provider(reviewer_provider or ("codex" if normalize_worker_provider(worker_provider) in {"codex", "cursor", "dsh"} else worker_provider))
+    if reviewer_context_window is not None and context_reviewer not in {"codex", "dsh"}:
+        raise ValueError("Explicit reviewer context windows require Codex or DSH")
+    for value in (context_window, reviewer_context_window):
+        if value is not None and (type(value) is not int or value <= 0):
+            raise ValueError("Context window must be a positive integer")
     project=create_project(workspace,project_id,task,title)
     if mode_configuration:modes.install(project,mode_configuration)
     building=bool(construction) if construction is not None else (scene_path is None and experiment_path is None and _tier_name(tier) in (None,"high"))
@@ -149,12 +157,14 @@ def start(workspace,project_id,task=None,*,title=None,scene_path=None,executable
     if building:state["request"]["tier"]=_tier_name(tier) or "high"
     worker_provider=normalize_worker_provider(worker_provider)
     effective_model=model or state["request"].get("model") or default_worker_model(worker_provider)
-    default_reasoning="high" if worker_provider=="codex" else "medium"
+    default_reasoning="high" if worker_provider in {"codex","dsh"} else "medium"
     state["request"].update(model=effective_model,worker_provider=worker_provider,
                             reasoning_effort=reasoning if reasoning is not None else default_reasoning,
                             chrono_python=chrono_python,feedback_mode=feedback_mode,
                             author_visual_policy=author_visual_policy)
-    if worker_provider in {"codex","cursor"}:
+    for key, value in {"context_window": context_window, "reviewer_context_window": reviewer_context_window}.items():
+        if value is not None: state["request"][key] = value
+    if worker_provider in {"codex","cursor","dsh"}:
         reviewer_provider=normalize_worker_provider(reviewer_provider) if reviewer_provider is not None else "codex"
         if reviewer_model is None:reviewer_model=default_worker_model(reviewer_provider)
         if reviewer_reasoning is None:reviewer_reasoning="medium"
@@ -259,7 +269,7 @@ def _initialize_project(workspace,project,*,executable,worker_provider,model,bud
     author=create_worker(provider=worker_provider,model=effective_model,reasoning_effort=reasoning,executable=executable,
                           session_id=state.get("author_session_id"),disabled_features=("multi_agent","multi_agent_v2"))
     from .sandbox_binding import bind_worker
-    author=bind_worker(author,workspace,project,'author',state.get('request',{}).get('author_visual_policy','full'))
+    author=bind_worker(author,workspace,project,'author',state.get('request',{}).get('author_visual_policy','full'),context_window=state['request'].get('context_window'))
     author=budget.worker(author)
     author=worker_for(project,author)
     def next_turn(kind):
@@ -358,6 +368,7 @@ def main(argv=None):
     parser.add_argument("--codex",default="codex")
     parser.add_argument("--worker-provider",choices=list(WORKER_PROVIDERS),default="codex",
                         help="LLM worker backend: codex (Codex CLI), cursor (Cursor CLI), claude_code (Claude Code CLI), or anthropic")
+    parser.add_argument("--context-window", type=int, default=None, help="Explicit author context capacity, saved for resume")
     parser.add_argument("--model",default=None,help="Override the default model for the worker provider")
     parser.add_argument("--reasoning",choices=REASONING_EFFORTS,default=None,
                         help="Worker reasoning effort; new Codex projects default to high, resume restores the saved selection")
@@ -378,6 +389,7 @@ def main(argv=None):
         command.add_argument("--mode",choices=("free",),help="Construction mode; free creation is the only mode and the default for create/submit")
         command.add_argument("--reviewer-provider",choices=list(WORKER_PROVIDERS))
         command.add_argument("--reviewer-model")
+        command.add_argument("--reviewer-context-window", type=int, default=None)
         command.add_argument("--reviewer-executable")
         command.add_argument("--reviewer-reasoning",choices=REASONING_EFFORTS)
         command.add_argument("--experiment",type=Path,help="Researcher-frozen Slim criteria and tests (JSON); omitted for automatic test design")
@@ -430,6 +442,8 @@ def main(argv=None):
             command.add_argument("--chrono-python",default=None)
     args=parser.parse_args(argv)
     harness_umask(args.workspace)
+    if args.context_window is not None and args.command not in {"create", "submit"}:
+        parser.error("Context window is selected at creation; resume preserves the saved setting")
     if args.author_visual_policy is not None and args.command not in {"create", "submit", "resume"}:
         parser.error("--author-visual-policy belongs to create/submit; resume preserves the saved policy")
     if args.command == "resume" and args.author_visual_policy is not None:
@@ -502,7 +516,7 @@ def main(argv=None):
             max_geometry_units=args.max_geometry_units or 2048,
             max_geometry_units_per_body=args.max_geometry_units_per_body or 128,
             audit_timeout_seconds=args.audit_timeout if args.audit_timeout is not None else 600)
-        result=start(args.workspace,args.project,task,title=args.title,scene_path=getattr(args,"scene",None),executable=args.codex,experiment_path=args.experiment,worker_provider=args.worker_provider,model=args.model,tier=selected_tier,task_adjustable=args.adjustable,reasoning=args.reasoning,reasoning_effort=args.reasoning_effort,budget_config=config,chrono_python=args.chrono_python,construction=args.construction,mode=mode,reviewer_provider=args.reviewer_provider,reviewer_model=args.reviewer_model,reviewer_executable=args.reviewer_executable,reviewer_reasoning=args.reviewer_reasoning,feedback_mode=args.feedback_mode,author_visual_policy=args.author_visual_policy)
+        result=start(args.workspace,args.project,task,title=args.title,scene_path=getattr(args,"scene",None),executable=args.codex,experiment_path=args.experiment,worker_provider=args.worker_provider,model=args.model,tier=selected_tier,task_adjustable=args.adjustable,reasoning=args.reasoning,reasoning_effort=args.reasoning_effort,budget_config=config,chrono_python=args.chrono_python,construction=args.construction,mode=mode,reviewer_provider=args.reviewer_provider,reviewer_model=args.reviewer_model,reviewer_executable=args.reviewer_executable,reviewer_reasoning=args.reviewer_reasoning,feedback_mode=args.feedback_mode,author_visual_policy=args.author_visual_policy,context_window=args.context_window,reviewer_context_window=args.reviewer_context_window)
     print(json.dumps({"status":result.get("status"),"issues":result.get("issues",[]),"attempt":result.get("attempt"),
                       "budget_timing":result.get("budget_timing"),"pending_tests":result.get("pending_tests")},ensure_ascii=False))
     return 0 if result.get("status") in {"PASS","READY","ready","RUNNING","ACTIVE_BUDGET_EXHAUSTED","BUDGET_EXHAUSTED"} else 2

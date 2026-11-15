@@ -25,6 +25,48 @@ PREFIX='simulation_ready_cad_workflow.validation_pipeline.slim_harness.construct
 
 
 class ConstructionSupervisorDeadlineTests(unittest.TestCase):
+    def test_reserved_first_pass_without_repair_time_does_not_spin(self):
+        from ..slim_harness.test_coverage import FirstPassReserveReached
+        with tempfile.TemporaryDirectory() as directory:
+            project = Path(directory) / '.runtime_runs/projects/reserved'
+            project.mkdir(parents=True)
+            write_json_atomic(project/'workflow.json', {'request': {}, 'revision': 1,
+                              'first_pass_handoff': True, 'phase': 'revision_needed'})
+            budget = Mock(); budget.activity.return_value = nullcontext()
+            result = {'status': 'NEEDS_REVISION', 'issues': ['DeliveryError: scene.json has not been delivered'],
+                      'complete_instance_pass': False}
+            with patch(PREFIX+'budget_for', return_value=budget), patch(PREFIX+'summary'), \
+                    patch('simulation_ready_cad_workflow.validation_pipeline.slim_harness.construction.author_turn_timeout',
+                          side_effect=FirstPassReserveReached('reserved for first coverage')), \
+                    patch('simulation_ready_cad_workflow.validation_pipeline.slim_harness.cli.resume_project',
+                          side_effect=[result, AssertionError('repeated unchanged revision')]) as resumed:
+                value = execute_project(Path(directory), project)
+            self.assertEqual(value['status'], 'INCOMPLETE_EVIDENCE')
+            self.assertTrue(value['first_pass_blocked'])
+            resumed.assert_called_once()
+            self.assertEqual(json.loads((project/'workflow.json').read_text())['revision'], 1)
+
+    def test_external_action_failure_stops_all_supervisor_routes_after_one_attempt(self):
+        for arm in (None, 'A'):
+            for kind in ('auth', 'response'):
+                with self.subTest(arm=arm, kind=kind), tempfile.TemporaryDirectory() as directory:
+                    project = Path(directory) / '.runtime_runs/projects/auth-failed'
+                    project.mkdir(parents=True)
+                    write_json_atomic(project / 'workflow.json', {'request': {'experiment_arm': arm}})
+                    budget = Mock(); budget.activity.return_value = nullcontext()
+                    budget.snapshot.return_value = {'remaining_seconds': 100}
+                    failure = {'status': 'provider_error', 'provider_error': {
+                        'kind': kind, 'message': 'Refresh token was revoked', 'needs_external_action': True}}
+                    with patch(PREFIX + 'budget_for', return_value=budget), \
+                            patch(PREFIX + 'summary'), \
+                            patch('simulation_ready_cad_workflow.validation_pipeline.slim_harness.cli.resume_project',
+                                  side_effect=[failure, AssertionError('Unexpected second attempt')]) as resumed:
+                        result = execute_project(Path(directory), project)
+                    resumed.assert_called_once()
+                    self.assertEqual(result, failure)
+                    self.assertEqual(json.loads((project / 'construction_result.json').read_text()), failure)
+                    self.assertNotIn('last_construction_feedback', json.loads((project / 'workflow.json').read_text()))
+
     def test_active_record_requires_this_workflow_identity_and_unique_stop_path(self):
         with tempfile.TemporaryDirectory() as directory:
             stop=Path(directory)/'sandbox-stop-owned.json'

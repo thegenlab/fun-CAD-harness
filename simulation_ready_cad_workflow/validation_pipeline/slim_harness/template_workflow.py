@@ -37,6 +37,22 @@ def retained_files(directory):
             and not {"__pycache__", ".git", ".runtime_runs"}.intersection(p.relative_to(directory).parts)]
 
 
+def source_model_failure(row):
+    """Authored domain or connection requirements need source revision, not binding repair."""
+    return (row.get('execution_status') == 'binding_or_execution_error'
+            and str(row.get('failure', {}).get('error', '')).startswith((
+                'SourcePhysicsError: EQUIVALENT_WORKING_RANGE_EXCEEDED ',
+                'SourcePhysicsError: EQUIVALENT_CONNECTION_RELEASED ')))
+
+
+def numerical_execution_failure(row):
+    """An unconverged native solve supplies revision feedback, never a physical verdict."""
+    return (row.get('execution_status') == 'binding_or_execution_error'
+            and str(row.get('failure', {}).get('error', '')).startswith((
+                'RuntimeError: Implicit resistance solve did not establish convergence: ',
+                'SourcePhysicsError: NONFINITE_BODY_STATE ')))
+
+
 def implementation_binding():
     """Bind loaded code, independently of the project data workspace."""
     import benchmark_templates
@@ -296,7 +312,8 @@ def run_revision(flow):
                                    attempt / "floating-parts.json")
         assembly_warnings.extend(finding["message"] for finding in (assembly or {}).get("findings", []))
         request = {"template": str(template_copy), "binding": str(binding), "plan": str(plan_file),
-                   "requested_parameters": adjustments.get("parameters", {})}
+                   "requested_parameters": adjustments.get("parameters", {}),
+                   "parameter_diagnostics": str(attempt / 'constructor-parameter-check.json')}
         prompt = (
             f"You are the independent Harness template reviewer and instance filler. Read {flow.workspace / 'benchmark_templates/AUTHORING_API.md'}. "
             + ("Write all newly authored explanations, parameter provenance, code comments and reports in English. "
@@ -314,6 +331,8 @@ def run_revision(flow):
                if config["mode"] == "free" else "The selected task template is fixed; do not rewrite it. ")
             + "The constructor owns difficulty and parameter decisions. Implement requested parameter values; "
             "record disagreement as advice, not a veto. Technical binding errors should be repaired in the binding. "
+            "Keep the selected template's operation modes: parameter notes do not authorize replacing them. "
+            "Do not ignore template input efforts in an actuator wrapper. "
             f"Requested decisions: {json.dumps(adjustments, ensure_ascii=False)}\n"
             "Write parameter_sources.json as an object keyed by each used PROTOCOL parameter, with "
             "value (the actual resolved value) and source (source file/geometry/task/constructor decision). "
@@ -367,6 +386,11 @@ def run_revision(flow):
             except BUDGET_ERRORS:
                 raise
             except Exception as exc:
+                parameter_report = Path(request['parameter_diagnostics'])
+                if parameter_report.is_file() and 'ConstructorParameterError:' in str(exc):
+                    diagnosed = read(parameter_report)
+                    if diagnosed.get('status') == 'invalid_constructor_parameters':
+                        return finish('NEEDS_REVISION', diagnosed['issues'], constructor_parameter_error=True)
                 if filling:
                     return finish("EVIDENCE_REQUIRED", [f"Reviewer binding failed technical precheck: {exc}"], template_binding_error=True)
                 prompt += f"\nThe binding's technical validation failed. Correct binding/provenance only: {exc}"
@@ -462,10 +486,20 @@ def run_revision(flow):
                 or implementation_binding() != implementation):
             return finish("HARNESS_ERROR", ["Source, filled template or implementation changed during validation"])
         technical = [row for row in summaries if row.get("execution_status") in
-                     {"binding_or_execution_error", "assessment_error", "HARNESS_ERROR"}]
+                     {"binding_or_execution_error", "assessment_error", "HARNESS_ERROR"}
+                     and not source_model_failure(row) and not numerical_execution_failure(row)]
         if technical:
             return finish("EVIDENCE_REQUIRED", ["Template binding or assessment requires technical repair", *technical],
                           template_binding_error=True)
+        numerical_failures = [row for row in summaries if numerical_execution_failure(row)]
+        if numerical_failures:
+            return finish("NEEDS_REVISION", ["Native execution did not converge; no physical verdict is available. "
+                          "Revise the source model or execution while retaining the task and solver acceptance gates",
+                          *numerical_failures], numerical_failure_unresolved=True)
+        source_failures = [row for row in summaries if source_model_failure(row)]
+        if source_failures:
+            return finish("NEEDS_REVISION", ["Authored equivalent model violated its domain or connection requirements; "
+                          "revise the source model or operation using justified source parameters", *source_failures])
         success = len(summaries) == len(plan["trials"]) and all(
             row["physical_pass"] and row["geometry_audit"].get("passed") is True for row in summaries)
         if flow.state.get("first_pass_handoff"):

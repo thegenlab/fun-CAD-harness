@@ -5,11 +5,12 @@ import os
 from pathlib import Path
 
 
-def bind_worker(worker, workspace, project, role, author_visual_policy=None):
-    from ..cold_start.claude_code_worker import ClaudeCodeWorker
+def bind_worker(worker, workspace, project, role, author_visual_policy=None, *, context_window=None):
+    from ..cold_start.claude_code_worker import ClaudeCodeWorker as DirectClaudeCodeWorker
     from ..cold_start.cursor_worker import CursorCliWorker
-    from ..cold_start.provider_workers import CodexAppWorker, KimiCliWorker
+    from ..cold_start.provider_workers import ClaudeCodeWorker, CodexAppWorker, KimiCliWorker
     from ..cold_start.worker import CodexCliWorker
+    from ..cold_start.dsh_worker import DshWorker
     from .budget import BudgetedWorker
     from .execution import formal_sandbox_required
 
@@ -22,10 +23,16 @@ def bind_worker(worker, workspace, project, role, author_visual_policy=None):
     anthropic = any(base.__name__ == 'AnthropicWorker'
         and base.__module__ == 'simulation_ready_cad_workflow.validation_pipeline.cold_start.anthropic_worker'
         for base in type(target).__mro__)
-    # These subclass CursorCliWorker; reject them before it is bound as client cursor.
-    if anthropic or isinstance(target, (CodexAppWorker, KimiCliWorker, ClaudeCodeWorker)):
-        raise ValueError('Formal sandbox execution currently supports the original Codex CLI and Cursor CLI only')
-    if isinstance(target, CodexCliWorker):
+    # The direct Claude Code worker subclasses CursorCliWorker; reject it before it is bound as client cursor.
+    if anthropic or isinstance(target, (CodexAppWorker, DirectClaudeCodeWorker)):
+        raise ValueError('Formal sandbox execution supports the original Codex, Cursor and Kimi CLIs, the sandboxed Claude Code client and CPU DSH SDK only')
+    if isinstance(target, ClaudeCodeWorker):
+        client = 'claude'
+    elif isinstance(target, KimiCliWorker):
+        client = 'kimi'
+    elif isinstance(target, DshWorker):
+        client = 'dsh'
+    elif isinstance(target, CodexCliWorker):
         client = 'codex'
     elif isinstance(target, CursorCliWorker):
         client = 'cursor'
@@ -36,6 +43,9 @@ def bind_worker(worker, workspace, project, role, author_visual_policy=None):
         raise ValueError('Formal worker role must be author or reviewer')
     workspace = Path(workspace).resolve()
     project = Path(project).resolve()
+    if context_window is not None and (type(context_window) is not int or context_window <= 0):
+        raise ValueError('Context window must be a positive integer')
+    target.context_window = context_window
     configured = os.environ.get('CADHARNESS_SANDBOX_CONFIG')
     config = Path(configured).expanduser() if configured else workspace / '.runtime_runs/benchmark_sandbox/runtime.json'
     if not config.is_absolute():

@@ -24,7 +24,9 @@ def model_binding(geometry):
 
 
 def worker_configuration(worker, project, workspace, readonly):
-    providers={'CodexCliWorker':'codex','CodexAppWorker':'codex_app','CursorCliWorker':'cursor','KimiCliWorker':'kimi','ClaudeCodeWorker':'claude_code','AnthropicWorker':'anthropic'}
+    providers={'DshWorker':'dsh','CodexCliWorker':'codex','CodexAppWorker':'codex_app','CursorCliWorker':'cursor','KimiCliWorker':'kimi','AnthropicWorker':'anthropic',
+               # Two workers share this name: the direct CLI ('claude_code') and the formal sandbox client ('claude').
+               'ClaudeCodeWorker':getattr(worker,'provider','claude_code')}
     data={'scope':'worker','revision':revision_from_path(workspace),'captured_ms':int(time.time()*1000),
           'worker':{'provider':providers.get(type(worker).__name__),'model':getattr(worker,'model',None),
                     'reasoning_effort':getattr(worker,'reasoning_effort',None),

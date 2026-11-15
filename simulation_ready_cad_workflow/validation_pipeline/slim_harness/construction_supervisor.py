@@ -138,17 +138,38 @@ def execute_project(workspace,project,*,executable='codex',one_revision=False,fe
                     result = _stopped_result(project, reason, result)
                     break
                 if one_revision:break
+                from .budget import provider_needs_external_action
+                if (result.get('needs_external_action')
+                        or provider_needs_external_action(result.get('provider_error'))):
+                    break
                 # A provider outage resumes the same session after a bounded backoff.
                 if result.get('status')=='provider_error' and provider_outage(result.get('provider_error')):
                     if outages>=PROVIDER_RECOVERY_RETRIES:break
                     _wait_for_provider(project,budget,outages);outages+=1
                     continue
                 outages=0
+                state=json.loads((Path(project)/'workflow.json').read_text())
                 provider=result.get('provider_error',{}).get('kind')
                 retryable=result.get('status') in {
                     'needs_revision','NEEDS_REVISION','unsupported','harness_defect','HARNESS_ERROR'} or (
                     result.get('status')=='provider_error' and provider in {'timeout','response'})
                 if not retryable:break
+                if state.get('first_pass_handoff'):
+                    from .construction import author_turn_timeout
+                    from .test_coverage import FirstPassReserveReached
+                    try:
+                        author_turn_timeout(project)
+                    except FirstPassReserveReached:
+                        # The reserved evaluation already ran. Retrying cannot
+                        # invoke an author and only copies the same failed design.
+                        result = {**result, 'status': 'INCOMPLETE_EVIDENCE',
+                                  'first_pass_blocked': True, 'complete_instance_pass': False,
+                                  'stop_reason': 'no_author_time_after_first_pass'}
+                        write_json_atomic(Path(project)/'runs'/f"r{int(state['revision']):02d}"/'result.json', result)
+                        state.update(phase='first_pass_blocked', stop_reason=result['stop_reason'],
+                                     active_turn={}, active_test=None)
+                        write_json_atomic(Path(project)/'workflow.json', state)
+                        break
                 # Preserve the same author session and evidence; allow a new
                 # strategy while time remains, instead of requiring a human
                 # resume for every incomplete author turn.

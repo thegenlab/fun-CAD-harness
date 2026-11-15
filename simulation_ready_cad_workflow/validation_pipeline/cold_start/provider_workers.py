@@ -12,6 +12,8 @@ from .cursor_worker import CursorCliWorker
 
 DEFAULT_KIMI_MODEL = "kimi-code/k3"
 DEFAULT_KIMI_EXECUTABLE = "kimi"
+DEFAULT_CLAUDE_MODEL = "claude-fable-5-1"
+DEFAULT_CLAUDE_EXECUTABLE = "claude"
 
 
 class _TransportWorker(CursorCliWorker):
@@ -99,3 +101,20 @@ class KimiCliWorker(_TransportWorker):
         self.requested_reasoning_effort = reasoning_effort
         super().__init__(model=model or DEFAULT_KIMI_MODEL, reasoning_effort=None,
                          executable=executable, session_id=session_id, disabled_features=disabled_features)
+
+
+class ClaudeCodeWorker(_TransportWorker):
+    """Original Claude Code CLI; supported only through the formal CPU sandbox."""
+
+    provider = "claude"
+    provider_label = "Claude Code"
+
+    def __init__(self, model=None, reasoning_effort=None, executable=DEFAULT_CLAUDE_EXECUTABLE,
+                 session_id=None, disabled_features: Sequence[str] | None = None):
+        # The sandbox applies the effort with the CLI's own --effort flag.
+        self.requested_reasoning_effort = reasoning_effort
+        super().__init__(model=model or DEFAULT_CLAUDE_MODEL, reasoning_effort=None,
+                         executable=executable, session_id=session_id, disabled_features=disabled_features)
+
+    def _command(self, *args, **kwargs):
+        raise RuntimeError("Claude Code turns run only inside the installed formal sandbox")

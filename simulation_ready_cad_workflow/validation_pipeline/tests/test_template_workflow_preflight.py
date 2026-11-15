@@ -107,6 +107,9 @@ class TemplateWorkflowPrecheckTests(unittest.TestCase):
         self.operations = []
         self.runtime_status = 'binding_or_execution_error'
         self.limits = []
+        self.runtime_error = 'fixture technical error'
+        self.constructor_issue = None
+        self.constructor_exception = 'ConstructorParameterError: parameter is below the fixed template minimum'
         class Capture:
             def __init__(self,*args,**kwargs): Path(args[1]).mkdir(parents=True,exist_ok=True)
             def __enter__(self): return self
@@ -143,7 +146,12 @@ class TemplateWorkflowPrecheckTests(unittest.TestCase):
             self.limits.append((operation,kwargs['timeout_seconds'],sorted(session['kind'] for session in sessions)))
         output = Path(request['output'])
         if operation == 'prepare' and self.prepare_exit is not None: return self.prepare_exit
-        if operation == 'plan': write(output,self.plan)
+        if operation == 'plan':
+            if self.constructor_issue:
+                diagnostics=request.get('parameter_diagnostics',str(self.root/'unreferenced-parameter-check.json'))
+                write(diagnostics,{'status':'invalid_constructor_parameters','issues':[self.constructor_issue]})
+                raise RuntimeError(self.constructor_exception)
+            write(output,self.plan)
         elif operation == 'prepare':
             write(output/'prepared.json',{'bodies':[{'id':'part'}]})
             write(output/'geometry/geometry.json',{'bodies':[{'id':'part'}]})
@@ -155,7 +163,7 @@ class TemplateWorkflowPrecheckTests(unittest.TestCase):
             write(output/'precheck.json',{'status':'ready','stepped':False})
         elif operation == 'run':
             write(output/'summary.json',{'trials':[{'id':request['trial'],'status':self.runtime_status,'checks':[],
-                                                  'functional_pass':None,'error':'fixture technical error'}]})
+                                                  'functional_pass':None,'error':self.runtime_error}]})
         else: raise AssertionError(operation)
         return SimpleNamespace(returncode=0,stdout=b'',stderr=b'')
 
@@ -210,6 +218,61 @@ class TemplateWorkflowPrecheckTests(unittest.TestCase):
     def test_capability_gap_from_prepare_remains_a_harness_error(self):
         result = self.failed_prepare('CAPABILITY_GAP: no native model for this joint')
         self.assertEqual(result['status'], 'HARNESS_ERROR')
+
+    def test_invalid_constructor_request_returns_to_author_without_second_judge(self):
+        self.constructor_issue={'parameter':'tail_gain','requested':0.0,'minimum':0.001}
+        result=workflow.run_revision(self.flow)
+        self.assertEqual(result['status'],'NEEDS_REVISION')
+        self.assertTrue(result['constructor_parameter_error'])
+        self.assertEqual(result['issues'],[self.constructor_issue])
+        self.assertEqual(self.review_calls,1)
+        self.assertFalse(any(op=='run' for op,_ in self.operations))
+
+    def test_parameter_diagnostics_do_not_hide_a_new_storage_failure(self):
+        self.constructor_issue={'parameter':'tail_gain','requested':0.0,'minimum':0.001}
+        self.constructor_exception='OSError: Disk quota exceeded'
+        result=workflow.run_revision(self.flow)
+        self.assertEqual(result['status'],'EVIDENCE_REQUIRED')
+        self.assertFalse(result.get('constructor_parameter_error',False))
+        self.assertIn('Disk quota exceeded',str(result['issues']))
+
+    def test_source_model_working_range_failure_returns_to_author(self):
+        self.runtime_error = "SourcePhysicsError: EQUIVALENT_WORKING_RANGE_EXCEEDED ['main_spring']"
+        result = workflow.run_revision(self.flow)
+        self.assertEqual(result['status'], 'NEEDS_REVISION')
+        self.assertFalse(result.get('template_binding_error', False))
+        self.assertTrue(all('EQUIVALENT_WORKING_RANGE_EXCEEDED' in row['failure']['error']
+                            for row in result['tests']))
+        self.assertEqual((self.design/'scene.json').read_bytes(), self.source_before)
+
+    def test_nonconvergence_returns_revision_feedback_without_physical_verdict(self):
+        self.runtime_error = "RuntimeError: Implicit resistance solve did not establish convergence: {'newton_iterations': 30}"
+        result = workflow.run_revision(self.flow)
+        self.assertEqual(result['status'], 'NEEDS_REVISION')
+        self.assertTrue(result['numerical_failure_unresolved'])
+        self.assertFalse(result.get('template_binding_error', False))
+        self.assertFalse(result['complete_instance_pass'])
+        self.assertTrue(all(row['failure']['functional_pass'] is None for row in result['tests']))
+
+    def test_released_equivalent_connection_returns_to_source_revision(self):
+        self.runtime_error='SourcePhysicsError: EQUIVALENT_CONNECTION_RELEASED hinge_friction_clutch'
+        result=workflow.run_revision(self.flow)
+        self.assertEqual(result['status'],'NEEDS_REVISION')
+        self.assertFalse(result.get('template_binding_error',False))
+
+    def test_nonfinite_state_returns_unresolved_numerical_feedback(self):
+        self.runtime_error='SourcePhysicsError: NONFINITE_BODY_STATE specimen'
+        result=workflow.run_revision(self.flow)
+        self.assertEqual(result['status'],'NEEDS_REVISION')
+        self.assertTrue(result['numerical_failure_unresolved'])
+        self.assertFalse(result['complete_instance_pass'])
+
+    def test_assessment_error_is_not_hidden_by_source_error_text(self):
+        self.runtime_status = 'assessment_error'
+        self.runtime_error = "SourcePhysicsError: EQUIVALENT_WORKING_RANGE_EXCEEDED ['main_spring']"
+        result = workflow.run_revision(self.flow)
+        self.assertEqual(result['status'], 'EVIDENCE_REQUIRED')
+        self.assertTrue(result['template_binding_error'])
 
     def test_data_catalogue_cannot_replace_loaded_implementation_provenance(self):
         data = self.root / 'data'

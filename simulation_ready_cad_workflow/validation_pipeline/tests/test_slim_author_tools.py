@@ -37,6 +37,24 @@ def build():
             "assertions":[{"id":"motion","purpose":"Downward motion","expression":"last(signal('moving.position.z_m')) < first(signal('moving.position.z_m'))"}]}] if with_tests else [])),encoding="utf-8")
         return source
 
+    def test_sandbox_draft_keeps_cached_obj_meshes_of_recent_attempts_only(self):
+        kept={}
+        for kind,workspace in (('ordinary',self.root/'ordinary'),('draft',self.root/'draft'/'.cadharness-draft')):
+            attempts=workspace/'.runtime_runs'/'author_tools'
+            for index in range(4):
+                folder=attempts/f'build-old{index}'/'geometry';folder.mkdir(parents=True)
+                (folder/'body.obj').write_bytes(b'cached mesh')
+                (folder/'assembly.glb').write_bytes(b'cached model')
+                (folder.parent/'capture.json').write_text(json.dumps({'started_ms':index}))
+                (folder.parent/'result.json').write_text('{"status":"BUILT"}')
+            source=workspace.parent/'scene.json';source.write_text('{"bodies":[]}')
+            result=run_tool('inspect',source,workspace=workspace)
+            self.assertEqual('DEVELOPMENT_FAILURE',result['status'])
+            kept[kind]=sorted(p.parent.parent.name for p in attempts.rglob('*.obj'))
+            self.assertEqual(4,len(list(attempts.rglob('*.glb'))))
+        self.assertEqual(['build-old0','build-old1','build-old2','build-old3'],kept['ordinary'])
+        self.assertEqual(['build-old2','build-old3'],kept['draft'])
+
     def test_named_parts_export_bodies_without_manual_solid_mapping(self):
         result=build_file(self.model(),self.root/"generated")
         scene=json.loads(Path(result["scene"]).read_text())

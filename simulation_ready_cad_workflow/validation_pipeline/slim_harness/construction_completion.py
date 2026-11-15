@@ -63,13 +63,17 @@ def _formal_cli_started(path,client,session_id):
                 if not isinstance(event,dict):continue
                 event=event.get('event',event)
                 if not isinstance(event,dict):continue
+                if client=='dsh' and event.get('method')=='session.event':
+                    params=event.get('params',{})
+                    if (not session_id or params.get('sessionId')==session_id) and params.get('event',{}).get('type') in {'step/start','request/header','assistant/message','turn/end'}:
+                        return True
                 kind=event.get('type')
                 if client=='codex' and kind in {'thread.started','turn.started','turn.completed','item.started','item.completed'}:
                     observed=event.get('thread_id')
                     if kind=='thread.started':
                         if isinstance(observed,str) and observed:return not session_id or observed==session_id
                     else:return True
-                if client=='cursor' and (kind in {'assistant','tool_call','result'}
+                if client in {'cursor','claude'} and (kind in {'assistant','tool_call','result'}
                         or kind=='system' and event.get('subtype')=='init'):
                     observed=event.get('session_id')
                     if isinstance(observed,str) and observed:return not session_id or observed==session_id
@@ -80,12 +84,17 @@ def _formal_cli_started(path,client,session_id):
 
 def _formal_cli_usage(turn,receipt_path):
     receipt=_read(receipt_path)
-    if receipt.get('schema_version')!=1 or receipt.get('client') not in {'codex','cursor'}:
+    if receipt.get('schema_version')!=1 or receipt.get('client') not in {'codex','cursor','dsh','claude'}:
         return None
     if not _formal_cli_started(turn/'events.jsonl',receipt['client'],receipt.get('session_id')):
         return None
     response=_read(turn/'response.json')
-    usage=normalize_token_usage(response.get('usage')) or _event_usage(turn/'events.jsonl')
+    if receipt['client']=='dsh':
+        from ..benchmark_sandbox.dsh_events import outcome
+        from ..benchmark_sandbox.formal_state import original_events
+        usage=normalize_token_usage(outcome(original_events(turn/'events.jsonl',allow_incomplete=True))['usage'])
+    else:
+        usage=normalize_token_usage(response.get('usage')) or _event_usage(turn/'events.jsonl')
     return {'call_id':receipt.get('call_id') or turn.name,'usage':usage,
         'status':'completed' if receipt.get('client_completed') is True else receipt.get('status','incomplete'),
         'record_path':str(receipt_path)}

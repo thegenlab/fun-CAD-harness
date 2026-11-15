@@ -96,6 +96,10 @@ def run_tool(command, source, *, workspace, project=None, output=None, test_id=N
     root = workspace / ".runtime_runs" / "author_tools"
     root.mkdir(parents=True, exist_ok=True)
     attempt = Path(tempfile.mkdtemp(prefix=f"{command}-", dir=root))
+    if workspace.name == ".cadharness-draft":
+        # A sandbox draft is carried between turns; only recent attempts keep cached OBJ meshes.
+        from .draft_meshes import prune_older_attempt_meshes
+        prune_older_attempt_meshes(root, attempt, source.parent)
     started = time.monotonic()
     result = {"schema_version": "slim_author_tool_result_v1", "command": command,
               "source": str(source), "attempt": str(attempt), "certified": False,

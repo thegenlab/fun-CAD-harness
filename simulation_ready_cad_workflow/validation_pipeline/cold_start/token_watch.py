@@ -42,7 +42,11 @@ _USAGE_ALIASES = {
     "cache_read_input_tokens": "cached_input_tokens",
     "cache_creation_input_tokens": "cache_write_input_tokens",
     "reasoningOutputTokens": "reasoning_output_tokens",
+    "reasoningTokens": "reasoning_output_tokens",
     "totalTokens": "total_tokens",
+    # Anthropic Messages / Claude Code: input_tokens excludes both cache fields.
+    "cache_read_input_tokens": "cached_input_tokens",
+    "cache_creation_input_tokens": "cache_write_input_tokens",
 }
 _SEPARATE_CACHE_KEYS = ("cacheReadTokens", "cacheWriteTokens", "cache_read_input_tokens", "cache_creation_input_tokens")
 

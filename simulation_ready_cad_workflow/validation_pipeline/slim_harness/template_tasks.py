@@ -48,6 +48,32 @@ def requested_parameter_value(value):
     return value
 
 
+class ConstructorParameterError(ValueError):
+    def __init__(self, parameter, value, reason):
+        self.issue = {'parameter': parameter.name, 'requested': value,
+                      'minimum': parameter.minimum, 'maximum': parameter.maximum,
+                      'choices': parameter.choices, 'unit': parameter.unit, 'reason': str(reason)}
+        super().__init__('Constructor parameter violates the selected template contract: ' + parameter.name)
+
+
+def constructor_protocol_values(parameters, protocol, requested):
+    """Validate author choices only when the selected template actually reads them."""
+    from benchmark_templates.runtime import ProtocolValues
+
+    class Values(ProtocolValues):
+        def __getitem__(self, name):
+            if name in requested and name in self.parameters:
+                parameter = self.parameters[name]
+                value = requested_parameter_value(requested[name])
+                try:
+                    parameter.resolve({name: value})
+                except ValueError as error:
+                    raise ConstructorParameterError(parameter, value, error) from error
+            return super().__getitem__(name)
+
+    return Values(parameters, protocol)
+
+
 def constructor_parameters_match(protocol, requested):
     """Compare used protocol values to constructor decisions.
 
@@ -202,8 +228,15 @@ def main():
         cad_native.build_native = tracked_build
     template_module = runtime.load_source_module(request["template"])
     binding = runtime.load_source_module(request["binding"])
-    values = runtime.ProtocolValues(template_module.PARAMETERS, binding.PROTOCOL)
-    template = template_module.build(values).validate()
+    values = constructor_protocol_values(template_module.PARAMETERS, binding.PROTOCOL,
+                                         request.get('requested_parameters') or {})
+    try:
+        template = template_module.build(values).validate()
+    except ConstructorParameterError as error:
+        if request.get('parameter_diagnostics'):
+            write_json_atomic(Path(request['parameter_diagnostics']), {
+                'status': 'invalid_constructor_parameters', 'issues': [error.issue]})
+        raise
     protocol = dict(values.used)
     if not constructor_parameters_match(protocol, request.get("requested_parameters") or {}):
         raise ValueError("Reviewer binding did not implement the constructor's parameter decision")

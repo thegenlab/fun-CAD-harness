@@ -312,8 +312,11 @@ class CursorCliStartTests(unittest.TestCase):
     def test_create_persists_cursor_provider_and_default_model(self) -> None:
         with tempfile.TemporaryDirectory() as directory:
             workspace = Path(directory)
+            # Stub the supervisor as well: a free-creation start would otherwise launch a real agent run.
             with patch("simulation_ready_cad_workflow.validation_pipeline.slim_harness.cli.initialize_project",
-                       return_value={"status": "ready"}):
+                       return_value={"status": "ready"}), \
+                    patch("simulation_ready_cad_workflow.validation_pipeline.slim_harness.construction_supervisor.supervise_project",
+                          return_value={"status": "ready"}):
                 start(workspace, "cursor-machine", "A slider must move.", worker_provider="cursor")
             request = json.loads((workspace / ".runtime_runs" / "projects" / "cursor-machine" / "workflow.json").read_text())["request"]
             self.assertEqual("cursor", request["worker_provider"])

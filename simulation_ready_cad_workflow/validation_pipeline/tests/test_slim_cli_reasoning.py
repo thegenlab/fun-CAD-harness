@@ -53,6 +53,17 @@ class CliReasoningTests(unittest.TestCase):
         _,workflow=self.invoke(["resume","machine"])
         self.assertEqual("high",workflow.call_args.kwargs["reasoning"])
 
+    def test_context_windows_persist_through_resume(self):
+        self.invoke(["--context-window", "1000000", "create", "--mode", "free", "--project", "window",
+                     "--brief", "A slider must move.", "--reviewer-context-window", "1000000"])
+        self.assertEqual(self.request("window")["context_window"], 1000000)
+        self.assertEqual(self.request("window")["reviewer_context_window"], 1000000)
+        self.invoke(["resume", "window"])
+        self.assertEqual(self.request("window")["context_window"], 1000000)
+        self.assertEqual(self.request("window")["reviewer_context_window"], 1000000)
+        with self.assertRaises(SystemExit):
+            self.invoke(["--context-window", "128000", "resume", "window"])
+
     def test_submit_max_keeps_setting_without_calling_initial_worker(self):
         (self.workspace/"part.step").write_text("copy-only fixture; not geometric evidence")
         scene=self.workspace/"scene.json"

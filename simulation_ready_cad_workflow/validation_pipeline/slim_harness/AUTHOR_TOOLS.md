@@ -79,6 +79,11 @@ source is saved before execution; declared dependencies are saved once `build()`
 returns its Asset, before validating/exporting its parts. Sources
 and local helpers must be under the scene/model directory. Preview/check/simulate
 do not modify the live design, formal attempts or published results.
+In a sandbox draft workspace only the three most recent command directories
+keep their cached OBJ meshes. Older finished build/preview/check directories
+keep their source snapshot, reports, logs and GLB, and a build or check on the
+source regenerates meshes. A directory with a saved simulation request keeps
+its meshes, so `audit` on that request still works.
 Do not count a development check as an independent benchmark attempt; include its
 cost in the enclosing author session/experiment cost.
 

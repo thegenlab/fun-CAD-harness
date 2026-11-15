@@ -8,6 +8,7 @@ import os
 from pathlib import Path
 import shutil
 import sys
+import tempfile
 import time
 from datetime import datetime, timezone
 from typing import Any
@@ -198,8 +199,8 @@ class SlimWorkflow:
         self.reviewer=create_worker(provider=reviewer_provider,model=reviewer_model,reasoning_effort=reviewer_reasoning,executable=reviewer_executable)
         from .sandbox_binding import bind_worker
         if self.author is not None:
-            self.author=bind_worker(self.author,self.workspace,self.project,'author',settings.get('author_visual_policy','full'))
-        self.reviewer=bind_worker(self.reviewer,self.workspace,self.project,'reviewer')
+            self.author=bind_worker(self.author,self.workspace,self.project,'author',settings.get('author_visual_policy','full'),context_window=settings.get('context_window'))
+        self.reviewer=bind_worker(self.reviewer,self.workspace,self.project,'reviewer',context_window=settings.get('reviewer_context_window'))
         if self.author is not None:
             self.author=self.budget.worker(self.author)
         self.reviewer=self.budget.worker(self.reviewer)
@@ -748,6 +749,26 @@ class SlimWorkflow:
         write_json_atomic(baseline,definition)
         return None
 
+    def _new_revision_design(self):
+        previous=self.project/'runs'/f"r{int(self.state['revision']):02d}"/'design'
+        revision=int(self.state['revision'])+1
+        design=self.project/'runs'/f'r{revision:02d}'/'design'
+        if design.exists():raise RuntimeError('Next revision already exists; preserve it')
+        # Failed copies must not occupy a canonical revision. All copied bytes
+        # remain in the previous design until the complete copy is published.
+        design.parent.mkdir(parents=True,exist_ok=True)
+        from .draft_meshes import revision_copy_ignore,share_derived_meshes
+        with tempfile.TemporaryDirectory(prefix='.revision-copy-',dir=design.parent) as temporary:
+            staged=Path(temporary)/'design'
+            shutil.copytree(previous,staged,ignore=revision_copy_ignore(previous))
+            # Cached draft meshes are not copied: the new revision gets hard links,
+            # so both revisions keep their recorded paths with one copy of the bytes.
+            # Linking before the rename keeps an interrupted revision out of runs/.
+            share_derived_meshes(previous,staged)
+            staged.rename(design)
+        self.publish('author',revision=revision,active_test=None)
+        return design
+
     def _budget_revision(self, design, feedback):
         """Let the author choose the tradeoff after bounded task-change advice."""
         from .feedback_ablation import transform_feedback
@@ -970,12 +991,11 @@ class SlimWorkflow:
                     self.publish("evidence_collection" if result["status"]=="EVIDENCE_REQUIRED" else "harness_repair" if result["status"]=="HARNESS_ERROR" else "revision_needed",
                                  stop_reason=result["status"],active_test=None)
                     return result
-                previous=run/"design"
-                revision=int(self.state["revision"])+1
-                design=self.project/"runs"/f"r{revision:02d}"/"design"
-                if design.exists(): raise RuntimeError("Next revision already exists; preserve it")
-                shutil.copytree(previous,design,ignore=shutil.ignore_patterns("__pycache__",".presim_gate"))
-                self.publish("author",revision=revision,active_test=None)
+                # Check the existing author reserve before copying a potentially
+                # large design/draft tree for a turn that cannot be started.
+                if self.building:
+                    author_turn_timeout(self.project)
+                design=self._new_revision_design()
                 from .task_adaptation import adjustment_allowed
                 if self.template_mode or self.budget_tracker is not None or adjustment_allowed(self.state):
                     outcome=self._budget_revision(design,result)
